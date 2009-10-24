@@ -20,9 +20,9 @@ private:
     cUPnPWebServer(const char* root = "/");
 protected:
     bool enable(bool enable);
-    static void free();
 public:
     bool init();
+    bool uninit();
     static cUPnPWebServer* getInstance(const char* rootdir = "/");
     virtual ~cUPnPWebServer();
 //};

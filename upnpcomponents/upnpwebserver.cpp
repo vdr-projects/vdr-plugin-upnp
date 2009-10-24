@@ -95,7 +95,7 @@ cUPnPWebServer::cUPnPWebServer(const char* root) : mRootdir(root) {
 }
 
 cUPnPWebServer::~cUPnPWebServer(){
-    delete this->mRootdir;
+    delete [] this->mRootdir;
 }
 
 cUPnPWebServer* cUPnPWebServer::mInstance = NULL;
@@ -136,6 +136,13 @@ bool cUPnPWebServer::init(){
     return true;
 }
 
+bool cUPnPWebServer::uninit(){
+    MESSAGE("Disabling the internal webserver");
+    UpnpEnableWebserver(FALSE);
+
+    MESSAGE("Closing open file transfers");
+}
+
 cUPnPWebServer* cUPnPWebServer::getInstance(const char* rootdir){
     if(cUPnPWebServer::mInstance == NULL)
         cUPnPWebServer::mInstance = new cUPnPWebServer(rootdir);
@@ -144,10 +151,6 @@ cUPnPWebServer* cUPnPWebServer::getInstance(const char* rootdir){
         return cUPnPWebServer::mInstance;
     }
     else return NULL;
-}
-
-void cUPnPWebServer::free(){
-    delete cUPnPWebServer::mInstance;
 }
 
 int cUPnPWebServer::getInfo(const char* filename, File_Info* info){

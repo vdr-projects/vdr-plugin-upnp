@@ -20,7 +20,7 @@
 #define PK_RESOURCES                    TOSTRING(2)
 #define PK_SEARCHCLASSES                TOSTRING(3)
 
-#define SQLITE_FIRST_CUSTOMID           TOSTRING(0)
+#define SQLITE_FIRST_CUSTOMID           TOSTRING(100)
 
 #define SQLITE_COLUMN_NAME_LENGTH       64
 

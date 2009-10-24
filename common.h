@@ -262,6 +262,8 @@ enum UPNP_RESOURCE_TYPES {
  *
  ****************************************************/
 
+#define UPNP_WEB_MAX_FILE_HANDLES    512
+
 #define UPNP_WEB_PRESENTATION_URL    "/index.html"
 #define UPNP_WEB_SERVER_ROOT_DIR     UPNP_DIR_PRESENTATION
 

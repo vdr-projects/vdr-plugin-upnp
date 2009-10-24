@@ -186,16 +186,27 @@ int cMediaDatabase::prepareDatabase(){
         Radio->addSearchClass(AudioBCClass);
         Radio->setSearchable(true);
         if(this->mFactory->saveObject(Radio)) return -1;
+
+        cUPnPClassContainer* CustomVideos = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("User videos"));
+        CustomVideos->setID(6);
+        Video->addObject(CustomVideos);
+        CustomVideos->addSearchClass(VideoClass);
+        CustomVideos->setSearchable(true);
+        if(this->mFactory->saveObject(CustomVideos)) return -1;
     }
     return 0;
 }
 
 int cMediaDatabase::loadChannels(){
-    MESSAGE("Loading channels from Database");
+    MESSAGE("Loading channels");
     cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
     if(TV){
         // Iterating channels
         cList<cUPnPClassObject>* List = TV->getObjectList();
+        bool noResource = false;
+        // TODO: Add to setup
+        // if an error occured while loading resources, add the channel anyway
+        bool addWithoutResources = false;
         for(cChannel* Channel = Channels.First(); Channel; Channel = Channels.Next(Channel)){
             bool inList = false;
             for(cUPnPClassVideoBroadcast* Child = (cUPnPClassVideoBroadcast*)List->First();
@@ -205,6 +216,7 @@ int cMediaDatabase::loadChannels(){
             }
             if(!inList){
                 if(!Channel->GroupSep()){
+                    noResource = false;
                     tChannelID ChannelID = Channel->GetChannelID();
                     MESSAGE("Adding channel '%s' ID:%s", Channel->Name(), *ChannelID.ToString());
                     cUPnPClassVideoBroadcast* ChannelItem;
@@ -215,9 +227,14 @@ int cMediaDatabase::loadChannels(){
                     if(Channel->Alang(0)){
                         ChannelItem->setLanguage(Channel->Alang(0));
                     }
-                    cUPnPResources::getInstance()->createFromChannel(ChannelItem, Channel);
-                    TV->addObject(ChannelItem);
-                    if(this->mFactory->saveObject(ChannelItem)) return -1;
+                    if(cUPnPResources::getInstance()->createFromChannel(ChannelItem, Channel)){
+                        ERROR("Unable to get resources for this channel");
+                        noResource = true;
+                    }
+                    if(noResource && addWithoutResources) {
+                        TV->addObject(ChannelItem);
+                        if(this->mFactory->saveObject(ChannelItem)) return -1;
+                    }
                 }
                 else {
                     MESSAGE("Skipping group '%s'", Channel->Name());
@@ -233,6 +250,18 @@ int cMediaDatabase::loadChannels(){
     }
     return 0;
 }
+
+//int cMediaDatabase::loadRecordings(){
+//    MESSAGE("Loading recordings");
+//    cUPnPClassContainer* Records = (cUPnPClassContainer*)this->getObjectByID(4);
+//    if(Records){
+//        // Iterating channels
+//        cList<cUPnPClassObject>* List = Records->getObjectList();
+//        for(cRecording* Record = Recordings.First(); Record; Record = Recordings.Next(Record)){
+//
+//        }
+//    }
+//}
 
 void cMediaDatabase::Action(){
     time_t LastEPGUpdate = 0;

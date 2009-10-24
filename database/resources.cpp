@@ -101,6 +101,12 @@ int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel
     }
 
     DLNAProfile* Profile = cDlna::getInstance()->getProfileOfChannel(Channel);
+
+    if(!Profile){
+        ERROR("No profile found for Channel %s", *Channel->GetChannelID().ToString());
+        return -1;
+    }
+
     const char* ProtocolInfo = cDlna::getInstance()->getProtocolInfo(Profile);
 
     MESSAGE("Protocol info: %s", ProtocolInfo);

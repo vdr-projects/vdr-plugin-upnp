@@ -186,6 +186,10 @@ bool cUPnPServer::uninit(void) {
     MESSAGE("Closing metadata database");
     delete this->mMediaDatabase; this->mMediaDatabase = NULL;
 
+    MESSAGE("Closing the web server");
+    this->mWebServer->uninit();
+    delete this->mWebServer;
+
     MESSAGE("Close Intel SDK");
     // unregiser media server device from UPnP SDK
     int ret = UpnpUnRegisterRootDevice(this->mDeviceHandle);
