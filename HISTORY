@@ -1,0 +1,16 @@
+VDR Plugin 'upnp' Revision History
+----------------------------------
+
+2009-10-23: Version 0.0.1-alpha1
+
+- Fixed #185: Database rejected statements with single quotes inside strings
+
+2009-10-23: Version 0.0.1-alpha0
+
+- Initial revision.
+- Known limitations: currently only channel lists with less than 30 channels
+  work.
+- LiveTV support
+- Limited sort capabilities: Title, Creator, Write status, Publisher,
+  Description, Long description, Genre
+  Note: Sort will only work if this properties are present
