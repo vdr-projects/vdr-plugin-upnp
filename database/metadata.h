@@ -51,6 +51,8 @@ public:
     const char*  getContainerUpdateIDs();
     cMediaDatabase();
     virtual ~cMediaDatabase();
+    int addFastFind(cUPnPClassObject* Object, const char* FastFind);
+    cUPnPClassObject* getObjectByFastFind(const char* FastFind);
     cUPnPClassObject* getObjectByID(cUPnPObjectID ID);
     int browse(OUT cUPnPResultSet** Results, IN const char* ID, IN bool BrowseMetadata, IN const char* Filter = "*", IN unsigned int Offset = 0, IN unsigned int Count = 0, IN const char* SortCriteria = "");
     int search(OUT cUPnPResultSet** Results, IN const char* ID, IN const char* Search, IN const char* Filter = "*", IN unsigned int Offset = 0, IN unsigned int Count = 0, IN const char* SortCriteria = "");

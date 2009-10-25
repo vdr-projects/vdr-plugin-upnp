@@ -16,6 +16,7 @@
 #include <vdr/channels.h>
 #include <vdr/epg.h>
 #include <upnp/upnp.h>
+#include <vdr/device.h>
 
 #define KEY_SYSTEM_UPDATE_ID        "SystemUpdateID"
 
@@ -51,6 +52,10 @@ bool cMediaDatabase::init(){
         ERROR("Loading channels failed");
         return false;
     }
+//    if(this->loadRecordings()){
+//        ERROR("Loading records failed");
+//        return false;
+//    }
     return true;
 }
 
@@ -101,18 +106,65 @@ cUPnPObjectID cMediaDatabase::getNextObjectID(){
     }
     cRows* Rows = this->mDatabase->getResultRows();
     cRow* Row;
+    int ret = 0;
     if(!Rows->fetchRow(&Row)){
         ERROR("No rows found");
-        return 0;
+        ret = 0;
     }
-    while(Row->fetchColumn(&Column, &Value)){
-        if(!strcasecmp(Column, "Key")){
-            this->mLastInsertObjectID = atoi(Value);
-            return this->mLastInsertObjectID;
+    else {
+        while(Row->fetchColumn(&Column, &Value)){
+            if(!strcasecmp(Column, "Key")){
+                this->mLastInsertObjectID = atoi(Value);
+                ret = this->mLastInsertObjectID;
+            }
         }
     }
     delete Rows;
+    return ret;
+}
+
+int cMediaDatabase::addFastFind(cUPnPClassObject* Object, const char* FastFind){
+    if(!Object || !FastFind){
+        MESSAGE("Invalid fast find parameters");
+        return -1;
+    }
+    cString Statement = cString::sprintf("INSERT OR REPLACE INTO %s (%s, %s) VALUES ('%s', '%s')",
+            SQLITE_TABLE_ITEMFINDER,
+            SQLITE_COL_OBJECTID,
+            SQLITE_COL_ITEMFINDER,
+            *Object->getID(),
+            FastFind
+                                        );
+    if(this->mDatabase->execStatement(Statement)){
+        ERROR("Error while executing statement");
+        return -1;
+    }
     return 0;
+}
+
+cUPnPClassObject* cMediaDatabase::getObjectByFastFind(const char* FastFind){
+    if(!FastFind) return NULL;
+    MESSAGE("Try to find Object with identifier %s", FastFind);
+    cString Statement, Column, Value;
+    const char* Format = "SELECT %s FROM %s WHERE %s='%s'";
+    Statement = cString::sprintf(Format, SQLITE_COL_OBJECTID, SQLITE_TABLE_ITEMFINDER, SQLITE_COL_ITEMFINDER, FastFind);
+    if(this->mDatabase->execStatement(Statement)){
+        ERROR("Error while executing statement");
+        return 0;
+    }
+    cRows* Rows = this->mDatabase->getResultRows();
+    cRow* Row;
+    if(!Rows->fetchRow(&Row)){
+        ERROR("No rows found");
+        return NULL;
+    }
+    while(Row->fetchColumn(&Column, &Value)){
+        if(!strcasecmp(Column, SQLITE_COL_OBJECTID)){
+            return this->getObjectByID(atoi(Value));
+        }
+    }
+    delete Rows;
+    return NULL;
 }
 
 cUPnPClassObject* cMediaDatabase::getObjectByID(cUPnPObjectID ID){
@@ -201,25 +253,38 @@ int cMediaDatabase::loadChannels(){
     MESSAGE("Loading channels");
     cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
     if(TV){
-        // Iterating channels
-        cList<cUPnPClassObject>* List = TV->getObjectList();
         bool noResource = false;
         // TODO: Add to setup
         // if an error occured while loading resources, add the channel anyway
         bool addWithoutResources = false;
-        for(cChannel* Channel = Channels.First(); Channel; Channel = Channels.Next(Channel)){
+        cChannel* Channel = NULL;
+        for(int Index = 0; (Channel = Channels.Get(Index)); Index = Channels.GetNextNormal(Index)){
+            // Iterating the channels
+//        for(Channel = Channels.First(); Channel; Channel = Channels.(Channel)){
             bool inList = false;
-            for(cUPnPClassVideoBroadcast* Child = (cUPnPClassVideoBroadcast*)List->First();
-                Child;
-                Child = (cUPnPClassVideoBroadcast*)List->Next(Child)){
-                if(!strcasecmp(Child->getChannelName(),Channel->Name())){ inList = true; break; }
-            }
+
+            tChannelID ChannelID = Channel->GetChannelID();
+            MESSAGE("Determine if the channel %s is already listed", *ChannelID.ToString());
+            cUPnPClassVideoBroadcast* ChannelItem = NULL;
+
+            ChannelItem = (cUPnPClassVideoBroadcast*)this->getObjectByFastFind(ChannelID.ToString());
+
+            inList = (ChannelItem && TV->getObject(ChannelItem->getID())) ? true : false;
+            
             if(!inList){
-                if(!Channel->GroupSep()){
+                if(Channel->GroupSep()){
+                    MESSAGE("Skipping group '%s'", Channel->Name());
+                    // Skip channel groups
+                    // Channel groups may be supported theoretically. However, DLNA states that a tuner needs
+                    // a consecutive list of channels. A simple work-around may be a virtual tuner for each group.
+                }
+                else if(Channel->Vpid()==0){
+                    // TODO: add radio support
+                    MESSAGE("Skipping radio '%s'", Channel->Name());
+                }
+                else {
                     noResource = false;
-                    tChannelID ChannelID = Channel->GetChannelID();
                     MESSAGE("Adding channel '%s' ID:%s", Channel->Name(), *ChannelID.ToString());
-                    cUPnPClassVideoBroadcast* ChannelItem;
                     ChannelItem = (cUPnPClassVideoBroadcast*)this->mFactory->createObject(UPNP_CLASS_VIDEOBC, Channel->Name());
                     ChannelItem->setChannelName(Channel->Name());
                     ChannelItem->setChannelNr(Channel->Number());
@@ -231,16 +296,15 @@ int cMediaDatabase::loadChannels(){
                         ERROR("Unable to get resources for this channel");
                         noResource = true;
                     }
-                    if(noResource && addWithoutResources) {
+                    if(!noResource || addWithoutResources) {
                         TV->addObject(ChannelItem);
-                        if(this->mFactory->saveObject(ChannelItem)) return -1;
+                        if(this->mFactory->saveObject(ChannelItem) ||
+                           this->addFastFind(ChannelItem, ChannelID.ToString())){
+                            this->mFactory->deleteObject(ChannelItem);
+                            return -1;
+                        }
+                        MESSAGE("Successfuly added channel");
                     }
-                }
-                else {
-                    MESSAGE("Skipping group '%s'", Channel->Name());
-                    // Skip channel groups
-                    // Channel groups may be supported theoretically. However, DLNA states that a tuner needs
-                    // a consecutive list of channels. A simple work-around may be a virtual tuner for each group.
                 }
             }
             else {
@@ -255,12 +319,38 @@ int cMediaDatabase::loadChannels(){
 //    MESSAGE("Loading recordings");
 //    cUPnPClassContainer* Records = (cUPnPClassContainer*)this->getObjectByID(4);
 //    if(Records){
-//        // Iterating channels
-//        cList<cUPnPClassObject>* List = Records->getObjectList();
-//        for(cRecording* Record = Recordings.First(); Record; Record = Recordings.Next(Record)){
+//        cRecording* Recording = NULL;
+//        for(Recording = Recordings.First(); Recording; Recording = Recordings.Next(Recording)){
+//            // Iterating the records
+//            bool inList = false;
 //
+//            MESSAGE("Determine if the channel %s is already listed", Recording->FileName());
+//            const cRecordingInfo* RecInfo = Recording->Info();
+//
+//            MESSAGE("%s", *RecInfo->Components()->Component(0)->ToString());
+//            cUPnPClassMovie *MovieItem = NULL;
+//
+//            MovieItem = (cUPnPClassMovie*)this->getObjectByFastFind(Recording->FileName());
+//
+//            inList = (MovieItem && Records->getObject(MovieItem->getID())) ? true : false;
+//
+//            if(inList){
+//
+//                MESSAGE("Adding movie '%s' File name:%s", RecInfo->Title(), Recording->FileName());
+//
+//                MovieItem = (cUPnPClassMovie*)this->mFactory->createObject(UPNP_CLASS_MOVIE, RecInfo->Title());
+//                MovieItem->setDescription(RecInfo->ShortText());
+//                MovieItem->setLongDescription(RecInfo->Description());
+//                MovieItem->setStorageMedium(UPNP_STORAGE_HDD);
+//
+//
+//            }
+//            else {
+//                MESSAGE("Skipping %s, already in Database", Recording->FileName());
+//            }
 //        }
 //    }
+//    return 0;
 //}
 
 void cMediaDatabase::Action(){

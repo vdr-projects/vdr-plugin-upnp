@@ -169,6 +169,7 @@ void cSQLiteDatabase::startTransaction(){
         }
     }
     this->execStatement("BEGIN TRANSACTION");
+    MESSAGE("Start new transaction");
     this->mActiveTransaction = true;
 }
 
@@ -185,6 +186,7 @@ void cSQLiteDatabase::rollbackTransaction(){
 int cSQLiteDatabase::initializeTables(){
     int ret = 0;
     this->startTransaction();
+    if(this->execStatement(SQLITE_CREATE_TABLE_ITEMFINDER)==-1) ret = -1;
     if(this->execStatement(SQLITE_CREATE_TABLE_SYSTEM)==-1) ret = -1;
     if(this->execStatement(SQLITE_CREATE_TABLE_PRIMARY_KEYS)==-1) ret = -1;
     if(this->execStatement(SQLITE_CREATE_TABLE_ALBUMS)==-1) ret = -1;
@@ -213,6 +215,7 @@ int cSQLiteDatabase::initializeTables(){
 int cSQLiteDatabase::initializeTriggers(){
     int ret = 0;
     this->startTransaction();
+    if(this->execStatement(SQLITE_TRIGGER_D_OBJECTS_ITEMFINDER)==-1) ret = -1;
     if(this->execStatement(SQLITE_TRIGGER_UPDATE_SYSTEM)==-1) ret = -1;
     if(this->execStatement(SQLITE_TRIGGER_UPDATE_OBJECTID)==-1) ret = -1;
     if(this->execStatement(SQLITE_TRIGGER_D_AUDIOITEMS_AUDIOBROADCASTS)==-1) ret = -1;

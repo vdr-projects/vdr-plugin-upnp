@@ -104,6 +104,7 @@ class cUPnPClassObject : public cListObject {
     friend class cUPnPObjectMediator;
     friend class cUPnPClassContainer;
 private:
+    cUPnPObjectID           mLastID;
     bool                    mDeleted;                                           // is this Objected marked as deleted
 protected:
     time_t                  mLastModified;
@@ -269,6 +270,28 @@ public:
     const char* getProducers() const { return this->mProducers; }
     const char* getDirectors() const { return this->mDirectors; }
     const char* getRating() const { return this->mRating; }
+};
+
+class cUPnPClassMovie : public cUPnPClassVideoItem {
+    friend class cMediaDatabase;
+    friend class cUPnPObjectMediator;
+    friend class cUPnPMovieMediator;
+protected:
+    int          mDVDRegionCode;
+    cString      mStorageMedium;
+    cUPnPClassMovie();
+public:
+    virtual ~cUPnPClassMovie();
+    //virtual cString createDIDLFragment(cStringList* Filter);
+    virtual cStringList* getPropertyList();
+    virtual bool setProperty(const char* Property, const char* Value);
+    virtual bool getProperty(const char* Property, char** Value) const;
+    /******** Setter ********/
+    int setDVDRegionCode(int RegionCode);
+    int setStorageMedium(const char* StorageMedium);
+    /******** Getter ********/
+    int getDVDRegionCode() const { return this->mDVDRegionCode; }
+    const char* getStorageMedium() const { return this->mStorageMedium; }
 };
 
 class cUPnPClassVideoBroadcast : public cUPnPClassVideoItem {

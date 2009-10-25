@@ -12,8 +12,8 @@
 #include <vdr/tools.h>
 #include "../common.h"
 
-//#define SQLITE_PRINT_STATEMENTS
-//#define SQLITE_PRINT_FETCHES
+#define SQLITE_PRINT_STATEMENTS
+#define SQLITE_PRINT_FETCHES
 #define SQLITE_CASCADE_DELETES
 
 #define PK_OBJECTS                      TOSTRING(1)
@@ -40,6 +40,7 @@
 #define SQLITE_TABLE_SEARCHCLASS        "SearchClass"
 #define SQLITE_TABLE_PRIMARY_KEYS       "PrimaryKeys"
 #define SQLITE_TABLE_SYSTEM             "System"
+#define SQLITE_TABLE_ITEMFINDER         "ItemFinder"
 
 #define SQLITE_TYPE_TEXT                "TEXT"
 #define SQLITE_TYPE_INTEGER             "INTEGER"
@@ -110,6 +111,7 @@
 #define SQLITE_COL_ARTIST               "Artist"
 #define SQLITE_COL_DLNA_CONTAINERTYPE   "DLNAContainer"
 #define SQLITE_COL_CHILDCOUNT           "ChildCount"
+#define SQLITE_COL_ITEMFINDER           "ItemFastID"
 
 #define SQLITE_UPNP_OBJECTID            SQLITE_COL_OBJECTID " " SQLITE_TYPE_INTEGER " " SQLITE_NOT_NULL " " SQLITE_CONFLICT_CLAUSE " "\
                                                                 SQLITE_UNIQUE " " SQLITE_CONFLICT_CLAUSE
@@ -294,6 +296,22 @@
 
  /**********************************************\
  *                                              *
+ *  Fast item finder                            *
+ *                                              *
+ \**********************************************/
+
+#define SQLITE_CREATE_TABLE_ITEMFINDER      "CREATE TABLE IF NOT EXISTS "\
+                                            SQLITE_TABLE_ITEMFINDER " "\
+                                            "("\
+                                            SQLITE_UPNP_OBJECTID ","\
+                                            SQLITE_COL_ITEMFINDER " " SQLITE_TYPE_TEXT " " SQLITE_NOT_NULL " " SQLITE_UNIQUE \
+                                            ");"
+
+#define SQLITE_TRIGGER_D_OBJECTS_ITEMFINDER SQLITE_DELETE_TRIGGER(SQLITE_TABLE_OBJECTS,\
+                                                                  SQLITE_TABLE_ITEMFINDER)
+
+ /**********************************************\
+ *                                              *
  *  Objects                                     *
  *                                              *
  \**********************************************/
@@ -325,7 +343,7 @@
                                          "((SELECT " SQLITE_COL_PARENTID " FROM " SQLITE_TABLE_OBJECTS " "\
                                          "WHERE " SQLITE_COL_PARENTID "=-1) IS NOT NULL) "\
                                          "AND "\
-                                         "(NEW." SQLITE_COL_PARENTID "=-1) "\
+                                         "(NEW." SQLITE_COL_PARENTID "=-1)"\
                                          ") THEN "\
                                          "RAISE(" SQLITE_TRANSACTION_TYPE ","\
                                          "'INSERT on table " SQLITE_TABLE_OBJECTS " violates constraint. "\
@@ -344,7 +362,7 @@
                                          "WHERE " SQLITE_COL_PARENTID "=-1 "\
                                          "AND " SQLITE_COL_OBJECTID "!=NEW." SQLITE_COL_OBJECTID " ) IS NOT NULL) "\
                                          "AND "\
-                                         "(NEW." SQLITE_COL_PARENTID "=-1) "\
+                                         "(NEW." SQLITE_COL_PARENTID "=-1) AND (OLD." SQLITE_COL_PARENTID "!=-1) "\
                                          ") THEN "\
                                          "RAISE(" SQLITE_TRANSACTION_TYPE ","\
                                          "'UPDATE on table " SQLITE_TABLE_OBJECTS " violates constraint. "\

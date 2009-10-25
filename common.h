@@ -517,39 +517,36 @@ enum    UPNP_WEB_METHODS {
  *
  ****************************************************/
 
-enum UPnPStorageMedia {
-    SM_UNKNOWN,
-    SM_DV,
-    SM_MINI_DV,
-    SM_VHS,
-    SM_W_VHS,
-    SM_S_VHS,
-    SM_D_VHS,
-    SM_VHSC,
-    SM_VIDEO8,
-    SM_HI8,
-    SM_CD_ROM,
-    SM_CD_DA,
-    SM_CD_R,
-    SM_CD_RW,
-    SM_VIDEO_CD,
-    SM_SACD,
-    SM_MD_AUDIO,
-    SM_MD_PICTURE,
-    SM_DVD_ROM,
-    SM_DVD_VIDEO,
-    SM_DVD_R_MINUS,
-    SM_DVD_RW_PLUS,
-    SM_DVD_RW_MINUS,
-    SM_DVD_RAM,
-    SM_DVD_AUDIO,
-    SM_DAT,
-    SM_LD,
-    SM_HDD,
-    SM_MICRO_MV,
-    SM_NETWORK,
-    SM_NONE
-};
+#define UPNP_STORAGE_UNKNOWN			"UNKNOWN"
+#define UPNP_STORAGE_DV                         "DV"
+#define UPNP_STORAGE_MINI_DV			"MINI-DV"
+#define UPNP_STORAGE_VHS			"VHS"
+#define UPNP_STORAGE_W_VHS			"W-VHS"
+#define UPNP_STORAGE_S_VHS			"S-VHS"
+#define UPNP_STORAGE_D_VHS			"D-VHS"
+#define UPNP_STORAGE_VHSC			"VHSC"
+#define UPNP_STORAGE_VIDEO8			"VIDEO8"
+#define UPNP_STORAGE_HI8			"HI8"
+#define UPNP_STORAGE_CD_ROM			"CD-ROM"
+#define UPNP_STORAGE_CD_DA			"CD-DA"
+#define UPNP_STORAGE_CD_R			"CD-R"
+#define UPNP_STORAGE_CD_RW			"CD-RW"
+#define UPNP_STORAGE_VIDEO_CD			"VIDEO-CD"
+#define UPNP_STORAGE_SACD			"SACD"
+#define UPNP_STORAGE_MD_AUDIO			"MD-AUDIO"
+#define UPNP_STORAGE_MD_PICTURE			"MD-PICTURE"
+#define UPNP_STORAGE_DVD_ROM			"DVD-ROM"
+#define UPNP_STORAGE_DVD_VIDEO			"DVD-VIDEO"
+#define UPNP_STORAGE_DVD_R_MINUS		"DVD-R"
+#define UPNP_STORAGE_DVD_RW_PLUS		"DVD+RW"
+#define UPNP_STORAGE_DVD_RW_MINUS		"DVD-RW"
+#define UPNP_STORAGE_DVD_RAM			"DVD-RAM"
+#define UPNP_STORAGE_DVD_AUDIO			"DVD-AUDIO"
+#define UPNP_STORAGE_DAT			"DAT"
+#define UPNP_STORAGE_LD                         "LD"
+#define UPNP_STORAGE_HDD			"HDD"
+#define UPNP_STORAGE_MICRO_MV			"MICRO-MV"
+#define UPNP_STORAGE_NETWORK			"NETWORK"
 
 /****************************************************
  *

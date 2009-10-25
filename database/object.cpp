@@ -36,7 +36,7 @@ cUPnPResource::cUPnPResource(){
 }
 
 off64_t cUPnPResource::getFileSize() const {
-    return (this->mSize) ? this->mSize : -1;
+    return (this->mSize) ? this->mSize : (off64_t)-1;
 }
 
 time_t cUPnPResource::getLastModification() const {
@@ -105,6 +105,7 @@ void cUPnPObjects::SortBy(const char* Property, bool Descending){
 
 cUPnPClassObject::cUPnPClassObject(){
     this->mID = -1;
+    this->mLastID = -1;
     this->mResources = new cList<cUPnPResource>;
     this->mResourcesID = new cHash<cUPnPResource>;
     this->mParent = NULL;
@@ -154,6 +155,7 @@ int cUPnPClassObject::setID(cUPnPObjectID ID){
         ERROR("Invalid object ID '%s'",*ID);
         return -1;
     }
+    this->mLastID = (this->mID==-1) ? ID : this->mID;
     this->mID = ID;
     return 0;
 }
@@ -520,16 +522,16 @@ bool cUPnPClassContainer::getProperty(const char* Property, char** Value) const 
 
 void cUPnPClassContainer::addObject(cUPnPClassObject* Object){
     MESSAGE("Adding object (ID:%s) to container (ID:%s)", *Object->getID(), *this->getID());
+    Object->setParent(this);
     this->mChildren->Add(Object);
     this->mChildrenID->Add(Object, (unsigned int)Object->getID());
-    Object->setParent(this);
 }
 
 void cUPnPClassContainer::removeObject(cUPnPClassObject* Object){
-    MESSAGE("Removing object (ID:%s) from container (ID:%s)", *Object->getID(), *this->getID());
     this->mChildrenID->Del(Object, (unsigned int)Object->getID());
     this->mChildren->Del(Object, false);
     Object->mParent = NULL;
+    MESSAGE("Removed object (ID:%s) from container (ID:%s)", *Object->getID(), *this->getID());
 }
 
 cUPnPClassObject* cUPnPClassContainer::getObject(cUPnPObjectID ID) const {
@@ -1104,6 +1106,7 @@ cUPnPClassObject* cUPnPObjectMediator::getObject(cUPnPObjectID){ WARNING("Gettin
 cUPnPClassObject* cUPnPObjectMediator::createObject(const char*, bool){ WARNING("Getting instance of class 'Object' forbidden"); return NULL; }
 
 int cUPnPObjectMediator::objectToDatabase(cUPnPClassObject* Object){
+    MESSAGE("Updating object #%s", *Object->getID());
     cString Format = "UPDATE %s SET %s WHERE %s='%s'";
     //cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
     cString Statement=NULL;
@@ -1128,16 +1131,19 @@ int cUPnPObjectMediator::objectToDatabase(cUPnPClassObject* Object){
         }
         char *escapedValue;
         escapeSQLite(Value, &escapedValue);
+        MESSAGE("Set %s to %s", *(*Property), escapedValue);
         //Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", Value?Value:"NULL");
         Set = cString::sprintf("%s%s%s='%s'", *Set?*Set:"", *Set?",":"", *(*Property), escapedValue?escapedValue:"NULL");
         
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, *Set, SQLITE_COL_OBJECTID, *Object->getID());
+    Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, *Set, SQLITE_COL_OBJECTID, *Object->mLastID);
     //Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, *Columns, *Values);
     if(this->mDatabase->execStatement(Statement)){
         ERROR("Error while executing statement");
         return -1;
     }
+    // The update was successful --> the current ID is now also the LastID
+    Object->mLastID = Object->mID;
     return 0;
 }
 
@@ -1146,7 +1152,6 @@ int cUPnPObjectMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectI
     cString Statement = NULL, Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
     Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, SQLITE_COL_OBJECTID, *ID);
-//    MESSAGE("Fehler hier");
     if(this->mDatabase->execStatement(Statement)){
         ERROR("Error while executing statement");
         return -1;

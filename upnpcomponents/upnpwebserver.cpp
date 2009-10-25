@@ -94,9 +94,7 @@ struct cWebFileHandle {
 cUPnPWebServer::cUPnPWebServer(const char* root) : mRootdir(root) {
 }
 
-cUPnPWebServer::~cUPnPWebServer(){
-    delete [] this->mRootdir;
-}
+cUPnPWebServer::~cUPnPWebServer(){}
 
 cUPnPWebServer* cUPnPWebServer::mInstance = NULL;
 
@@ -140,7 +138,7 @@ bool cUPnPWebServer::uninit(){
     MESSAGE("Disabling the internal webserver");
     UpnpEnableWebserver(FALSE);
 
-    MESSAGE("Closing open file transfers");
+    return true;
 }
 
 cUPnPWebServer* cUPnPWebServer::getInstance(const char* rootdir){
