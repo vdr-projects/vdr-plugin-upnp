@@ -1544,7 +1544,7 @@ int cUPnPContainerMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
                 Class.ID = strdup0(*Value);
             }
             else if(!strcasecmp(Column, SQLITE_COL_CLASSDERIVED)){
-                Class.includeDerived = atoi(Value)==1?"true":"false";
+                Class.includeDerived = atoi(Value)==1?true:false;
             }
         }
         SearchClasses.push_back(Class);

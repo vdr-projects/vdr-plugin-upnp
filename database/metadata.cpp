@@ -306,6 +306,10 @@ int cMediaDatabase::loadChannels(){
                         }
                         MESSAGE("Successfuly added channel");
                     }
+                    else {
+                        // Delete temporarily created object with no resource
+                        this->mFactory->deleteObject(ChannelItem);
+                    }
                 }
             }
             else {
@@ -366,6 +370,10 @@ int cMediaDatabase::loadRecordings(){
                         return -1;
                     }
                     MESSAGE("Successfuly added movie");
+                }
+                else {
+                    // Delete temporarily created object with no resource
+                    this->mFactory->deleteObject(MovieItem);
                 }
             }
             else {

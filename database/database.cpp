@@ -134,7 +134,12 @@ bool cRow::fetchColumn(char** Column, char** Value){
     MESSAGE("Fetching column %s='%s' (%d/%d)", this->Columns[currentCol], this->Values[currentCol], currentCol+1, this->ColCount);
     #endif
     *Column = strdup0(this->Columns[currentCol]);
-    *Value  = strcasecmp(this->Values[currentCol],"NULL")?strdup0(this->Values[currentCol]):NULL;
+    if(this->Values[currentCol]){
+        *Value = strcasecmp(this->Values[currentCol],"NULL")?strdup0(this->Values[currentCol]):NULL;
+    }
+    else {
+        *Value = NULL;
+    }
     currentCol++;
     return true;
 }
