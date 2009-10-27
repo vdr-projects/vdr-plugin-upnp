@@ -8,7 +8,7 @@
 #include <stdarg.h>
 #include "common.h"
 
-DLNAProfile DLNA_PROFILE_MPEG2_TS_SD_EU = { "MPEG2_TS_SD_EU", "video/mpeg" };
+DLNAProfile DLNA_PROFILE_MPEG2_TS_SD_EU = { "MPEG_TS_SD_EU", "video/vnd.dlna.mpeg-tts" };
 DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU = { "AVC_TS_HD_EU", "video/vnd.dlna.mpeg-tts" };
 DLNAProfile DLNA_PROFILE_MPEG1_L3 = { "MP3", "audio/mpeg" };
 

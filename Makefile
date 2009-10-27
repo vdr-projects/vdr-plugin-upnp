@@ -18,7 +18,7 @@ VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).cpp | awk '{ p
 
 ### The C++ compiler and options:
 
-CXX      ?= g++
+CXX      ?= gcc
 CXXFLAGS ?= -fPIC -g -Wall -O2 -Wextra -Woverloaded-virtual -Wno-parentheses -Wl,-R/usr/local/lib
 
 ### The directory environment:
@@ -47,7 +47,7 @@ PACKAGE = vdr-$(ARCHIVE)
 
 ### Includes and Defines (add further entries here):
 
-LIBS += -lupnp -lixml -lsqlite3
+LIBS += -lupnp -lixml -lsqlite3 -lavformat -lavcodec
 
 INCLUDES += -I$(VDRDIR)/include	-I/usr/include \
 
@@ -67,6 +67,7 @@ OBJS = $(PLUGIN).o \
 		database/object.o \
 		database/resources.o \
 		server/server.o \
+		misc/avdetector.o \
 		upnpcomponents/dlna.o \
 		upnpcomponents/upnpwebserver.o \
 		upnpcomponents/upnpservice.o \

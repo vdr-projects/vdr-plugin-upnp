@@ -52,10 +52,10 @@ bool cMediaDatabase::init(){
         ERROR("Loading channels failed");
         return false;
     }
-//    if(this->loadRecordings()){
-//        ERROR("Loading records failed");
-//        return false;
-//    }
+    if(this->loadRecordings()){
+        ERROR("Loading records failed");
+        return false;
+    }
     return true;
 }
 
@@ -315,43 +315,65 @@ int cMediaDatabase::loadChannels(){
     return 0;
 }
 
-//int cMediaDatabase::loadRecordings(){
-//    MESSAGE("Loading recordings");
-//    cUPnPClassContainer* Records = (cUPnPClassContainer*)this->getObjectByID(4);
-//    if(Records){
-//        cRecording* Recording = NULL;
-//        for(Recording = Recordings.First(); Recording; Recording = Recordings.Next(Recording)){
-//            // Iterating the records
-//            bool inList = false;
-//
-//            MESSAGE("Determine if the channel %s is already listed", Recording->FileName());
-//            const cRecordingInfo* RecInfo = Recording->Info();
-//
-//            MESSAGE("%s", *RecInfo->Components()->Component(0)->ToString());
-//            cUPnPClassMovie *MovieItem = NULL;
-//
-//            MovieItem = (cUPnPClassMovie*)this->getObjectByFastFind(Recording->FileName());
-//
-//            inList = (MovieItem && Records->getObject(MovieItem->getID())) ? true : false;
-//
-//            if(inList){
-//
-//                MESSAGE("Adding movie '%s' File name:%s", RecInfo->Title(), Recording->FileName());
-//
-//                MovieItem = (cUPnPClassMovie*)this->mFactory->createObject(UPNP_CLASS_MOVIE, RecInfo->Title());
-//                MovieItem->setDescription(RecInfo->ShortText());
-//                MovieItem->setLongDescription(RecInfo->Description());
-//                MovieItem->setStorageMedium(UPNP_STORAGE_HDD);
-//
-//
-//            }
-//            else {
-//                MESSAGE("Skipping %s, already in Database", Recording->FileName());
-//            }
-//        }
-//    }
-//    return 0;
-//}
+int cMediaDatabase::loadRecordings(){
+    MESSAGE("Loading recordings");
+    cUPnPClassContainer* Records = (cUPnPClassContainer*)this->getObjectByID(4);
+    if(Records){
+        bool noResource = false;
+        // TODO: Add to setup
+        // if an error occured while loading resources, add the channel anyway
+        bool addWithoutResources = false;
+        cRecording* Recording = NULL;
+        for(Recording = Recordings.First(); Recording; Recording = Recordings.Next(Recording)){
+            // Iterating the records
+            bool inList = false;
+
+            MESSAGE("Determine if the channel %s is already listed", Recording->FileName());
+
+            cUPnPClassMovie *MovieItem = NULL;
+
+            MovieItem = (cUPnPClassMovie*)this->getObjectByFastFind(Recording->FileName());
+
+            inList = (MovieItem && Records->getObject(MovieItem->getID())) ? true : false;
+
+            if(inList){
+                noResource = false;
+                const cRecordingInfo* RecInfo = Recording->Info();
+
+                MESSAGE("Adding movie '%s' File name:%s", RecInfo->Title(), Recording->FileName());
+
+                MovieItem = (cUPnPClassMovie*)this->mFactory->createObject(UPNP_CLASS_MOVIE, RecInfo->Title());
+                MovieItem->setDescription(RecInfo->ShortText());
+                MovieItem->setLongDescription(RecInfo->Description());
+                MovieItem->setStorageMedium(UPNP_STORAGE_HDD);
+                
+                if(RecInfo->Components()){
+                    // The first component
+                    tComponent *Component = RecInfo->Components()->Component(0);
+                    if(Component) MovieItem->setLanguage(Component->language);
+                }
+
+                if(cUPnPResources::getInstance()->createFromRecording(MovieItem, Recording)){
+                    ERROR("Unable to get resources for this channel");
+                    noResource = true;
+                }
+                if(!noResource || addWithoutResources) {
+                    Records->addObject(MovieItem);
+                    if(this->mFactory->saveObject(MovieItem) ||
+                       this->addFastFind(MovieItem, Recording->FileName())){
+                        this->mFactory->deleteObject(MovieItem);
+                        return -1;
+                    }
+                    MESSAGE("Successfuly added movie");
+                }
+            }
+            else {
+                MESSAGE("Skipping %s, already in Database", Recording->FileName());
+            }
+        }
+    }
+    return 0;
+}
 
 void cMediaDatabase::Action(){
     time_t LastEPGUpdate = 0;

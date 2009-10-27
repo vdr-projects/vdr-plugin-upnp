@@ -51,6 +51,7 @@ struct cClass {
 class cUPnPResource : public cListObject {
     friend class cUPnPResourceMediator;
     friend class cUPnPResources;
+    friend class cAudioVideoDetector;
 private:
     unsigned int mResourceID;
     cUPnPObjectID mObjectID;
@@ -403,6 +404,17 @@ public:
     virtual ~cUPnPVideoBroadcastMediator(){};
     virtual cUPnPClassVideoBroadcast* createObject(const char* Title, bool Restricted);
     virtual cUPnPClassVideoBroadcast* getObject(cUPnPObjectID ID);
+};
+
+class cUPnPMovieMediator : public cUPnPVideoItemMediator {
+protected:
+    virtual int objectToDatabase(cUPnPClassObject* Object);
+    virtual int databaseToObject(cUPnPClassObject* Object, cUPnPObjectID ID);
+public:
+    cUPnPMovieMediator(cMediaDatabase* MediaDatabase);
+    virtual ~cUPnPMovieMediator(){};
+    virtual cUPnPClassMovie* createObject(const char* Title, bool Restricted);
+    virtual cUPnPClassMovie* getObject(cUPnPObjectID ID);
 };
 
 class cUPnPContainerMediator : public cUPnPObjectMediator {

@@ -10,6 +10,7 @@
 #include "../upnpcomponents/dlna.h"
 #include <vdr/tools.h>
 #include "resources.h"
+#include "../misc/avdetector.h"
 
 cUPnPResources* cUPnPResources::mInstance = NULL;
 
@@ -92,6 +93,31 @@ cUPnPResource* cUPnPResources::getResource(unsigned int ResourceID){
         ERROR("No such resource with ID '%d'", ResourceID);
         return NULL;
     }
+}
+
+int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording* Recording){
+    cString VideoFile = cString::sprintf(VDR_RECORDFILE_PATTERN_TS, Recording->FileName(), 1);
+
+    cAudioVideoDetector* Detector = new cAudioVideoDetector();
+
+    cString ContentType = "video/mpeg";
+    cString ProtocolInfo = "http-get:*:video/mpeg:*";
+
+    cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_RECORDING, Recording->FileName(), ContentType, ProtocolInfo);
+
+    if(Detector->detectVideoProperties(Resource, VideoFile)){
+        ERROR("Error while detecting video properties");
+        return -1;
+    }
+
+    delete Detector;
+    MESSAGE("To be done");
+    return -1;
+}
+
+int cUPnPResources::createFromFile(cUPnPClassItem* , cString ){
+    MESSAGE("To be done");
+    return -1;
 }
 
 int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel* Channel){

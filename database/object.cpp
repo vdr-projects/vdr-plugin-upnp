@@ -868,11 +868,125 @@ int cUPnPClassVideoBroadcast::setRegion(const char* Region){
     return 0;
 }
 
- /**********************************************\
- *                                              *
- *  Mediator factory                            *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Movie item                                  *
+*                                              *
+\**********************************************/
+
+cUPnPClassMovie::cUPnPClassMovie(){
+     this->mDVDRegionCode = 2; // Europe
+     this->mStorageMedium = UPNP_STORAGE_UNKNOWN;
+}
+
+cUPnPClassMovie::~cUPnPClassMovie(){}
+
+//cString cUPnPClassMovie::createDIDLFragment(cStringList* Filter){
+//    return NULL;
+//}
+
+cStringList* cUPnPClassMovie::getPropertyList(){
+    cStringList* Properties = cUPnPClassVideoItem::getPropertyList();
+    Properties->Append(strdup(UPNP_PROP_DVDREGIONCODE));
+    Properties->Append(strdup(UPNP_PROP_STORAGEMEDIUM));
+    return Properties;
+}
+
+bool cUPnPClassMovie::setProperty(const char* Property, const char* Value){
+    bool ret;
+    if(!strcasecmp(Property, SQLITE_COL_DVDREGIONCODE) || !strcasecmp(Property, UPNP_PROP_DVDREGIONCODE)){
+        ret = this->setDVDRegionCode(atoi(Value));
+    }
+    else if(!strcasecmp(Property, SQLITE_COL_STORAGEMEDIUM) || !strcasecmp(Property, UPNP_PROP_STORAGEMEDIUM)){
+        ret = this->setStorageMedium(Value);
+    }
+    else return cUPnPClassVideoItem::setProperty(Property, Value);
+    return ret<0?false:true;
+}
+
+bool cUPnPClassMovie::getProperty(const char* Property, char** Value) const {
+    cString Val;
+    if(!strcasecmp(Property, SQLITE_COL_DVDREGIONCODE) || !strcasecmp(Property, UPNP_PROP_DVDREGIONCODE)){
+        Val = itoa(this->getDVDRegionCode());
+    }
+    else if(!strcasecmp(Property, SQLITE_COL_STORAGEMEDIUM) || !strcasecmp(Property, UPNP_PROP_STORAGEMEDIUM)){
+        Val = this->getStorageMedium();
+    }
+    else return cUPnPClassVideoItem::getProperty(Property, Value);
+    *Value = strdup0(*Val);
+    return true;
+}
+
+int cUPnPClassMovie::setDVDRegionCode(int RegionCode){
+//    http://en.wikipedia.org/wiki/DVD_region_code
+//    0 	Informal term meaning "worldwide". Region 0 is not an official setting; discs that bear the region 0 symbol either have no flag set or have region 1–6 flags set.
+//    1 	Canada, United States; U.S. territories; Bermuda
+//    2 	Western Europe; incl. United Kingdom, Ireland, and Central Europe; Eastern Europe, Western Asia; including Iran, Israel, Egypt; Japan, South Africa, Swaziland, Lesotho; French overseas territories
+//    3 	Southeast Asia; South Korea; Taiwan; Hong Kong; Macau
+//    4 	Mexico, Central and South America; Caribbean; Australia; New Zealand; Oceania;
+//    5 	Ukraine, Belarus, Russia, Continent of Africa, excluding Egypt, South Africa, Swaziland, and Lesotho; Central and South Asia, Mongolia, North Korea.
+//    6 	People's Republic of China
+//    7 	Reserved for future use (found in use on protected screener copies of MPAA-related DVDs and "media copies" of pre-releases in Asia)
+//    8 	International venues such as aircraft, cruise ships, etc.[1]
+//    ALL (9)	Region ALL discs have all 8 flags set, allowing the disc to be played in any locale on any player.
+    if(0 <= RegionCode && RegionCode <= 9){
+        this->mDVDRegionCode = RegionCode;
+        return 0;
+    }
+    else {
+        ERROR("Invalid DVD region code: %d", RegionCode);
+        return -1;
+    }
+}
+
+int cUPnPClassMovie::setStorageMedium(const char* StorageMedium){
+    if(!StorageMedium) this->mStorageMedium = UPNP_STORAGE_UNKNOWN;
+    else if(
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_DA) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_R) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_ROM) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_RW) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DAT) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DV) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_AUDIO) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RAM) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_ROM) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RW_MINUS) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RW_PLUS) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_R_MINUS) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_VIDEO) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_D_VHS) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_HDD) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_HI8) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_LD) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_MD_AUDIO) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_MD_PICTURE) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_MICRO_MV) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_MINI_DV) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_NETWORK) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_SACD) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_S_VHS) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_UNKNOWN) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_VHS) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_VHSC) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_VIDEO8) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_VIDEO_CD) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_W_VHS)
+    ){
+        ERROR("Invalid storage type: %s", StorageMedium);
+        return -1;
+    }
+    else {
+        this->mStorageMedium = StorageMedium;
+    }
+    return 0;
+}
+
+/**********************************************\
+*                                              *
+*  Mediator factory                            *
+*                                              *
+\**********************************************/
 
 cUPnPObjectFactory* cUPnPObjectFactory::mInstance = NULL;
 
@@ -1699,6 +1813,96 @@ int cUPnPVideoBroadcastMediator::databaseToObject(cUPnPClassObject* Object, cUPn
         else if(!strcasecmp(Column, SQLITE_COL_CHANNELNAME)){
             if(VideoBroadcast->setChannelName(Value)){
                 ERROR("Error while setting channel name");
+                return -1;
+            }
+        }
+    }
+    return 0;
+}
+
+/**********************************************\
+*                                              *
+*  Movie item mediator                         *
+*                                              *
+\**********************************************/
+
+cUPnPMovieMediator::cUPnPMovieMediator(cMediaDatabase* MediaDatabase) :
+    cUPnPVideoItemMediator(MediaDatabase){}
+
+cUPnPClassMovie* cUPnPMovieMediator::createObject(const char* Title, bool Restricted){
+    MESSAGE("Creating movie '%s'",Title);
+    cUPnPClassMovie* Object = new cUPnPClassMovie;
+    if(this->initializeObject(Object, UPNP_CLASS_MOVIE, Title, Restricted)) return NULL;
+    return Object;
+}
+
+cUPnPClassMovie* cUPnPMovieMediator::getObject(cUPnPObjectID ID){
+    MESSAGE("Getting movie with ID '%s'",*ID);
+    cUPnPClassMovie* Object = new cUPnPClassMovie;
+    if(this->databaseToObject(Object, ID)) return NULL;
+    return Object;
+}
+
+int cUPnPMovieMediator::objectToDatabase(cUPnPClassObject* Object){
+    if(cUPnPVideoItemMediator::objectToDatabase(Object)) return -1;
+    cUPnPClassMovie* Movie = (cUPnPClassMovie*)Object;
+    cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
+    cString Statement=NULL, Columns=NULL, Values=NULL;
+    char *Value=NULL;
+    cString Properties[] = {
+        SQLITE_COL_OBJECTID,
+        SQLITE_COL_DVDREGIONCODE,
+        SQLITE_COL_STORAGEMEDIUM,
+        NULL
+    };
+    for(cString* Property = Properties; *(*Property); Property++){
+        Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
+        if(!Movie->getProperty(*Property, &Value)){
+            ERROR("No such property '%s' in object with ID '%s'",*(*Property),* Movie->getID());
+            return -1;
+        }
+        char *escapedValue;
+        escapeSQLite(Value, &escapedValue);
+        Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", escapedValue?escapedValue:"NULL");
+
+    }
+    Statement = cString::sprintf(Format, SQLITE_TABLE_MOVIES, *Columns, *Values);
+    if(this->mDatabase->execStatement(Statement)){
+        ERROR("Error while executing statement");
+        return -1;
+    }
+    return 0;
+}
+
+int cUPnPMovieMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID ID){
+    if(cUPnPVideoItemMediator::databaseToObject(Object,ID)){
+        ERROR("Error while loading object");
+        return -1;
+    }
+    cUPnPClassMovie* Movie = (cUPnPClassMovie*)Object;
+    cString Format = "SELECT * FROM %s WHERE %s=%s";
+    cString Statement = NULL, Column = NULL, Value = NULL;
+    cRows* Rows; cRow* Row;
+    Statement = cString::sprintf(Format, SQLITE_TABLE_MOVIES, SQLITE_COL_OBJECTID, *ID);
+    if(this->mDatabase->execStatement(Statement)){
+        ERROR("Error while executing statement");
+        return -1;
+    }
+    Rows = this->mDatabase->getResultRows();
+    if(!Rows->fetchRow(&Row)){
+        MESSAGE("No item properties found");
+        return 0;
+    }
+    while(Row->fetchColumn(&Column, &Value)){
+        if(!strcasecmp(Column, SQLITE_COL_DVDREGIONCODE)){
+            if(Movie->setDVDRegionCode(atoi(Value))){
+                ERROR("Error while setting icon");
+                return -1;
+            }
+        }
+        else if(!strcasecmp(Column, SQLITE_COL_STORAGEMEDIUM)){
+            if(Movie->setStorageMedium(Value)){
+                ERROR("Error while setting region");
                 return -1;
             }
         }

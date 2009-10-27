@@ -12,8 +12,8 @@
 #include <vdr/tools.h>
 #include "../common.h"
 
-#define SQLITE_PRINT_STATEMENTS
-#define SQLITE_PRINT_FETCHES
+//#define SQLITE_PRINT_STATEMENTS
+//#define SQLITE_PRINT_FETCHES
 #define SQLITE_CASCADE_DELETES
 
 #define PK_OBJECTS                      TOSTRING(1)

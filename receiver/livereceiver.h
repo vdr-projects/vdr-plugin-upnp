@@ -13,6 +13,9 @@
 #include <vdr/thread.h>
 #include <vdr/receiver.h>
 
+#define RECEIVER_WAIT_ON_NODATA         50 // 50 ms
+#define RECEIVER_WAIT_ON_NODATA_TIMEOUT 1000 * 10 // 10s
+
 class cLiveReceiver : public cReceiver, public cThread, public cFileHandle {
 public:
     static cLiveReceiver* newInstance(cChannel *Channel, int Priority);

@@ -129,11 +129,19 @@ int cLiveReceiver::read(char* buf, size_t buflen){
     if(!this->IsAttached())
         bytesRead = -1;
     else {
+        int WaitTimeout = RECEIVER_WAIT_ON_NODATA_TIMEOUT; // 10 Seconds timeout with no data
         while(!this->mOutputBuffer->Available()){
             WARNING("No data, waiting...");
-            cCondWait::SleepMs(50);
+            cCondWait::SleepMs(RECEIVER_WAIT_ON_NODATA);
             if(!this->IsAttached()){
                 MESSAGE("Lost device...");
+                return 0;
+            }
+            WaitTimeout-=RECEIVER_WAIT_ON_NODATA;
+            if(WaitTimeout<=0){
+                double seconds = (RECEIVER_WAIT_ON_NODATA_TIMEOUT/1000);
+                ERROR("No data received for %4.2f seconds, aborting.", seconds);
+                this->Activate(false);
                 return 0;
             }
         }
