@@ -942,35 +942,35 @@ int cUPnPClassMovie::setDVDRegionCode(int RegionCode){
 int cUPnPClassMovie::setStorageMedium(const char* StorageMedium){
     if(!StorageMedium) this->mStorageMedium = UPNP_STORAGE_UNKNOWN;
     else if(
-            strcasecmp(StorageMedium,UPNP_STORAGE_CD_DA) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_CD_R) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_CD_ROM) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_CD_RW) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DAT) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DV) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_AUDIO) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RAM) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_ROM) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RW_MINUS) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RW_PLUS) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_R_MINUS) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_VIDEO) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_D_VHS) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_HDD) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_HI8) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_LD) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_MD_AUDIO) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_MD_PICTURE) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_MICRO_MV) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_MINI_DV) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_NETWORK) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_SACD) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_S_VHS) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_UNKNOWN) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_VHS) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_VHSC) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_VIDEO8) ||
-            strcasecmp(StorageMedium,UPNP_STORAGE_VIDEO_CD) ||
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_DA) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_R) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_ROM) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_CD_RW) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DAT) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DV) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_AUDIO) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RAM) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_ROM) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RW_MINUS) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_RW_PLUS) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_R_MINUS) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_DVD_VIDEO) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_D_VHS) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_HDD) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_HI8) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_LD) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_MD_AUDIO) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_MD_PICTURE) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_MICRO_MV) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_MINI_DV) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_NETWORK) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_SACD) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_S_VHS) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_UNKNOWN) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_VHS) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_VHSC) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_VIDEO8) &&
+            strcasecmp(StorageMedium,UPNP_STORAGE_VIDEO_CD) &&
             strcasecmp(StorageMedium,UPNP_STORAGE_W_VHS)
     ){
         ERROR("Invalid storage type: %s", StorageMedium);

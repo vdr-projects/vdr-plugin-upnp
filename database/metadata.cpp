@@ -36,6 +36,7 @@ cMediaDatabase::cMediaDatabase(){
     this->mFactory->registerMediator(UPNP_CLASS_CONTAINER, new cUPnPContainerMediator(this));
     this->mFactory->registerMediator(UPNP_CLASS_VIDEO, new cUPnPVideoItemMediator(this));
     this->mFactory->registerMediator(UPNP_CLASS_VIDEOBC, new cUPnPVideoBroadcastMediator(this));
+    this->mFactory->registerMediator(UPNP_CLASS_MOVIE, new cUPnPMovieMediator(this));
 }
 
 cMediaDatabase::~cMediaDatabase(){
@@ -336,7 +337,7 @@ int cMediaDatabase::loadRecordings(){
 
             inList = (MovieItem && Records->getObject(MovieItem->getID())) ? true : false;
 
-            if(inList){
+            if(!inList){
                 noResource = false;
                 const cRecordingInfo* RecInfo = Recording->Info();
 
