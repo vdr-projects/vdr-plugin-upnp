@@ -249,7 +249,7 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
 int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
 
     char* escapedResource = NULL;
-    escapeSQLite(Resource->mResource, escapedResource);
+    escapeSQLite(Resource->mResource, &escapedResource);
 
     cString Format = "UPDATE %s SET %s WHERE %s=%d";
     cString Sets   = cString::sprintf("%s='%s',"
@@ -304,7 +304,7 @@ cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int 
                                          SQLITE_COL_CONTENTTYPE,
                                          SQLITE_COL_RESOURCETYPE,
                                          *Object->getID(),
-                                         escapeSQLite(ResourceFile, escapedResource),
+                                         escapeSQLite(ResourceFile, &escapedResource),
                                          *ProtocolInfo,
                                          *ContentType,
                                          ResourceType
