@@ -204,7 +204,7 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
     cString Column = NULL, Value = NULL;
     while(Row->fetchColumn(&Column, &Value)){
         if(!strcasecmp(SQLITE_COL_OBJECTID, Column)){
-            Resource->mObjectID = atoi(Value);
+            Resource->mObjectID = *Value?atoi(Value):-1;
         }
         else if(!strcasecmp(SQLITE_COL_PROTOCOLINFO, Column)){
             Resource->mProtocolInfo = Value;
@@ -213,25 +213,25 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
             Resource->mResource = Value;
         }
         else if(!strcasecmp(SQLITE_COL_SIZE, Column)){
-            Resource->mSize = atol(Value);
+            Resource->mSize = *Value?atol(Value):0;
         }
         else if(!strcasecmp(SQLITE_COL_DURATION, Column)){
             Resource->mDuration = Value;
         }
         else if(!strcasecmp(SQLITE_COL_BITRATE, Column)){
-            Resource->mBitrate = atoi(Value);
+            Resource->mBitrate = *Value?atoi(Value):0;
         }
         else if(!strcasecmp(SQLITE_COL_SAMPLEFREQUENCE, Column)){
-            Resource->mSampleFrequency = atoi(Value);
+            Resource->mSampleFrequency = *Value?atoi(Value):0;
         }
         else if(!strcasecmp(SQLITE_COL_BITSPERSAMPLE, Column)){
-            Resource->mBitsPerSample = atoi(Value);
+            Resource->mBitsPerSample = *Value?atoi(Value):0;
         }
         else if(!strcasecmp(SQLITE_COL_NOAUDIOCHANNELS, Column)){
-            Resource->mNrAudioChannels = atoi(Value);
+            Resource->mNrAudioChannels = *Value?atoi(Value):0;
         }
         else if(!strcasecmp(SQLITE_COL_COLORDEPTH, Column)){
-            Resource->mColorDepth = atoi(Value);
+            Resource->mColorDepth = *Value?atoi(Value):0;
         }
         else if(!strcasecmp(SQLITE_COL_RESOLUTION, Column)){
             Resource->mResolution = Value;
@@ -240,7 +240,7 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
             Resource->mContentType = Value;
         }
         else if(!strcasecmp(SQLITE_COL_RESOURCETYPE, Column)){
-            Resource->mResourceType = atoi(Value);
+            Resource->mResourceType = *Value?atoi(Value):0;
         }
     }
     return Resource;

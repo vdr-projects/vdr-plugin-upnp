@@ -734,11 +734,11 @@
                                         "violates foreign key constraint \"" SQLITE_COL_OBJECTID "\"') " \
                                         "END; END;"
 
- /**********************************************\
- *                                              *
- *  Resources                                   *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Resources                                   *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_RESOURCES   "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_RESOURCES \

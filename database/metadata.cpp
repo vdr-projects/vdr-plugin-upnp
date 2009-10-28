@@ -129,13 +129,17 @@ int cMediaDatabase::addFastFind(cUPnPClassObject* Object, const char* FastFind){
         MESSAGE("Invalid fast find parameters");
         return -1;
     }
+
+    char* escapedFastFind;
+    escapeSQLite(FastFind, &escapedFastFind);
     cString Statement = cString::sprintf("INSERT OR REPLACE INTO %s (%s, %s) VALUES ('%s', '%s')",
             SQLITE_TABLE_ITEMFINDER,
             SQLITE_COL_OBJECTID,
             SQLITE_COL_ITEMFINDER,
             *Object->getID(),
-            FastFind
+            escapedFastFind
                                         );
+    free(escapedFastFind);
     if(this->mDatabase->execStatement(Statement)){
         ERROR("Error while executing statement");
         return -1;
