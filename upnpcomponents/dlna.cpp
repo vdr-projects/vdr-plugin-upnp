@@ -45,7 +45,7 @@ void cDlna::registerProfile(DLNAProfile* Profile, int Op, const char* Ps, int Ci
 }
 
 void cDlna::registerMainProfiles(){
-    this->registerProfile(&DLNA_PROFILE_MPEG2_TS_SD_EU, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
+    this->registerProfile(&DLNA_PROFILE_MPEG_TS_SD_EU, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
     this->registerProfile(&DLNA_PROFILE_AVC_TS_HD_EU, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
 }
 
@@ -73,7 +73,7 @@ DLNAProfile* cDlna::getProfileOfChannel(cChannel* Channel){
     switch(Channel->Vtype()){
         case 0x02:
             // MPEG2 Video
-            return &DLNA_PROFILE_MPEG2_TS_SD_EU;
+            return &DLNA_PROFILE_MPEG_TS_SD_EU;
         case 0x1B:
             return &DLNA_PROFILE_AVC_TS_HD_EU;
         default:
