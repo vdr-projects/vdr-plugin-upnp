@@ -100,6 +100,8 @@ int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording*
 
     cAudioVideoDetector* Detector = new cAudioVideoDetector();
 
+    // TODO: add DLNA-Support to detector
+
     cString ContentType = "video/mpeg";
     cString ProtocolInfo = "http-get:*:video/mpeg:*";
 
@@ -111,8 +113,8 @@ int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording*
     }
 
     delete Detector;
-    MESSAGE("To be done");
-    return -1;
+    MESSAGE("To be continued, may it work with DLNA?! Guess, not!");
+    return 0;
 }
 
 int cUPnPResources::createFromFile(cUPnPClassItem* , cString ){
@@ -245,6 +247,10 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
 }
 
 int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
+
+    char* escapedResource = NULL;
+    escapeSQLite(Resource->mResource, escapedResource);
+
     cString Format = "UPDATE %s SET %s WHERE %s=%d";
     cString Sets   = cString::sprintf("%s='%s',"
                                       "%s='%s',"
@@ -261,7 +267,7 @@ int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
                                       "%s=%d",
                                       SQLITE_COL_OBJECTID, *Resource->mObjectID?*Resource->mObjectID:"NULL",
                                       SQLITE_COL_PROTOCOLINFO, *Resource->mProtocolInfo?*Resource->mProtocolInfo:"NULL",
-                                      SQLITE_COL_RESOURCE, *Resource->mResource?*Resource->mResource:"NULL",
+                                      SQLITE_COL_RESOURCE, escapedResource?escapedResource:"NULL",
                                       SQLITE_COL_SIZE, Resource->mSize,
                                       SQLITE_COL_DURATION, *Resource->mDuration?*Resource->mDuration:"NULL",
                                       SQLITE_COL_BITRATE, Resource->mBitrate,
@@ -274,6 +280,7 @@ int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
                                       SQLITE_COL_RESOURCETYPE, Resource->mResourceType
                                      );
 
+    free(escapedResource);
     cString Statement = cString::sprintf(Format, SQLITE_TABLE_RESOURCES, *Sets, SQLITE_COL_RESOURCEID, Resource->mResourceID);
 
     if(this->mDatabase->execStatement(Statement)){
@@ -286,6 +293,9 @@ int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
 
 cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int ResourceType, cString ResourceFile, cString ContentType, cString ProtocolInfo){
     cUPnPResource* Resource = new cUPnPResource;
+    
+    char* escapedResource = NULL;
+    
     cString Statement = cString::sprintf("INSERT INTO %s (%s,%s,%s,%s,%s) VALUES ('%s','%s','%s','%s','%d')",
                                          SQLITE_TABLE_RESOURCES,
                                          SQLITE_COL_OBJECTID,
@@ -294,11 +304,13 @@ cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int 
                                          SQLITE_COL_CONTENTTYPE,
                                          SQLITE_COL_RESOURCETYPE,
                                          *Object->getID(),
-                                         *ResourceFile,
+                                         escapeSQLite(ResourceFile, escapedResource),
                                          *ProtocolInfo,
                                          *ContentType,
                                          ResourceType
                                         );
+    free(escapedResource);
+    
     if(this->mDatabase->execStatement(Statement)){
         ERROR("Error while executing statement");
         return NULL;
@@ -309,6 +321,6 @@ cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int 
     Resource->mProtocolInfo = ProtocolInfo;
     Resource->mContentType = ContentType;
     Resource->mResourceType = ResourceType;
-
+    
     return Resource;
 }

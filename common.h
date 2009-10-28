@@ -718,7 +718,7 @@ struct DLNAIconProfile {
 /* Audio */
 extern DLNAProfile DLNA_PROFILE_MPEG1_L3;               // MP3
 /* Video */
-extern DLNAProfile DLNA_PROFILE_MPEG2_TS_SD_EU;         // This is the profile for DVB-TV
+extern DLNAProfile DLNA_PROFILE_MPEG_TS_SD_EU;         // This is the profile for DVB-TV
 extern DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU;           // This is the profile for DVB-TV
 
 /* Icons */
