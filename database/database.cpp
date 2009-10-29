@@ -39,7 +39,7 @@ cSQLiteDatabase* cSQLiteDatabase::getInstance(){
         return NULL;
 }
 
-int cSQLiteDatabase::execStatement(const char* Statement){
+int cSQLiteDatabase::exec(const char* Statement){
     char* Error;
     if(!this->mDatabase){
         ERROR("Database not open. Cannot continue");
@@ -52,12 +52,31 @@ int cSQLiteDatabase::execStatement(const char* Statement){
     if(sqlite3_exec(this->mDatabase, Statement, cSQLiteDatabase::getResultRow, (cSQLiteDatabase*)this, &Error)!=SQLITE_OK){
         ERROR("Database error: %s", Error);
         ERROR("Statement was: %s", Statement);
+        delete this->mRows; this->mRows = NULL;
         sqlite3_free(Error);
         return -1;
     }
 
     sqlite3_free(Error);
     return 0;
+}
+
+const char* cSQLiteDatabase::sprintf(const char* Format, ...){
+    va_list vlist;
+    va_start(vlist, Format);
+    char* SQLStatement = sqlite3_vmprintf(Format, vlist);
+    va_end(vlist);
+    return SQLStatement;
+}
+
+int cSQLiteDatabase::execStatement(const char* Statement, ...){
+    va_list vlist;
+    va_start(vlist, Statement);
+    char* SQLStatement = sqlite3_vmprintf(Statement, vlist);
+    va_end(vlist);
+    int ret = this->exec(SQLStatement);
+    sqlite3_free(SQLStatement);
+    return ret;
 }
 
 int cSQLiteDatabase::getResultRow(void* DB, int NumCols, char** Values, char** ColNames){
@@ -135,7 +154,7 @@ bool cRow::fetchColumn(char** Column, char** Value){
     #endif
     *Column = strdup0(this->Columns[currentCol]);
     if(this->Values[currentCol]){
-        *Value = strcasecmp(this->Values[currentCol],"NULL")?strdup0(this->Values[currentCol]):NULL;
+        *Value = strcasecmp(this->Values[currentCol],"NULL")?strdup(this->Values[currentCol]):NULL;
     }
     else {
         *Value = NULL;

@@ -824,6 +824,7 @@ public:
 };
 
 class cSQLiteDatabase {
+    friend class cStatement;
 private:
     bool        mAutoCommit;
     bool        mActiveTransaction;
@@ -836,13 +837,15 @@ private:
     int initializeTables();
     int initializeTriggers();
     static int getResultRow(void* DB, int NumCols, char** Values, char** ColNames);
+    int exec(const char* Statement);
 public:
+    static const char* sprintf(const char* Format, ...);
     virtual ~cSQLiteDatabase();
     static cSQLiteDatabase* getInstance();
     int getResultCount() const { return this->mRows->Count(); }
     long getLastInsertRowID() const;
     cRows* getResultRows() const { return this->mRows; }
-    int execStatement(const char* Statement);
+    int execStatement(const char* Statement, ...);
     void startTransaction();
     void commitTransaction();
     void rollbackTransaction();

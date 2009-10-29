@@ -33,11 +33,7 @@ cUPnPResources* cUPnPResources::getInstance(){
 }
 
 int cUPnPResources::loadResources(){
-    cString Statement = cString::sprintf("SELECT %s FROM %s",
-                                        SQLITE_COL_RESOURCEID,
-                                        SQLITE_TABLE_RESOURCES
-                                        );
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement("SELECT %s FROM %s",SQLITE_COL_RESOURCEID,SQLITE_TABLE_RESOURCES)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -55,13 +51,11 @@ int cUPnPResources::loadResources(){
 }
 
 int cUPnPResources::getResourcesOfObject(cUPnPClassObject* Object){
-    cString Statement = cString::sprintf("SELECT %s FROM %s WHERE %s='%s'",
+    if(this->mDatabase->execStatement("SELECT %s FROM %s WHERE %s=%Q",
                                         SQLITE_COL_RESOURCEID,
                                         SQLITE_TABLE_RESOURCES,
                                         SQLITE_COL_OBJECTID,
-                                        *Object->getID()
-                                        );
-    if(this->mDatabase->execStatement(Statement)){
+                                        *Object->getID())){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -187,12 +181,10 @@ cUPnPResourceMediator::~cUPnPResourceMediator(){}
 cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
     cUPnPResource* Resource = new cUPnPResource;
     Resource->mResourceID = ResourceID;
-    cString Statement = cString::sprintf("SELECT * FROM %s WHERE %s=%d",
+    if(this->mDatabase->execStatement("SELECT * FROM %s WHERE %s=%d",
                                         SQLITE_TABLE_RESOURCES,
                                         SQLITE_COL_RESOURCEID,
-                                        ResourceID
-                                        );
-    if(this->mDatabase->execStatement(Statement)){
+                                        ResourceID)){
         ERROR("Error while executing statement");
         return NULL;
     }
@@ -248,42 +240,37 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
 
 int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
 
-    char* escapedResource = NULL;
-    escapeSQLite(Resource->mResource, &escapedResource);
+    cString Format = "UPDATE %s SET %s=%Q,"
+                                   "%s=%Q,"
+                                   "%s=%Q,"
+                                   "%s=%ld,"
+                                   "%s=%Q,"
+                                   "%s=%d,"
+                                   "%s=%d,"
+                                   "%s=%d,"
+                                   "%s=%d,"
+                                   "%s=%d,"
+                                   "%s=%Q,"
+                                   "%s=%Q,"
+                                   "%s=%d"
+                                   " WHERE %s=%d";
 
-    cString Format = "UPDATE %s SET %s WHERE %s=%d";
-    cString Sets   = cString::sprintf("%s='%s',"
-                                      "%s='%s',"
-                                      "%s='%s',"
-                                      "%s=%ld,"
-                                      "%s='%s',"
-                                      "%s=%d,"
-                                      "%s=%d,"
-                                      "%s=%d,"
-                                      "%s=%d,"
-                                      "%s=%d,"
-                                      "%s='%s',"
-                                      "%s='%s',"
-                                      "%s=%d",
-                                      SQLITE_COL_OBJECTID, *Resource->mObjectID?*Resource->mObjectID:"NULL",
-                                      SQLITE_COL_PROTOCOLINFO, *Resource->mProtocolInfo?*Resource->mProtocolInfo:"NULL",
-                                      SQLITE_COL_RESOURCE, escapedResource?escapedResource:"NULL",
-                                      SQLITE_COL_SIZE, Resource->mSize,
-                                      SQLITE_COL_DURATION, *Resource->mDuration?*Resource->mDuration:"NULL",
-                                      SQLITE_COL_BITRATE, Resource->mBitrate,
-                                      SQLITE_COL_SAMPLEFREQUENCE, Resource->mSampleFrequency,
-                                      SQLITE_COL_BITSPERSAMPLE, Resource->mBitsPerSample,
-                                      SQLITE_COL_NOAUDIOCHANNELS, Resource->mNrAudioChannels,
-                                      SQLITE_COL_COLORDEPTH, Resource->mColorDepth,
-                                      SQLITE_COL_RESOLUTION, *Resource->mResolution?*Resource->mResolution:"NULL",
-                                      SQLITE_COL_CONTENTTYPE, *Resource->mContentType,
-                                      SQLITE_COL_RESOURCETYPE, Resource->mResourceType
-                                     );
-
-    free(escapedResource);
-    cString Statement = cString::sprintf(Format, SQLITE_TABLE_RESOURCES, *Sets, SQLITE_COL_RESOURCEID, Resource->mResourceID);
-
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format,
+                                         SQLITE_TABLE_RESOURCES,
+                                         SQLITE_COL_OBJECTID, *Resource->mObjectID,
+                                         SQLITE_COL_PROTOCOLINFO, *Resource->mProtocolInfo,
+                                         SQLITE_COL_RESOURCE, *Resource->mResource,
+                                         SQLITE_COL_SIZE, Resource->mSize,
+                                         SQLITE_COL_DURATION, *Resource->mDuration,
+                                         SQLITE_COL_BITRATE, Resource->mBitrate,
+                                         SQLITE_COL_SAMPLEFREQUENCE, Resource->mSampleFrequency,
+                                         SQLITE_COL_BITSPERSAMPLE, Resource->mBitsPerSample,
+                                         SQLITE_COL_NOAUDIOCHANNELS, Resource->mNrAudioChannels,
+                                         SQLITE_COL_COLORDEPTH, Resource->mColorDepth,
+                                         SQLITE_COL_RESOLUTION, *Resource->mResolution,
+                                         SQLITE_COL_CONTENTTYPE, *Resource->mContentType,
+                                         SQLITE_COL_RESOURCETYPE, Resource->mResourceType,
+                                         SQLITE_COL_RESOURCEID, Resource->mResourceID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -294,9 +281,7 @@ int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
 cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int ResourceType, cString ResourceFile, cString ContentType, cString ProtocolInfo){
     cUPnPResource* Resource = new cUPnPResource;
     
-    char* escapedResource = NULL;
-    
-    cString Statement = cString::sprintf("INSERT INTO %s (%s,%s,%s,%s,%s) VALUES ('%s','%s','%s','%s','%d')",
+    if(this->mDatabase->execStatement("INSERT INTO %s (%s,%s,%s,%s,%s) VALUES (%Q,%Q,%Q,%Q,%d)",
                                          SQLITE_TABLE_RESOURCES,
                                          SQLITE_COL_OBJECTID,
                                          SQLITE_COL_RESOURCE,
@@ -304,14 +289,10 @@ cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int 
                                          SQLITE_COL_CONTENTTYPE,
                                          SQLITE_COL_RESOURCETYPE,
                                          *Object->getID(),
-                                         escapeSQLite(ResourceFile, &escapedResource),
+                                         *ResourceFile,
                                          *ProtocolInfo,
                                          *ContentType,
-                                         ResourceType
-                                        );
-    free(escapedResource);
-    
-    if(this->mDatabase->execStatement(Statement)){
+                                         ResourceType)){
         ERROR("Error while executing statement");
         return NULL;
     }

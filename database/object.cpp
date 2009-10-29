@@ -265,7 +265,7 @@ bool cUPnPClassObject::getProperty(const char* Property, char** Value) const {
         Val = this->isRestricted()?"1":"0";
     }
     else if(!strcasecmp(Property, SQLITE_COL_WRITESTATUS) || !strcasecmp(Property, UPNP_PROP_WRITESTATUS)){
-        Val = cString::sprintf("%d",this->getWriteStatus());
+        Val = itoa(this->getWriteStatus());
     }
     else {
         ERROR("Invalid property '%s'", Property);
@@ -1035,11 +1035,10 @@ void cUPnPObjectFactory::unregisterMediator(const char* UPnPClass, bool freeMedi
 }
 
 cMediatorInterface* cUPnPObjectFactory::findMediatorByID(cUPnPObjectID ID){
-    cString Format = "SELECT %s FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL, Class = NULL;
+    cString Format = "SELECT %s FROM %s WHERE %s=%Q";
+    cString Column = NULL, Value = NULL, Class = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_COL_CLASS, SQLITE_TABLE_OBJECTS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_COL_CLASS, SQLITE_TABLE_OBJECTS, SQLITE_COL_OBJECTID, *ID)){
         ERROR("Error while executing statement");
         return NULL;
     }
@@ -1142,10 +1141,8 @@ int cUPnPObjectMediator::saveObject(cUPnPClassObject* Object){
 }
 
 int cUPnPObjectMediator::deleteObject(cUPnPClassObject* Object){
-    cString Statement = NULL;
-    cString Format = "DELETE FROM %s WHERE %s=%s";
-    Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, SQLITE_COL_OBJECTID, *Object->getID());
-    if(this->mDatabase->execStatement(Statement)){
+    cString Format = "DELETE FROM %s WHERE %s=%Q";
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_OBJECTS, SQLITE_COL_OBJECTID, *Object->getID())){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1192,9 +1189,7 @@ int cUPnPObjectMediator::initializeObject(cUPnPClassObject* Object, const char* 
         ERROR("Error while setting restriction");
         return -1;
     }
-    char* escapedTitle;
-    escapeSQLite(Object->getTitle(), &escapedTitle);
-    cString Statement = cString::sprintf("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (%s, %s, '%s', '%s', %d)",
+    if(this->mDatabase->execStatement("INSERT INTO %s (%s, %s, %s, %s, %s) VALUES (%s, %s, %Q, %Q, %d)",
                                          SQLITE_TABLE_OBJECTS,
                                          SQLITE_COL_OBJECTID,
                                          SQLITE_COL_PARENTID,
@@ -1204,14 +1199,11 @@ int cUPnPObjectMediator::initializeObject(cUPnPClassObject* Object, const char* 
                                          *Object->getID(),
                                          *Object->getParentID(),
                                          Object->getClass(),
-                                         escapedTitle,
-                                         Object->isRestricted()?1:0
-                                        );
-    if(this->mDatabase->execStatement(Statement)){
+                                         Object->getTitle(),
+                                         Object->isRestricted()?1:0)){
         ERROR("Error while executing statement");
         return -1;
     }
-    free(escapedTitle);
     return 0;
 }
 
@@ -1223,7 +1215,6 @@ int cUPnPObjectMediator::objectToDatabase(cUPnPClassObject* Object){
     MESSAGE("Updating object #%s", *Object->getID());
     cString Format = "UPDATE %s SET %s WHERE %s='%s'";
     //cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
-    cString Statement=NULL;
     cString Set=NULL;
     //cString Columns=NULL, Values=NULL;
     char *Value=NULL;
@@ -1238,21 +1229,13 @@ int cUPnPObjectMediator::objectToDatabase(cUPnPClassObject* Object){
         NULL
     };
     for(cString* Property = Properties; *(*Property)!=NULL; Property++){
-        //Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
         if(!Object->getProperty(*Property, &Value)){
             ERROR("No such property '%s' in object with ID '%s'",*(*Property),*Object->getID());
             return -1;
         }
-        char *escapedValue;
-        escapeSQLite(Value, &escapedValue);
-        MESSAGE("Set %s to %s", *(*Property), escapedValue);
-        //Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", Value?Value:"NULL");
-        Set = cString::sprintf("%s%s%s='%s'", *Set?*Set:"", *Set?",":"", *(*Property), escapedValue?escapedValue:"NULL");
-        
+        Set = cSQLiteDatabase::sprintf("%s%s%s=%Q", *Set?*Set:"", *Set?",":"", *(*Property), Value);
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, *Set, SQLITE_COL_OBJECTID, *Object->mLastID);
-    //Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, *Columns, *Values);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_OBJECTS, *Set, SQLITE_COL_OBJECTID, *Object->mLastID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1262,11 +1245,12 @@ int cUPnPObjectMediator::objectToDatabase(cUPnPClassObject* Object){
 }
 
 int cUPnPObjectMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID ID){
-    cString Format = "SELECT * FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL;
+    cString Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_TABLE_OBJECTS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement("SELECT * FROM %s WHERE %s=%Q",
+                                        SQLITE_TABLE_OBJECTS,
+                                        SQLITE_COL_OBJECTID,
+                                        *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1345,7 +1329,7 @@ cUPnPItemMediator::cUPnPItemMediator(cMediaDatabase* MediaDatabase) :
 int cUPnPItemMediator::objectToDatabase(cUPnPClassObject* Object){
     if(cUPnPObjectMediator::objectToDatabase(Object)) return -1;
     cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
-    cString Statement=NULL, Columns=NULL, Values=NULL;
+    cString Columns=NULL, Values=NULL;
     char *Value=NULL;
     cString Properties[] = {
         SQLITE_COL_OBJECTID,
@@ -1353,18 +1337,15 @@ int cUPnPItemMediator::objectToDatabase(cUPnPClassObject* Object){
         NULL
     };
     for(cString* Property = Properties; *(*Property); Property++){
-        Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
+        Columns = cSQLiteDatabase::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
         if(!Object->getProperty(*Property, &Value)){
             ERROR("No such property '%s' in object with ID '%s'",*(*Property),*Object->getID());
             return -1;
         }
-        char *escapedValue;
-        escapeSQLite(Value, &escapedValue);
-        Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", escapedValue?escapedValue:"NULL");
+        Values = cSQLiteDatabase::sprintf("%s%s%Q", *Values?*Values:"", *Values?",":"", Value);
         
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_ITEMS, *Columns, *Values);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_ITEMS, *Columns, *Values)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1377,11 +1358,12 @@ int cUPnPItemMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID 
         return -1;
     }
     cUPnPClassItem* Item = (cUPnPClassItem*) Object;
-    cString Format = "SELECT * FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL;
+    cString Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_TABLE_ITEMS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement("SELECT * FROM %s WHERE %s=%Q",
+                                       SQLITE_TABLE_ITEMS,
+                                       SQLITE_COL_OBJECTID,
+                                       *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1437,7 +1419,7 @@ int cUPnPContainerMediator::objectToDatabase(cUPnPClassObject* Object){
     if(cUPnPObjectMediator::objectToDatabase(Object)) return -1;
     cUPnPClassContainer* Container = (cUPnPClassContainer*)Object;
     cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
-    cString Statement=NULL, Columns=NULL, Values=NULL;
+    cString Columns=NULL, Values=NULL;
     char *Value=NULL;
     cString Properties[] = {
         SQLITE_COL_OBJECTID,
@@ -1447,26 +1429,22 @@ int cUPnPContainerMediator::objectToDatabase(cUPnPClassObject* Object){
         NULL
     };
     for(cString* Property = Properties; *(*Property); Property++){
-        Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
+        Columns = cSQLiteDatabase::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
         if(!Container->getProperty(*Property, &Value)){
             ERROR("No such property '%s' in object with ID '%s'",*(*Property),*Container->getID());
             return -1;
         }
-        char *escapedValue;
-        escapeSQLite(Value, &escapedValue);
-        Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", escapedValue?escapedValue:"NULL");
+        Values = cSQLiteDatabase::sprintf("%s%s%Q", *Values?*Values:"", *Values?",":"", Value);
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_CONTAINERS, *Columns, *Values);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_CONTAINERS, *Columns, *Values)){
         ERROR("Error while executing statement");
         return -1;
     }
     for(unsigned int i=0; i<Container->getSearchClasses()->size(); i++){
         cClass Class = Container->getSearchClasses()->at(i);
-        Columns = cString::sprintf("%s,%s,%s", SQLITE_COL_OBJECTID, SQLITE_COL_CLASS, SQLITE_COL_CLASSDERIVED);
-        Values = cString::sprintf("'%s','%s','%s'", *Container->getID(), *Class.ID, Class.includeDerived?"1":"0");
-        Statement = cString::sprintf(Format, SQLITE_TABLE_SEARCHCLASS, *Columns, *Values);
-        if(this->mDatabase->execStatement(Statement)){
+        Columns = cSQLiteDatabase::sprintf("%s,%s,%s", SQLITE_COL_OBJECTID, SQLITE_COL_CLASS, SQLITE_COL_CLASSDERIVED);
+        Values = cSQLiteDatabase::sprintf("%Q,%Q,%d", *Container->getID(), *Class.ID, Class.includeDerived?1:0);
+        if(this->mDatabase->execStatement(Format, SQLITE_TABLE_SEARCHCLASS, *Columns, *Values)){
             ERROR("Error while executing statement");
             return -1;
         }
@@ -1482,10 +1460,9 @@ int cUPnPContainerMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
     }
     cUPnPClassContainer* Container = (cUPnPClassContainer*)Object;
     cString Format = "SELECT * FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL;
+    cString Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_TABLE_CONTAINERS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_CONTAINERS, SQLITE_COL_OBJECTID, *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1514,11 +1491,10 @@ int cUPnPContainerMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
             }
         }
     }
-    Statement = cString::sprintf("SELECT %s FROM %s WHERE %s=%s", SQLITE_COL_OBJECTID,
+    if(this->mDatabase->execStatement("SELECT %s FROM %s WHERE %s=%s", SQLITE_COL_OBJECTID,
                                                                   SQLITE_TABLE_OBJECTS,
                                                                   SQLITE_COL_PARENTID,
-                                                                  *ID);
-    if(this->mDatabase->execStatement(Statement)){
+                                                                  *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1530,8 +1506,7 @@ int cUPnPContainerMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
             }
         }
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_SEARCHCLASS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_SEARCHCLASS, SQLITE_COL_OBJECTID, *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1597,7 +1572,7 @@ int cUPnPVideoItemMediator::objectToDatabase(cUPnPClassObject* Object){
     if(cUPnPItemMediator::objectToDatabase(Object)) return -1;
     cUPnPClassVideoItem* VideoItem = (cUPnPClassVideoItem*)Object;
     cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
-    cString Statement=NULL, Columns=NULL, Values=NULL;
+    cString Columns=NULL, Values=NULL;
     char *Value=NULL;
     cString Properties[] = {
         SQLITE_COL_OBJECTID,
@@ -1614,18 +1589,14 @@ int cUPnPVideoItemMediator::objectToDatabase(cUPnPClassObject* Object){
         NULL
     };
     for(cString* Property = Properties; *(*Property); Property++){
-        Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
+        Columns = cSQLiteDatabase::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
         if(!VideoItem->getProperty(*Property, &Value)){
             ERROR("No such property '%s' in object with ID '%s'",*(*Property),* VideoItem->getID());
             return -1;
         }
-        char *escapedValue;
-        escapeSQLite(Value, &escapedValue);
-        Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", escapedValue?escapedValue:"NULL");
-        
+        Values = cSQLiteDatabase::sprintf("%s%s%Q", *Values?*Values:"", *Values?",":"", Value);
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_VIDEOITEMS, *Columns, *Values);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_VIDEOITEMS, *Columns, *Values)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1639,10 +1610,9 @@ int cUPnPVideoItemMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
     }
     cUPnPClassVideoItem* VideoItem = (cUPnPClassVideoItem*)Object;
     cString Format = "SELECT * FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL;
+    cString Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_TABLE_VIDEOITEMS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_VIDEOITEMS, SQLITE_COL_OBJECTID, *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1743,7 +1713,7 @@ int cUPnPVideoBroadcastMediator::objectToDatabase(cUPnPClassObject* Object){
     if(cUPnPVideoItemMediator::objectToDatabase(Object)) return -1;
     cUPnPClassVideoBroadcast* VideoBroadcast = (cUPnPClassVideoBroadcast*)Object;
     cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
-    cString Statement=NULL, Columns=NULL, Values=NULL;
+    cString Columns=NULL, Values=NULL;
     char *Value=NULL;
     cString Properties[] = {
         SQLITE_COL_OBJECTID,
@@ -1754,18 +1724,14 @@ int cUPnPVideoBroadcastMediator::objectToDatabase(cUPnPClassObject* Object){
         NULL
     };
     for(cString* Property = Properties; *(*Property); Property++){
-        Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
+        Columns = cSQLiteDatabase::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
         if(!VideoBroadcast->getProperty(*Property, &Value)){
             ERROR("No such property '%s' in object with ID '%s'",*(*Property),* VideoBroadcast->getID());
             return -1;
         }
-        char *escapedValue;
-        escapeSQLite(Value, &escapedValue);
-        Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", escapedValue?escapedValue:"NULL");
-        
+        Values = cSQLiteDatabase::sprintf("%s%s%Q", *Values?*Values:"", *Values?",":"", Value);
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_VIDEOBROADCASTS, *Columns, *Values);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_VIDEOBROADCASTS, *Columns, *Values)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1779,10 +1745,9 @@ int cUPnPVideoBroadcastMediator::databaseToObject(cUPnPClassObject* Object, cUPn
     }
     cUPnPClassVideoBroadcast* VideoBroadcast = (cUPnPClassVideoBroadcast*)Object;
     cString Format = "SELECT * FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL;
+    cString Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_TABLE_VIDEOBROADCASTS, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_VIDEOBROADCASTS, SQLITE_COL_OBJECTID, *ID)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1847,7 +1812,7 @@ int cUPnPMovieMediator::objectToDatabase(cUPnPClassObject* Object){
     if(cUPnPVideoItemMediator::objectToDatabase(Object)) return -1;
     cUPnPClassMovie* Movie = (cUPnPClassMovie*)Object;
     cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
-    cString Statement=NULL, Columns=NULL, Values=NULL;
+    cString Columns=NULL, Values=NULL;
     char *Value=NULL;
     cString Properties[] = {
         SQLITE_COL_OBJECTID,
@@ -1856,18 +1821,14 @@ int cUPnPMovieMediator::objectToDatabase(cUPnPClassObject* Object){
         NULL
     };
     for(cString* Property = Properties; *(*Property); Property++){
-        Columns = cString::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
+        Columns = cSQLiteDatabase::sprintf("%s%s%s", *Columns?*Columns:"", *Columns?",":"", *(*Property));
         if(!Movie->getProperty(*Property, &Value)){
             ERROR("No such property '%s' in object with ID '%s'",*(*Property),* Movie->getID());
             return -1;
         }
-        char *escapedValue;
-        escapeSQLite(Value, &escapedValue);
-        Values = cString::sprintf("%s%s'%s'", *Values?*Values:"", *Values?",":"", escapedValue?escapedValue:"NULL");
-
+        Values = cSQLiteDatabase::sprintf("%s%s%Q", *Values?*Values:"", *Values?",":"", Value);
     }
-    Statement = cString::sprintf(Format, SQLITE_TABLE_MOVIES, *Columns, *Values);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_MOVIES, *Columns, *Values)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -1881,10 +1842,9 @@ int cUPnPMovieMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID
     }
     cUPnPClassMovie* Movie = (cUPnPClassMovie*)Object;
     cString Format = "SELECT * FROM %s WHERE %s=%s";
-    cString Statement = NULL, Column = NULL, Value = NULL;
+    cString Column = NULL, Value = NULL;
     cRows* Rows; cRow* Row;
-    Statement = cString::sprintf(Format, SQLITE_TABLE_MOVIES, SQLITE_COL_OBJECTID, *ID);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement(Format, SQLITE_TABLE_MOVIES, SQLITE_COL_OBJECTID, *ID)){
         ERROR("Error while executing statement");
         return -1;
     }

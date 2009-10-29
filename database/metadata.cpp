@@ -61,12 +61,10 @@ bool cMediaDatabase::init(){
 }
 
 void cMediaDatabase::updateSystemID(){
-    cString Statement = cString::sprintf("INSERT OR REPLACE INTO %s (Key,Value) VALUES ('%s','%d')",
-            SQLITE_TABLE_SYSTEM,
-            KEY_SYSTEM_UPDATE_ID,
-            this->getSystemUpdateID()+1
-            );
-    this->mDatabase->execStatement(Statement);
+    this->mDatabase->execStatement("INSERT OR REPLACE INTO %s (Key,Value) VALUES (%Q,%d)",
+                                    SQLITE_TABLE_SYSTEM,
+                                    KEY_SYSTEM_UPDATE_ID,
+                                    this->getSystemUpdateID()+1);
 }
 
 const char* cMediaDatabase::getContainerUpdateIDs(){
@@ -74,11 +72,9 @@ const char* cMediaDatabase::getContainerUpdateIDs(){
 }
 
 unsigned int cMediaDatabase::getSystemUpdateID(){
-    cString Statement = cString::sprintf("SELECT Value FROM %s WHERE Key='%s'",
-            SQLITE_TABLE_SYSTEM,
-            KEY_SYSTEM_UPDATE_ID
-            );
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement("SELECT Value FROM %s WHERE Key=%Q",
+                                        SQLITE_TABLE_SYSTEM,
+                                        KEY_SYSTEM_UPDATE_ID)){
         ERROR("Error while executing statement");
         return 0;
     }
@@ -99,9 +95,9 @@ unsigned int cMediaDatabase::getSystemUpdateID(){
 
 cUPnPObjectID cMediaDatabase::getNextObjectID(){
     cString Statement, Column, Value;
-    const char* Format = "SELECT Key FROM %s WHERE KeyID=%s";
-    Statement = cString::sprintf(Format, SQLITE_TABLE_PRIMARY_KEYS, PK_OBJECTS);
-    if(this->mDatabase->execStatement(Statement)){
+    if(this->mDatabase->execStatement("SELECT Key FROM %s WHERE KeyID=%Q",
+                                      SQLITE_TABLE_PRIMARY_KEYS,
+                                      PK_OBJECTS)){
         ERROR("Error while executing statement");
         return 0;
     }
@@ -130,17 +126,12 @@ int cMediaDatabase::addFastFind(cUPnPClassObject* Object, const char* FastFind){
         return -1;
     }
 
-    char* escapedFastFind;
-    escapeSQLite(FastFind, &escapedFastFind);
-    cString Statement = cString::sprintf("INSERT OR REPLACE INTO %s (%s, %s) VALUES ('%s', '%s')",
+    if(this->mDatabase->execStatement("INSERT OR REPLACE INTO %s (%s, %s) VALUES (%Q, %Q)",
             SQLITE_TABLE_ITEMFINDER,
             SQLITE_COL_OBJECTID,
             SQLITE_COL_ITEMFINDER,
             *Object->getID(),
-            escapedFastFind
-                                        );
-    free(escapedFastFind);
-    if(this->mDatabase->execStatement(Statement)){
+            FastFind)){
         ERROR("Error while executing statement");
         return -1;
     }
@@ -150,10 +141,12 @@ int cMediaDatabase::addFastFind(cUPnPClassObject* Object, const char* FastFind){
 cUPnPClassObject* cMediaDatabase::getObjectByFastFind(const char* FastFind){
     if(!FastFind) return NULL;
     MESSAGE("Try to find Object with identifier %s", FastFind);
-    cString Statement, Column, Value;
-    const char* Format = "SELECT %s FROM %s WHERE %s='%s'";
-    Statement = cString::sprintf(Format, SQLITE_COL_OBJECTID, SQLITE_TABLE_ITEMFINDER, SQLITE_COL_ITEMFINDER, FastFind);
-    if(this->mDatabase->execStatement(Statement)){
+    cString Column, Value;
+    if(this->mDatabase->execStatement("SELECT %s FROM %s WHERE %s=%Q",
+                                       SQLITE_COL_OBJECTID,
+                                       SQLITE_TABLE_ITEMFINDER,
+                                       SQLITE_COL_ITEMFINDER,
+                                       FastFind)){
         ERROR("Error while executing statement");
         return 0;
     }
