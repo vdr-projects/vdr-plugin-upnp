@@ -232,5 +232,5 @@ const char* cDlna::getDeviceDescription(const char* URLBase){
 //            UPNP_AVT_CONTROL_URL,           // UPnP AVT Control URL
 //            UPNP_AVT_EVENT_URL              // UPnP AVT Event URL
             );
-    return description;
+    return strdup0(*description);
 }

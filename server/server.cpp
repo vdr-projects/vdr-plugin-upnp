@@ -118,7 +118,7 @@ bool cUPnPServer::init(void){
     //register media server device to SDK
     cString URLBase = cString::sprintf("http://%s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
 
-    this->mDeviceDescription = cDlna::getInstance()->getDeviceDescription(URLBase);
+    this->mDeviceDescription = cString(cDlna::getInstance()->getDeviceDescription(URLBase),true);
 
     MESSAGE("Register Media Server Device");
     ret = UpnpRegisterRootDevice2(UPNPREG_BUF_DESC,
