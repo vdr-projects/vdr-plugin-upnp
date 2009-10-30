@@ -129,7 +129,7 @@
                                                         "OR "\
                                                         "((SELECT " SQLITE_COL_OBJECTID " FROM " SQLITE_TABLE_OBJECTS " "\
                                                         "WHERE " SQLITE_COL_OBJECTID "=NEW." SQLITE_COL_OBJECTID " "\
-                                                        "AND " SQLITE_COL_CLASS " LIKE '" Class "%') IS NULL) "\
+                                                        "AND " SQLITE_COL_CLASS " LIKE '" Class "%%') IS NULL) "\
                                                         ") THEN "\
                                                         "RAISE(" SQLITE_TRANSACTION_TYPE ", "\
                                                         "'INSERT on table " TableB " failed due constraint violation "\
@@ -146,7 +146,7 @@
                                                         "WHEN ("\
                                                         "((SELECT " SQLITE_COL_OBJECTID " FROM " TableA " "\
                                                         "WHERE " SQLITE_COL_OBJECTID "=NEW." SQLITE_COL_OBJECTID " "\
-                                                        "AND " SQLITE_COL_CLASS " LIKE '" Class "%') IS NULL)"\
+                                                        "AND " SQLITE_COL_CLASS " LIKE '" Class "%%') IS NULL)"\
                                                         ") THEN "\
                                                         "RAISE(" SQLITE_TRANSACTION_TYPE ", "\
                                                         "'UPDATE on table " TableB " failed due constraint violation "\

@@ -127,10 +127,8 @@ cRow::cRow(){
 }
 
 cRow::~cRow(){
-    for(int i=0;i<this->ColCount;i++){
-        delete Columns[i];
-        delete Values[i];
-    }
+    delete [] this->Columns;
+    delete [] this->Values;
     this->Columns = NULL;
     this->Values = NULL;
 }

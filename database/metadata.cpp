@@ -94,7 +94,7 @@ unsigned int cMediaDatabase::getSystemUpdateID(){
 }
 
 cUPnPObjectID cMediaDatabase::getNextObjectID(){
-    cString Statement, Column, Value;
+    cString Column, Value;
     if(this->mDatabase->execStatement("SELECT Key FROM %s WHERE KeyID=%Q",
                                       SQLITE_TABLE_PRIMARY_KEYS,
                                       PK_OBJECTS)){
