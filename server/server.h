@@ -20,6 +20,13 @@
 #include "../upnpcomponents/contentdirectory.h"
 #include "../upnp.h"
 
+/**
+ * The UPnP Server
+ *
+ * This is the core of the UPnP server. This handles all the components which
+ * are needed for a UPnP media server. Incoming messages are passed through it
+ * and it determines what to do.
+ */
 class cUPnPServer {
     friend class cPluginUpnp;
 public:
@@ -42,7 +49,10 @@ public:
      *
      * This switch indicates if the server is startable or not
      *
-     * If it is set to FALSE, any invocation of start() will do nothing.
+     * If it is set to false, any invocation of start() will do nothing.
+     *
+     * @param enabled if \bc true, the server will be enabled. If \bc false it is
+     * disabled.
      */
     void enable(bool enabled);
     /**
@@ -50,7 +60,9 @@ public:
      *
      * This will start the UPnP server activities as a background task.
      *
-     * @return 1 when the server started successfully, 0 otherwise
+     * @return returns
+     * - \bc true, when the server started successfully
+     * - \bc false, otherwise
      */
     bool start(void);
     /**
@@ -60,7 +72,9 @@ public:
      * It will stop the server functionalities, clear everything and
      * start it again.
      *
-     * @return 1 when the server restarted successfully, 0 otherwise
+     * @return returns
+     * - \bc true, when the server restarted successfully
+     * - \bc false, otherwise
      */
     bool restart(void);
     /**
@@ -70,6 +84,16 @@ public:
      * any clients and open ports will be closed.
      */
     void stop(void);
+    /**
+     * Automatically detect settings
+     *
+     * This will automatically detect the network settings if the autodetection
+     * is turned on.
+     *
+     * @return returns
+     * - \bc true, if autoDetection was successful
+     * - \bc false, otherwise
+     */
     bool autoDetectSettings(void);
     /**
      * Get the server address
@@ -82,7 +106,7 @@ public:
     /**
      * Get the interface the server listens to
      *
-     * Returns the network interface
+     * @return the network interface
      */
     const char* getInterface(void) const { return this->mInterface; }
     /**
@@ -98,13 +122,20 @@ public:
      * Returns 1 when the port is valid, 0 otherwise
      *
      * @param port     The port of the server
-     * @return 1 if the new server address is set, 0 otherwise
+     * @return returns
+     * - \bc true, if the new server port is set
+     * - \bc false, otherwise
      */
     bool setServerPort(unsigned short port);
     /**
      * The Interface to listen on
      * 
      * Sets the listener interface, for instance 'eth1' or 'wlan0'
+     *
+     * @param Interface     The interface of the server
+     * @return returns
+     * - \bc true, if the new server address is set
+     * - \bc false, otherwise
      */
     bool setInterface(const char* Interface);
     /**
@@ -115,7 +146,12 @@ public:
      * changes through the system.
      *
      * This method should only be used in cases of fixed IP addresses
-     * for example when no DHCP server is available. 
+     * for example when no DHCP server is available.
+     *
+     * @param Address     The address of the server
+     * @return returns
+     * - \bc true, if the new server address is set
+     * - \bc false, otherwise
      */
     bool setAddress(const char* Address);
     /**
@@ -123,6 +159,11 @@ public:
      *
      * If this is set to true, the setup will get it's information via
      * auto detection
+     *
+     * @param enable \bc true enables and \bc false disables the auto detection
+     * @return returns
+     * - \bc true, if the new server address is set
+     * - \bc false, otherwise
      */
     bool setAutoDetection(bool enable);
     /**
@@ -130,7 +171,9 @@ public:
      *
      * This indicates if the server is currently enabled.
      *
-     * @return 1 if the server is enabled, 0 otherwise
+     * @return returns
+     * - \bc true, if the server is enabled
+     * - \bc false, otherwise
      */
     bool isEnabled(void) const { return this->mIsEnabled; }
     /**
@@ -138,13 +181,19 @@ public:
      *
      * If the server is enabled, this indicates if it is running.
      *
-     * @return 1 if the server is running, 0 otherwise
+     * @return returns
+     * - \bc true if the server is running
+     * - \bc false, otherwise
      */
     bool isRunning(void) const { return this->mIsRunning; }
     /**
      * Is auto detection enabled or not
      *
      * Returns true or false if auto detection is enabled or not
+     *
+     * @return returns
+     * - \bc true, if autodetection is enabled
+     * - \bc false, otherwise
      */
     bool isAutoDetectionEnabled() { return this->mIsAutoDetectionEnabled; }
 protected:

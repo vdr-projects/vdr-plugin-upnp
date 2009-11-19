@@ -12,8 +12,6 @@
 #include <vdr/tools.h>
 #include "../common.h"
 
-#define SQLITE_PRINT_STATEMENTS
-#define SQLITE_PRINT_FETCHES
 #define SQLITE_CASCADE_DELETES
 
 #define PK_OBJECTS                      TOSTRING(1)
@@ -144,7 +142,7 @@
                                                         "FOR EACH ROW BEGIN "\
                                                         "SELECT CASE "\
                                                         "WHEN ("\
-                                                        "((SELECT " SQLITE_COL_OBJECTID " FROM " TableA " "\
+                                                        "((SELECT " SQLITE_COL_OBJECTID " FROM " SQLITE_TABLE_OBJECTS " "\
                                                         "WHERE " SQLITE_COL_OBJECTID "=NEW." SQLITE_COL_OBJECTID " "\
                                                         "AND " SQLITE_COL_CLASS " LIKE '" Class "%%') IS NULL)"\
                                                         ") THEN "\
@@ -238,11 +236,11 @@
 #define SQLITE_DELETE_PARENT_TRIGGER                    SQLITE_DELETE_REFERENCE_TRIGGER(SQLITE_TABLE_OBJECTS, SQLITE_COL_PARENTID)
 #endif
 
- /**********************************************\
- *                                              *
- *  Primary keys                                *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Primary keys                                *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_PRIMARY_KEYS    "CREATE TABLE IF NOT EXISTS "\
                                             SQLITE_TABLE_PRIMARY_KEYS \
@@ -274,11 +272,11 @@
                                             "UPDATE " SQLITE_TABLE_PRIMARY_KEYS " SET Key=Key+1 WHERE KeyID=" PK_OBJECTS "; "\
                                             "END;"
 
- /**********************************************\
- *                                              *
- *  System settings                             *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  System settings                             *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_SYSTEM          "CREATE TABLE IF NOT EXISTS "\
                                             SQLITE_TABLE_SYSTEM " "\
@@ -294,11 +292,11 @@
                                             "WHEN ((SELECT Key FROM " SQLITE_TABLE_SYSTEM " WHERE Key=NEW.Key) IS NULL) "\
                                             "BEGIN INSERT INTO " SQLITE_TABLE_SYSTEM " (Key) VALUES (NEW.Key); END;"
 
- /**********************************************\
- *                                              *
- *  Fast item finder                            *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Fast item finder                            *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_ITEMFINDER      "CREATE TABLE IF NOT EXISTS "\
                                             SQLITE_TABLE_ITEMFINDER " "\
@@ -310,11 +308,11 @@
 #define SQLITE_TRIGGER_D_OBJECTS_ITEMFINDER SQLITE_DELETE_TRIGGER(SQLITE_TABLE_OBJECTS,\
                                                                   SQLITE_TABLE_ITEMFINDER)
 
- /**********************************************\
- *                                              *
- *  Objects                                     *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Objects                                     *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_OBJECTS     "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_OBJECTS \
@@ -369,11 +367,11 @@
                                          SQLITE_COL_PARENTID " must uniquely be -1') "\
                                          "END; END;"
 
- /**********************************************\
- *                                              *
- *  Items                                       *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Items                                       *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_ITEMS       "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_ITEMS \
@@ -403,11 +401,11 @@
 
 #define SQLITE_TRIGGER_D_ITEMS_ITEMS    SQLITE_DELETE_REFERENCE_TRIGGER(SQLITE_TABLE_ITEMS, SQLITE_COL_REFERENCEID)
 
- /**********************************************\
- *                                              *
- *  Containers                                  *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Containers                                  *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_CONTAINER   "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_CONTAINERS \
@@ -429,11 +427,11 @@
                                                                   SQLITE_TABLE_CONTAINERS,\
                                                                   UPNP_CLASS_CONTAINER)
 
- /**********************************************\
- *                                              *
- *  Video items                                 *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Video items                                 *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_VIDEOITEMS  "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_VIDEOITEMS \
@@ -461,11 +459,11 @@
                                                                 SQLITE_TABLE_VIDEOITEMS, \
                                                                 UPNP_CLASS_VIDEO)
 
- /**********************************************\
- *                                              *
- *  Audio items                                 *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Audio items                                 *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_AUDIOITEMS  "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_AUDIOITEMS \
@@ -488,11 +486,11 @@
                                                                 SQLITE_TABLE_AUDIOITEMS, \
                                                                 UPNP_CLASS_AUDIO)
 
- /**********************************************\
- *                                              *
- *  Image items                                 *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Image items                                 *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_IMAGEITEMS  "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_IMAGEITEMS \
@@ -517,11 +515,11 @@
                                                                 SQLITE_TABLE_IMAGEITEMS, \
                                                                 UPNP_CLASS_IMAGE)
 
- /**********************************************\
- *                                              *
- *  Video broadcasts                            *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Video broadcasts                            *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_VIDEOBROADCASTS "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_VIDEOBROADCASTS \
@@ -543,11 +541,11 @@
                                                                           SQLITE_TABLE_VIDEOBROADCASTS,\
                                                                           UPNP_CLASS_VIDEOBC)
 
- /**********************************************\
- *                                              *
- *  Audio broadcasts                            *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Audio broadcasts                            *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_AUDIOBROADCASTS "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_AUDIOBROADCASTS \
@@ -570,11 +568,11 @@
                                                                           SQLITE_TABLE_AUDIOBROADCASTS,\
                                                                           UPNP_CLASS_AUDIOBC)
 
- /**********************************************\
- *                                              *
- *  Movies                                      *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Movies                                      *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_MOVIES      "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_MOVIES \
@@ -598,11 +596,11 @@
                                                                  SQLITE_TABLE_MOVIES,\
                                                                  UPNP_CLASS_MOVIE)
 
- /**********************************************\
- *                                              *
- *  Photos                                      *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Photos                                      *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_PHOTOS      "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_PHOTOS \
@@ -621,11 +619,11 @@
                                                                  SQLITE_TABLE_PHOTOS,\
                                                                  UPNP_CLASS_PHOTO)
 
- /**********************************************\
- *                                              *
- *  Albums                                      *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Albums                                      *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_ALBUMS      "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_ALBUMS \
@@ -651,11 +649,11 @@
                                                                  SQLITE_TABLE_ALBUMS,\
                                                                  UPNP_CLASS_ALBUM)
 
- /**********************************************\
- *                                              *
- *  Playlists                                   *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Playlists                                   *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_PLAYLISTS   "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_PLAYLISTS \
@@ -683,11 +681,11 @@
                                                                     SQLITE_TABLE_PLAYLISTS,\
                                                                     UPNP_CLASS_PLAYLISTCONT)
 
- /**********************************************\
- *                                              *
- *  Search classes                              *
- *                                              *
- \**********************************************/
+/**********************************************\
+*                                              *
+*  Search classes                              *
+*                                              *
+\**********************************************/
 
 #define SQLITE_CREATE_TABLE_SEARCHCLASS "CREATE TABLE IF NOT EXISTS "\
                                         SQLITE_TABLE_SEARCHCLASS \
@@ -798,6 +796,13 @@
 
 class cSQLiteDatabase;
 
+/**
+ * Result row of a SQL SELECT request
+ *
+ * This is a single row of a {\c SQL SELECT} request.
+ *
+ * @see cRows
+ */
 class cRow : public cListObject {
     friend class cSQLiteDatabase;
 private:
@@ -808,11 +813,50 @@ private:
     cRow();
 public:
     virtual ~cRow();
+    /**
+     * Number of columns in this row
+     *
+     * @return the number of rows
+     */
     int  Count(){ return this->ColCount; }
-    bool fetchColumn(cString* Column, cString* Value);
-    bool fetchColumn(char** Column, char** Value);
+    /**
+     * Fetches a Column
+     *
+     * This will fetch a column of this row and stores the name of the column
+     * in the first parameter and the value in the second parameter.
+     *
+     * @return returns
+     * - \bc true, if more columns to come
+     * - \bc false, if the column is its last in this row.
+     */
+    bool fetchColumn(
+        cString* Column, /**< The name of the current column */
+        cString* Value /**< The value of the current value */
+    );
+    
+    /**
+     * Fetches a Column
+     *
+     * This will fetch a column of this row and stores the name of the column
+     * in the first parameter and the value in the second parameter.
+     *
+     * @return returns
+     * - \bc true, if more columns to come
+     * - \bc false, if the column is its last in this row.
+     */
+    bool fetchColumn(
+        char** Column, /**< The name of the current column */
+        char** Value /**< The value of the current column */
+    );
 };
 
+/**
+ * Result rows of a SQL SELECT request
+ *
+ * Contains the rows of a SQL SELECT request
+ *
+ * @see cRow
+ */
 class cRows : public cList<cRow> {
     friend class cSQLiteDatabase;
 private:
@@ -820,9 +864,29 @@ private:
     cRows();
 public:
     virtual ~cRows();
-    bool fetchRow(cRow** Row);
+    /**
+     * Fetches a row from the result
+     *
+     * This fetches the next row in the resultset by storing the contents of
+     * that row in the first parameter.
+     *
+     * @return returns
+     * - \bc true, if more rows to come
+     * - \bc false, if the row is its last in this resultset.
+     */
+    bool fetchRow(
+        cRow** Row /**< The Pointer of the row */
+    );
 };
 
+/**
+ * SQLite Database
+ *
+ * This is a wrapper class for a SQLite3 database connection
+ * It supports simple execution functions.
+ *
+ * On requests with returns any results a instance of \c cRows* will be created.
+ */
 class cSQLiteDatabase {
     friend class cStatement;
 private:
@@ -839,17 +903,122 @@ private:
     static int getResultRow(void* DB, int NumCols, char** Values, char** ColNames);
     int exec(const char* Statement);
 public:
-    static const char* sprintf(const char* Format, ...);
+    /**
+     * Prints a SQLite escaped text
+     *
+     * Returns a formated text with special characters to escape SQLite special
+     * characters like "'". Additionally to the well known characters of \a printf
+     * the following are allowed:
+     *
+     * - \bc q, like s, escapes single quotes in strings
+     * - \bc Q, like q, surrounds the escaped string with additional
+     *             single quotes
+     * - \bc z, frees the string after reading and coping it
+     *
+     * @see sprintf()
+     * @return the formated string
+     */
+    static const char* sprintf(
+        const char* Format, /**< The format string */
+        ... /**< optional properties which will be passed to sprintf */
+    );
     virtual ~cSQLiteDatabase();
+    /**
+     * Returns the instance of the database
+     *
+     * Returns the instance of the SQLite database. This will create a single
+     * instance of none is existing on the very first call. A subsequent call
+     * will return the same instance.
+     *
+     * @return the database instance
+     */
     static cSQLiteDatabase* getInstance();
+    /**
+     * Row count of the last result
+     *
+     * Returns the row count of the last {\c SQL SELECT} request.
+     *
+     * @see cRows
+     * @return the result row count
+     */
     int getResultCount() const { return this->mRows->Count(); }
+    /**
+     * The last \c INSERT RowID
+     *
+     * Returns the primary key of the last inserted row.
+     * This will only work if there are no successive calls to the database.
+     *
+     * @return the last insert RowID
+     */
     long getLastInsertRowID() const;
+    /**
+     * Result set of the last request
+     *
+     * Returns the result rows of the SQL SELECT request.
+     * This might be NULL, if the last statement was not a SELECT.
+     *
+     * @see cRows
+     * @return the result rows of the last \c SELECT statement.
+     */
     cRows* getResultRows() const { return this->mRows; }
-    int execStatement(const char* Statement, ...);
+    /**
+     * Executes a SQL statement
+     *
+     * This will execute the statement in the first parameter. If it is followed
+     * by any optional parameters it will be formated using the same function as
+     * in \c cSQLiteDatabase::sprintf().
+     *
+     * \sa cSQLiteDatabase::sprintf().
+     *
+     * @return returns an integer representing
+     * - \bc -1, in case of an error
+     * - \bc 0, when the statement was executed successfuly
+     */
+    int execStatement(
+        const char* Statement , /**< Statement to be executed */
+        ... /**< optional parameters passed to the format string */
+    );
+    /**
+     * Starts a transaction
+     *
+     * This starts a new transaction and commits or rolls back a previous.
+     *
+     * @see cSQLiteDatabase::setAutoCommit
+     * @see cSQLiteDatabase::commitTransaction
+     */
     void startTransaction();
+    /**
+     * Commits a transaction
+     *
+     * This function commits the transaction and writes all changes to the
+     * database
+     *
+     * @see cSQLiteDatabase::startTransaction
+     */
     void commitTransaction();
+    /**
+     * Performs a rollback on a transaction
+     *
+     * This function performs a rollback. No changes will be made to the
+     * database
+     *
+     * @see cSQLiteDatabase::rollbackTransaction
+     */
     void rollbackTransaction();
-    void setAutoCommit(bool Commit=true){ this->mAutoCommit = Commit; }
+    /**
+     * Set the commit behavior
+     *
+     * This function sets the auto commit behavior on new transactions with
+     * \sa cSQLiteDatabase::startTransaction.
+     *
+     * - \bc true, commits the last transaction before starting a
+     *              new one
+     * - \bc false, performs a rollback on the old transaction
+     *
+     */
+    void setAutoCommit(
+        bool Commit=true /**< Switches the behavior of auto commit */
+    ){ this->mAutoCommit = Commit; }
 };
 
 #endif	/* _DATABASE_H */

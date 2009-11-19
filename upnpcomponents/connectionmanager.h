@@ -10,6 +10,11 @@
 
 #include "upnpservice.h"
 
+/**
+ * Connection status
+ *
+ * The connection status of a certain virtual connection
+ */
 enum eConnectionStatus {
     OK,
     CONTENT_FORMAT_MISMATCH,
@@ -18,11 +23,22 @@ enum eConnectionStatus {
     UNKNOWN
 };
 
+/**
+ * Direction
+ *
+ * The direction of a virtual connection. Input means client to server, Output
+ * server to client
+ */
 enum eDirection {
     OUTPUT,
     INPUT
 };
 
+/**
+ * Virtual connection
+ *
+ * A virtual connection managed by the connection manager service
+ */
 class cVirtualConnection : public cListObject {
     friend class cConnectionManager;
 private:
@@ -41,15 +57,31 @@ private:
     static int getConnectionStatus(const char* ConnectionStatus);
 };
 
+/**
+ * The connection manager service
+ *
+ * This is the connection manager service which handles all incoming connection,
+ * creates and destroys connections to clients.
+ */
 class cConnectionManager : public cUpnpService {
 public:
-    cConnectionManager(UpnpDevice_Handle DeviceHandle);
+    /**
+     * Constructor of a Connection manager
+     *
+     * This creates an instance of a <em>Connection Manager Service</em> and provides
+     * interfaces for executing actions and subscribing on events.
+     */
+    cConnectionManager(
+        UpnpDevice_Handle DeviceHandle          ///< the UPnP device handle of this root device
+    );
     virtual ~cConnectionManager();
-    virtual int execute(Upnp_Action_Request* Request);
+    /*! @copydoc cUpnpService::subscribe(Upnp_Subscription_Request* Request) */
     virtual int subscribe(Upnp_Subscription_Request* Request);
-    bool setProtocolInfo(const char* ProtocolInfo);
-private:
+    /*! @copydoc cUpnpService::execute(Upnp_Action_Request* Request) */
+    virtual int execute(Upnp_Action_Request* Request);
+    /*! @copydoc cUpnpService::setError(Upnp_Action_Request* Request, int Error) */
     virtual void setError(Upnp_Action_Request* Request, int Error);
+private:
     int getProtocolInfo(Upnp_Action_Request* Request);
     int getCurrentConnectionIDs(Upnp_Action_Request* Request);
     int getCurrentConnectionInfo(Upnp_Action_Request* Request);

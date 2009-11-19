@@ -1,6 +1,10 @@
 VDR Plugin 'upnp' Revision History
 ----------------------------------
 
+2009-11-19: Version 0.0.1-alpha4
+
+- New: Added options for verbosity level and autodetect settings.
+
 2009-10-23: Version 0.0.1-alpha1
 
 - Fixed #185: Database rejected statements with single quotes inside strings

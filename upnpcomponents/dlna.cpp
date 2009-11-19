@@ -21,7 +21,7 @@ cDlna* cDlna::getInstance(void){
 }
 
 cDlna::cDlna() {
-    this->mRegisteredProfiles = new cRegisteredProfiles;
+    this->mRegisteredProfiles = new cList<cRegisteredProfile>;
     this->init();
 }
 
@@ -47,6 +47,8 @@ void cDlna::registerProfile(DLNAProfile* Profile, int Op, const char* Ps, int Ci
 void cDlna::registerMainProfiles(){
     this->registerProfile(&DLNA_PROFILE_MPEG_TS_SD_EU, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
     this->registerProfile(&DLNA_PROFILE_AVC_TS_HD_EU, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
+    this->registerProfile(&DLNA_PROFILE_MPEG_TS_SD_EU_ISO, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
+    this->registerProfile(&DLNA_PROFILE_AVC_TS_HD_EU_ISO, -1, NULL, -1, DLNA_FLAGS_PLUGIN_SUPPORT);
 }
 
 const char* cDlna::getSupportedProtocols(){
@@ -73,9 +75,9 @@ DLNAProfile* cDlna::getProfileOfChannel(cChannel* Channel){
     switch(Channel->Vtype()){
         case 0x02:
             // MPEG2 Video
-            return &DLNA_PROFILE_MPEG_TS_SD_EU;
+            return &DLNA_PROFILE_MPEG_TS_SD_EU_ISO;
         case 0x1B:
-            return &DLNA_PROFILE_AVC_TS_HD_EU;
+            return &DLNA_PROFILE_AVC_TS_HD_EU_ISO;
         default:
             ERROR("Unknown video type %d for channel %s!", Channel->Vtype(), Channel->Name());
             return NULL;

@@ -40,7 +40,7 @@ int cContentDirectory::subscribe(Upnp_Subscription_Request* Request){
 
 void cContentDirectory::Action(){
     static int Retry = 5;
-    MESSAGE("Start Content directory thread");
+    MESSAGE(VERBOSE_CDS, "Start Content directory thread");
     while(this->Running()){
         IXML_Document* PropertySet = NULL;
         UpnpAddToPropertySet(&PropertySet, "SystemUpdateID", itoa(this->mMediaDatabase->getSystemUpdateID()));
@@ -84,7 +84,7 @@ int cContentDirectory::execute(Upnp_Action_Request* Request){
 
 
 int cContentDirectory::browse(Upnp_Action_Request* Request){
-    MESSAGE("Browse requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
+    MESSAGE(VERBOSE_CDS, "Browse requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
 
     char* ObjectID = NULL;
     if(this->parseStringValue(Request->ActionRequest, "ObjectID", &ObjectID)){
@@ -201,7 +201,7 @@ int cContentDirectory::getSystemUpdateID(Upnp_Action_Request* Request){
 }
 
 int cContentDirectory::getSearchCapabilities(Upnp_Action_Request* Request){
-    MESSAGE("Sorry, no search capabilities yet");
+    MESSAGE(VERBOSE_CDS, "Sorry, no search capabilities yet");
 
     cString Result = cString::sprintf(
             "<u:%sResponse xmlns:u=\"%s\"> \
@@ -220,7 +220,7 @@ int cContentDirectory::getSearchCapabilities(Upnp_Action_Request* Request){
 }
 
 int cContentDirectory::getSortCapabilities(Upnp_Action_Request* Request){
-    MESSAGE("Sorry, no sort capabilities yet");
+    MESSAGE(VERBOSE_CDS, "Sorry, no sort capabilities yet");
 
     cString Result = cString::sprintf(
             "<u:%sResponse xmlns:u=\"%s\"> \

@@ -91,7 +91,7 @@
 #define att(s)                  strchr(s,'@')!=NULL?strchr(s,'@')+1:NULL
 #define prop(s)                 substr(s, 0, strchr(s,'@')-s)
 
-void message(const char* File, int Line, const char* Format, ...) __attribute__ ((format (printf, 3, 4)));
+void message(int level, const char* File, int Line, const char* Format, ...) __attribute__ ((format (printf, 4, 5)));
 
 /****************************************************
  *
@@ -154,11 +154,47 @@ void message(const char* File, int Line, const char* Format, ...) __attribute__ 
  * Messages are additional information about the servers behavior. This will
  * be useful for debugging.
  */
-#ifdef DEBUG
-#define MESSAGE(s...)       message(__FILE__, __LINE__, "UPnP server message: " s)
+#ifndef DEBUG
+#define MESSAGE(l,s...)       message(l,__FILE__, __LINE__, "UPnP server message: " s)
 #else
-#define MESSAGE(s...)       dsyslog("UPnP server message: " s)
+#define MESSAGE(l,s...)       dsyslog("UPnP server message: " s)
 #endif
+
+
+/**
+ * Define at which level the different messages will be printed
+ *
+ * The log levels reach from 1 to 5, where 1 is the highest log
+ * priority and 5 the lowest. 0 will deactivate the logging of
+ * the message. If you want to specifiy a certain level, add
+ * 'v' options as many as required for the log level.
+ *
+ * @example
+ * - \-v       Show warnings
+ * - \-vv      Log level 1
+ * - \-vvv     Log level 2
+ * - \-vvvv    Log level 3
+ * - \-vvvvv   Log level 4
+ * - \-vvvvvv  Log level 5
+ */
+#define VERBOSE_SQL               4
+#define VERBOSE_SQL_FETCHES       5
+#define VERBOSE_SQL_STATEMENTS    5
+#define VERBOSE_DIDL              4
+#define VERBOSE_LIVE_TV           3
+#define VERBOSE_RECORDS           3
+#define VERBOSE_CUSTOMFILES       3
+#define VERBOSE_SDK               1
+#define VERBOSE_EPG_UPDATES       3
+#define VERBOSE_WEBSERVER         2
+#define VERBOSE_MODIFICATIONS     2
+#define VERBOSE_METADATA          3
+#define VERBOSE_CUSTOM_OUTPUT     5
+#define VERBOSE_PARSERS           5
+#define VERBOSE_BUFFERS           5
+#define VERBOSE_CDS               2
+#define VERBOSE_CMS               2
+#define VERBOSE_OBJECTS           3
 
 /****************************************************
  *
@@ -648,17 +684,17 @@ enum UPnPWriteStatus {
  * The following operation field assumes that s0 is NOT changing. Only changes to sN are permitted.
  * If s0 and/or sN changes these fields must be set to false. Use DLNA_FLAG_*_BASED_SEEK flags instead.
  */
-#define DLNA_OPERATION_NONE                 00          // No seek operations supported
-#define DLNA_OPERATION_TIME_SEEK_RANGE      10          // is the server supporting time based seeks?
-#define DLNA_OPERATION_RANGE                01          // or byte based seeks?
+#define DLNA_OPERATION_NONE                 00          ///< No seek operations supported
+#define DLNA_OPERATION_TIME_SEEK_RANGE      10          ///< is the server supporting time based seeks?
+#define DLNA_OPERATION_RANGE                01          ///< or byte based seeks?
 
-#define DLNA_CONVERSION_TRANSCODED          1           // the content was converted from one media format to another
-#define DLNA_CONVERSION_NONE                0           // the content is available without conversion
+#define DLNA_CONVERSION_TRANSCODED          1           ///< the content was converted from one media format to another
+#define DLNA_CONVERSION_NONE                0           ///< the content is available without conversion
 
-#define DLNA_SUPPORTED_PLAYSPEEDS           "2,4,8,-2,-4,-8"; // 1 is required, but omited in the PS parameter
+#define DLNA_SUPPORTED_PLAYSPEEDS           "2,4,8,-2,-4,-8"; ///< 1 is required, but omited in the PS parameter
 
-#define DLNA_TRANSFER_PROTOCOL_HTTP         1           // use http tranfer
-#define DLNA_TRANSFER_PROTOCOL_RTP          2           // use rtp tranfer
+#define DLNA_TRANSFER_PROTOCOL_HTTP         1           ///< use http tranfer
+#define DLNA_TRANSFER_PROTOCOL_RTP          2           ///< use rtp tranfer
 
 /****************************************************
  *
@@ -666,21 +702,21 @@ enum UPnPWriteStatus {
  *
  ****************************************************/
 
-#define DLNA_FLAG_SENDER_PACED              1 << 31     // is the server setting the pace (i.e. RTP)?
-#define DLNA_FLAG_TIME_BASED_SEEK           1 << 30     // is the server supporting time based seeks?
-#define DLNA_FLAG_BYTE_BASED_SEEK           1 << 29     // or byte based seeking?
-#define DLNA_FLAG_PLAY_CONTAINER            1 << 28     // is it possible to play all contents of a container?
-#define DLNA_FLAG_S0_INCREASE               1 << 27     // is the beginning changing (time shift)?
-#define DLNA_FLAG_SN_INCREASE               1 << 26     // is the end changing (live-TV)?
-#define DLNA_FLAG_RTSP_PAUSE                1 << 25     // is pausing rtp streams permitted?
-#define DLNA_FLAG_STREAMING_TRANSFER        1 << 24     // is the transfer a stream (Audio/AV)?
-#define DLNA_FLAG_INTERACTIVE_TRANSFER      1 << 23     // is the transfer interactiv (printings)?
-#define DLNA_FLAG_BACKGROUND_TRANSFER       1 << 22     // is the tranfer done in background (downloaded)?
-#define DLNA_FLAG_CONNECTION_STALLING       1 << 21     // can the connection be paused on HTTP streams?
-#define DLNA_FLAG_VERSION_1_5               1 << 20     // does the server complies with DLNA V1.5
-#define DLNA_FLAG_CLEARTEXT_CONTENT         1 << 16     // (Link Protection) currently not used
-#define DLNA_FLAG_CLEARTEXT_BYTE_FULL_SEEK  1 << 15     // (Link Protection) currently not used
-#define DLNA_FLAG_CLEARTEXT_LIMITED_SEEK    1 << 14     // (Link Protection) currently not used
+#define DLNA_FLAG_SENDER_PACED              1 << 31     ///< is the server setting the pace (i.e. RTP)?
+#define DLNA_FLAG_TIME_BASED_SEEK           1 << 30     ///< is the server supporting time based seeks?
+#define DLNA_FLAG_BYTE_BASED_SEEK           1 << 29     ///< or byte based seeking?
+#define DLNA_FLAG_PLAY_CONTAINER            1 << 28     ///< is it possible to play all contents of a container?
+#define DLNA_FLAG_S0_INCREASE               1 << 27     ///< is the beginning changing (time shift)?
+#define DLNA_FLAG_SN_INCREASE               1 << 26     ///< is the end changing (live-TV)?
+#define DLNA_FLAG_RTSP_PAUSE                1 << 25     ///< is pausing rtp streams permitted?
+#define DLNA_FLAG_STREAMING_TRANSFER        1 << 24     ///< is the transfer a stream (Audio/AV)?
+#define DLNA_FLAG_INTERACTIVE_TRANSFER      1 << 23     ///< is the transfer interactiv (printings)?
+#define DLNA_FLAG_BACKGROUND_TRANSFER       1 << 22     ///< is the tranfer done in background (downloaded)?
+#define DLNA_FLAG_CONNECTION_STALLING       1 << 21     ///< can the connection be paused on HTTP streams?
+#define DLNA_FLAG_VERSION_1_5               1 << 20     ///< does the server complies with DLNA V1.5
+#define DLNA_FLAG_CLEARTEXT_CONTENT         1 << 16     ///< (Link Protection) currently not used
+#define DLNA_FLAG_CLEARTEXT_BYTE_FULL_SEEK  1 << 15     ///< (Link Protection) currently not used
+#define DLNA_FLAG_CLEARTEXT_LIMITED_SEEK    1 << 14     ///< (Link Protection) currently not used
 
 #define DLNA_FLAGS_PLUGIN_SUPPORT           DLNA_FLAG_BYTE_BASED_SEEK | \
                                             DLNA_FLAG_SN_INCREASE | \
@@ -703,29 +739,37 @@ enum UPnPWriteStatus {
  * label field as it seams to be not needed.
  */
 struct DLNAProfile {
-    const char* ID;
-    const char* mime;
+    const char* ID;     ///< the DLNA profile ID
+    const char* mime;   ///< the mime type of the resource
 };
 
+/**
+ * The DLNA profile for a icon image
+ *
+ * This complies with the DLNA media format guidelines. It contains a valid
+ * mime type, the resolution of the image and the corresponding bit depth
+ */
 struct DLNAIconProfile {
-    const char* mime;
-    unsigned short width;
-    unsigned short height;
-    unsigned char bitDepth;
+    const char* mime;       ///< the mime type of the image
+    unsigned short width;   ///< image width in pixel
+    unsigned short height;  ///< image height in pixel
+    unsigned char bitDepth; ///< bit depth in bits per pixel
 };
 
 /* Images */
 /* Audio */
-extern DLNAProfile DLNA_PROFILE_MPEG1_L3;               // MP3
+extern DLNAProfile DLNA_PROFILE_MPEG1_L3;              ///< DLNA MP3 Profile
 /* Video */
-extern DLNAProfile DLNA_PROFILE_MPEG_TS_SD_EU;         // This is the profile for DVB-TV
-extern DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU;           // This is the profile for DVB-TV
+extern DLNAProfile DLNA_PROFILE_MPEG_TS_SD_EU;         ///< DLNA Profile for DVB Television broadcasts
+extern DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU;          ///< DLNA Profile for HD DVB Television broadcasts
+extern DLNAProfile DLNA_PROFILE_MPEG_TS_SD_EU_ISO;     ///< DLNA Profile for DVB Television broadcasts without timestamp
+extern DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU_ISO;      ///< DLNA Profile for HD DVB Television broadcasts without timestamp
 
 /* Icons */
-extern DLNAIconProfile DLNA_ICON_JPEG_SM_24;
-extern DLNAIconProfile DLNA_ICON_JPEG_LRG_24;
-extern DLNAIconProfile DLNA_ICON_PNG_SM_24A;
-extern DLNAIconProfile DLNA_ICON_PNG_LRG_24A;
+extern DLNAIconProfile DLNA_ICON_JPEG_SM_24;           ///< DLNA icon profile of small jpeg images
+extern DLNAIconProfile DLNA_ICON_JPEG_LRG_24;          ///< DLNA icon profile of large jpeg images
+extern DLNAIconProfile DLNA_ICON_PNG_SM_24A;           ///< DLNA icon profile of small png images
+extern DLNAIconProfile DLNA_ICON_PNG_LRG_24A;          ///< DLNA icon profile of large png images
 
 /****************************************************
  *

@@ -53,6 +53,29 @@ The command line settings are:
                                       Supported ports:
                                       0           (auto detect)
                                       49152-65535 (user defined)
+  -d              --autodetect        Force auto detection
+                                      Use this option to
+                                      overwrite the setup menu
+                                      options.
+  -v              --verbose           Increase verbosity level
+                                      The more v options the
+                                      higher the output level
+
+The verbose option can be more than once. With each option the verbosity level
+will be increased. The maximum level is 5. Further options are silently ignored.
+
+  -v                                  Print most important messages
+  -vv                                 Print messages from the components
+                                      i.e. the webserver, CDS, CMS, etc.
+  -vvv                                Print messages from receivers and players
+                                      and other additional components
+  -vvvv                               You can't get enough, hum?
+                                      This will print SQL messages and DIDL
+                                      messages
+  -vvvvv                              Can you read the matrix? You can't?
+                                      Then try first reading SQL statements,
+                                      fetches, buffer and parser outputs or
+                                      any other outputs.
 
 If not options are set, menu options will be used.
 
@@ -68,7 +91,18 @@ Dependencies:
 
 This plugin is tested with and requires the following libraries to work:
 
-libupnp-1.6.6
-libsqlite-3.6
+libupnp-1.6.6               The UPnP SDK
+libsqlite-3.6               SQLite 3 Database
+libavcodec-svn20090303      FFMPEG Library for analyzing audio video codecs
+libavformat-svn20090303     FFMPEG Library for analyzing audio video formats
+boost::spirit               Grammar parser
+boost::function             Boost function library
+boost::bind                 Boost bind library
 
-libupnp-1.8.0 is known not to work with this plugin!
+The boost libraries are usually available in a packed version, so that only a
+single installation is required. The FFMPEG libraries comes with FFMPEG itself.
+
+ATTENTION: DO NOT USE ANOTHER VERSION OF LIBUPNP.
+
+libupnp-1.8.0 is known not to work with this plugin! Versions below 1.6.6 may
+work. However, there may exist some unknown issues.

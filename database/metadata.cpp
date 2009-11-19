@@ -44,7 +44,7 @@ cMediaDatabase::~cMediaDatabase(){
 }
 
 bool cMediaDatabase::init(){
-    MESSAGE("Initializing...");
+    MESSAGE(VERBOSE_SDK,"Initializing...");
     if(this->prepareDatabase()){
         ERROR("Initializing of database failed.");
         return false;
@@ -122,7 +122,7 @@ cUPnPObjectID cMediaDatabase::getNextObjectID(){
 
 int cMediaDatabase::addFastFind(cUPnPClassObject* Object, const char* FastFind){
     if(!Object || !FastFind){
-        MESSAGE("Invalid fast find parameters");
+        MESSAGE(VERBOSE_OBJECTS,"Invalid fast find parameters");
         return -1;
     }
 
@@ -140,7 +140,7 @@ int cMediaDatabase::addFastFind(cUPnPClassObject* Object, const char* FastFind){
 
 cUPnPClassObject* cMediaDatabase::getObjectByFastFind(const char* FastFind){
     if(!FastFind) return NULL;
-    MESSAGE("Try to find Object with identifier %s", FastFind);
+    MESSAGE(VERBOSE_OBJECTS,"Try to find Object with identifier %s", FastFind);
     cString Column, Value;
     if(this->mDatabase->execStatement("SELECT %s FROM %s WHERE %s=%Q",
                                        SQLITE_COL_OBJECTID,
@@ -166,14 +166,14 @@ cUPnPClassObject* cMediaDatabase::getObjectByFastFind(const char* FastFind){
 }
 
 cUPnPClassObject* cMediaDatabase::getObjectByID(cUPnPObjectID ID){
-    MESSAGE("Try to find Object with ID '%s'", *ID);
+    MESSAGE(VERBOSE_OBJECTS, "Try to find Object with ID '%s'", *ID);
     cUPnPClassObject* Object;
     if((Object = this->mObjects->Get((unsigned int)ID))){
-        MESSAGE("Found cached object with ID '%s'", *ID);
+        MESSAGE(VERBOSE_OBJECTS, "Found cached object with ID '%s'", *ID);
     }
     else if((Object = this->mFactory->getObject(ID))){
         //this->cacheObject(Object);
-        MESSAGE("Found object with ID '%s' in database", *ID);
+        MESSAGE(VERBOSE_OBJECTS, "Found object with ID '%s' in database", *ID);
     }
     else {
         ERROR("No object with such ID '%s'", *ID);
@@ -184,14 +184,14 @@ cUPnPClassObject* cMediaDatabase::getObjectByID(cUPnPObjectID ID){
 
 void cMediaDatabase::cacheObject(cUPnPClassObject* Object){
     if(this->mObjects->Get((unsigned int)Object->getID())==NULL){
-        MESSAGE("Added %s to cache.", *Object->getID());
+        MESSAGE(VERBOSE_OBJECTS ,"Added %s to cache.", *Object->getID());
         this->mObjects->Add(Object, (unsigned int)Object->getID());
     }
 }
 
 int cMediaDatabase::prepareDatabase(){
     if(this->getObjectByID(0)==NULL){
-        MESSAGE("Creating database structure");
+        MESSAGE(VERBOSE_SDK, "Creating database structure");
         cUPnPClassContainer* Root = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _(PLUGIN_SHORT_NAME));
         Root->setID(0);
         if(this->mFactory->saveObject(Root)) return -1;
@@ -248,7 +248,7 @@ int cMediaDatabase::prepareDatabase(){
 }
 
 int cMediaDatabase::loadChannels(){
-    MESSAGE("Loading channels");
+    MESSAGE(VERBOSE_LIVE_TV ,"Loading channels");
     cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
     if(TV){
         bool noResource = false;
@@ -262,7 +262,7 @@ int cMediaDatabase::loadChannels(){
             bool inList = false;
 
             tChannelID ChannelID = Channel->GetChannelID();
-            MESSAGE("Determine if the channel %s is already listed", *ChannelID.ToString());
+            MESSAGE(VERBOSE_LIVE_TV, "Determine if the channel %s is already listed", *ChannelID.ToString());
             cUPnPClassVideoBroadcast* ChannelItem = NULL;
 
             ChannelItem = (cUPnPClassVideoBroadcast*)this->getObjectByFastFind(ChannelID.ToString());
@@ -271,18 +271,18 @@ int cMediaDatabase::loadChannels(){
             
             if(!inList){
                 if(Channel->GroupSep()){
-                    MESSAGE("Skipping group '%s'", Channel->Name());
+                    MESSAGE(VERBOSE_LIVE_TV, "Skipping group '%s'", Channel->Name());
                     // Skip channel groups
                     // Channel groups may be supported theoretically. However, DLNA states that a tuner needs
                     // a consecutive list of channels. A simple work-around may be a virtual tuner for each group.
                 }
                 else if(Channel->Vpid()==0){
                     // TODO: add radio support
-                    MESSAGE("Skipping radio '%s'", Channel->Name());
+                    MESSAGE(VERBOSE_LIVE_TV, "Skipping radio '%s'", Channel->Name());
                 }
                 else {
                     noResource = false;
-                    MESSAGE("Adding channel '%s' ID:%s", Channel->Name(), *ChannelID.ToString());
+                    MESSAGE(VERBOSE_LIVE_TV, "Adding channel '%s' ID:%s", Channel->Name(), *ChannelID.ToString());
                     ChannelItem = (cUPnPClassVideoBroadcast*)this->mFactory->createObject(UPNP_CLASS_VIDEOBC, Channel->Name());
                     ChannelItem->setChannelName(Channel->Name());
                     ChannelItem->setChannelNr(Channel->Number());
@@ -301,7 +301,7 @@ int cMediaDatabase::loadChannels(){
                             this->mFactory->deleteObject(ChannelItem);
                             return -1;
                         }
-                        MESSAGE("Successfuly added channel");
+                        MESSAGE(VERBOSE_LIVE_TV, "Successfuly added channel");
                     }
                     else {
                         // Delete temporarily created object with no resource
@@ -310,7 +310,7 @@ int cMediaDatabase::loadChannels(){
                 }
             }
             else {
-                MESSAGE("Skipping %s, already in database", Channel->Name());
+                MESSAGE(VERBOSE_LIVE_TV, "Skipping %s, already in database", Channel->Name());
             }
         }
     }
@@ -318,7 +318,7 @@ int cMediaDatabase::loadChannels(){
 }
 
 int cMediaDatabase::loadRecordings(){
-    MESSAGE("Loading recordings");
+    MESSAGE(VERBOSE_RECORDS, "Loading recordings");
     cUPnPClassContainer* Records = (cUPnPClassContainer*)this->getObjectByID(4);
     if(Records){
         bool noResource = false;
@@ -330,7 +330,7 @@ int cMediaDatabase::loadRecordings(){
             // Iterating the records
             bool inList = false;
 
-            MESSAGE("Determine if the channel %s is already listed", Recording->FileName());
+            MESSAGE(VERBOSE_RECORDS, "Determine if the channel %s is already listed", Recording->FileName());
 
             cUPnPClassMovie *MovieItem = NULL;
 
@@ -342,7 +342,7 @@ int cMediaDatabase::loadRecordings(){
                 noResource = false;
                 const cRecordingInfo* RecInfo = Recording->Info();
 
-                MESSAGE("Adding movie '%s' File name:%s", RecInfo->Title(), Recording->FileName());
+                MESSAGE(VERBOSE_RECORDS, "Adding movie '%s' File name:%s", RecInfo->Title(), Recording->FileName());
 
                 MovieItem = (cUPnPClassMovie*)this->mFactory->createObject(UPNP_CLASS_MOVIE, RecInfo->Title());
                 MovieItem->setDescription(RecInfo->ShortText());
@@ -366,7 +366,7 @@ int cMediaDatabase::loadRecordings(){
                         this->mFactory->deleteObject(MovieItem);
                         return -1;
                     }
-                    MESSAGE("Successfuly added movie");
+                    MESSAGE(VERBOSE_RECORDS, "Successfuly added movie");
                 }
                 else {
                     // Delete temporarily created object with no resource
@@ -374,7 +374,7 @@ int cMediaDatabase::loadRecordings(){
                 }
             }
             else {
-                MESSAGE("Skipping %s, already in Database", Recording->FileName());
+                MESSAGE(VERBOSE_RECORDS, "Skipping %s, already in Database", Recording->FileName());
             }
         }
     }
@@ -386,7 +386,7 @@ void cMediaDatabase::Action(){
     while(this->Running()){
 
         if(cSchedules::Modified() >= LastEPGUpdate){
-            MESSAGE("Schedule changed. Updating...");
+            MESSAGE(VERBOSE_EPG_UPDATES, "Schedule changed. Updating...");
             updateChannelEPG();
             LastEPGUpdate = cSchedules::Modified();
         }
@@ -399,19 +399,19 @@ void cMediaDatabase::updateChannelEPG(){
     cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
     if(TV){
         // Iterating channels
-        MESSAGE("Getting schedule...");
+        MESSAGE(VERBOSE_EPG_UPDATES, "Getting schedule...");
         cSchedulesLock SchedulesLock;
         const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
 
         cList<cUPnPClassObject>* List = TV->getObjectList();
-        MESSAGE("TV folder has %d items", List->Count());
+        MESSAGE(VERBOSE_EPG_UPDATES, "TV folder has %d items", List->Count());
         for(cUPnPClassVideoBroadcast* ChannelItem = (cUPnPClassVideoBroadcast*)List->First();
             ChannelItem;
             ChannelItem = (cUPnPClassVideoBroadcast*)List->Next(ChannelItem)
             ){
-            MESSAGE("Find channel by number %d", ChannelItem->getChannelNr());
+            MESSAGE(VERBOSE_EPG_UPDATES, "Find channel by number %d", ChannelItem->getChannelNr());
             cChannel* Channel = Channels.GetByNumber(ChannelItem->getChannelNr());
-            MESSAGE("Found channel with ID %s", *Channel->GetChannelID().ToString());
+            MESSAGE(VERBOSE_EPG_UPDATES, "Found channel with ID %s", *Channel->GetChannelID().ToString());
 
             const cSchedule* Schedule = Schedules->GetSchedule(Channel);
             const cEvent* Event = Schedule?Schedule->GetPresentEvent():NULL;
@@ -420,10 +420,10 @@ void cMediaDatabase::updateChannelEPG(){
                 time_t LastEPGChange = Event->StartTime();
                 time_t LastObjectChange = ChannelItem->modified();
 
-                MESSAGE("Last event start: %s", ctime(&LastEPGChange));
-                MESSAGE("Last object modification:   %s", ctime(&LastObjectChange));
+                MESSAGE(VERBOSE_EPG_UPDATES, "Last event start: %s", ctime(&LastEPGChange));
+                MESSAGE(VERBOSE_EPG_UPDATES, "Last object modification:   %s", ctime(&LastObjectChange));
                 if(LastEPGChange >= LastObjectChange){
-                    MESSAGE("Updating details");
+                    MESSAGE(VERBOSE_EPG_UPDATES, "Updating details");
 
                     if(Event){
                         ChannelItem->setTitle(Event->Title()?Event->Title():Channel->Name());
@@ -439,11 +439,11 @@ void cMediaDatabase::updateChannelEPG(){
                     this->mFactory->saveObject(ChannelItem);
                 }
                 else {
-                    MESSAGE("Channel did not change");
+                    MESSAGE(VERBOSE_EPG_UPDATES, "Channel did not change");
                 }
             }
             else {
-                MESSAGE("No EPG data");
+                MESSAGE(VERBOSE_EPG_UPDATES, "No EPG data");
                 ChannelItem->setTitle(Channel->Name());
                 ChannelItem->setLongDescription(NULL);
                 ChannelItem->setDescription(NULL);
@@ -452,19 +452,27 @@ void cMediaDatabase::updateChannelEPG(){
     }
 }
 
-int cMediaDatabase::browse(cUPnPResultSet** Results, const char* ID, bool BrowseMetadata, const char* Filter, unsigned int Offset, unsigned int Count, const char* SortCriteria){
+int cMediaDatabase::browse(
+    OUT cUPnPResultSet** Results,
+    IN const char* ID,
+    IN bool BrowseMetadata,
+    IN const char* Filter,
+    IN unsigned int Offset,
+    IN unsigned int Count,
+    IN const char* SortCriteria
+){
     *Results = new cUPnPResultSet;
     (*Results)->mNumberReturned = 0;
     (*Results)->mTotalMatches = 0;
     (*Results)->mResult = NULL;
 
-    MESSAGE("===== Browsing =====");
-    MESSAGE("ID: %s", ID);
-    MESSAGE("Browse %s", BrowseMetadata?"metadata":"children");
-    MESSAGE("Filter: %s", Filter);
-    MESSAGE("Offset: %d", Offset);
-    MESSAGE("Count: %d", Count);
-    MESSAGE("Sort: %s", SortCriteria);
+    MESSAGE(VERBOSE_DIDL, "===== Browsing =====");
+    MESSAGE(VERBOSE_DIDL, "ID: %s", ID);
+    MESSAGE(VERBOSE_DIDL, "Browse %s", BrowseMetadata?"metadata":"children");
+    MESSAGE(VERBOSE_DIDL, "Filter: %s", Filter);
+    MESSAGE(VERBOSE_DIDL, "Offset: %d", Offset);
+    MESSAGE(VERBOSE_DIDL, "Count: %d", Count);
+    MESSAGE(VERBOSE_DIDL, "Sort: %s", SortCriteria);
 
     cUPnPObjectID ObjectID = atoi(ID);
 
@@ -498,7 +506,7 @@ int cMediaDatabase::browse(cUPnPResultSet** Results, const char* ID, bool Browse
 
                         if(SortCriterias){
                             for(cSortCrit* SortBy = SortCriterias->First(); SortBy ; SortBy = SortCriterias->Next(SortBy)){
-                                MESSAGE("Sorting by %s %s", SortBy->Property, SortBy->SortDescending?"ascending":"descending");
+                                MESSAGE(VERBOSE_DIDL, "Sorting by %s %s", SortBy->Property, SortBy->SortDescending?"ascending":"descending");
                                 Children->SortBy(SortBy->Property, SortBy->SortDescending);
                             }
                         }
@@ -507,7 +515,7 @@ int cMediaDatabase::browse(cUPnPResultSet** Results, const char* ID, bool Browse
                         if(Count==0) Count = Container->getChildCount();
                         while(Offset-- && (Child = Children->Next(Child))){}
                         for(; Count && Child ; Child = Children->Next(Child), Count--){
-                            MESSAGE("Appending %s to didl", Child->getTitle());
+                            MESSAGE(VERBOSE_DIDL, "Appending %s to didl", Child->getTitle());
                             ixmlNode_appendChild(Root, Child->createDIDLFragment(DIDLDoc, FilterList));
                             (*Results)->mNumberReturned++;
                         }

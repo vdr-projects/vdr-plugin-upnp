@@ -65,7 +65,14 @@ const char *cPluginUpnp::CommandLineHelp(void)
             "  -p <port>       --port=<port>       The server port\n"
             "                                      Supported ports:\n"
             "                                            %5d (auto detect)\n"
-            "                                      %5d-%5d (user defined)\n",
+            "                                      %5d-%5d (user defined)\n"
+            "  -d              --autodetect        Force auto detection\n"
+            "                                      Use this option to\n"
+            "                                      overwrite the setup menu\n"
+            "                                      options.\n"
+            "  -v              --verbose           Increase verbosity level\n"
+            "                                      The more v options the\n"
+            "                                      higher the output level\n",
             0,
             SERVER_MIN_PORT,
             SERVER_MAX_PORT
@@ -81,21 +88,21 @@ bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
 bool cPluginUpnp::Initialize(void)
 {
      // Initialize any background activities the plugin shall perform.
-    MESSAGE("######### LETS GET READY TO RUMBLE #########");
+    MESSAGE(VERBOSE_SDK, "######### LETS GET READY TO RUMBLE #########");
 
     cPluginUpnp::mConfigDirectory = strdup(cPlugin::ConfigDirectory(this->Name()));
     if(!cPluginUpnp::getConfigDirectory()){
         ERROR("Cannot set configuration directory");
         return false;
     }
-    MESSAGE("Configuration directory: %s", cPluginUpnp::getConfigDirectory());
+    MESSAGE(VERBOSE_SDK, "Configuration directory: %s", cPluginUpnp::getConfigDirectory());
     DatabaseLocker.Signal();
     return this->mUpnpServer->init();
 }
 
 bool cPluginUpnp::Start(void)
 {
-    MESSAGE("Call plugin START");
+    MESSAGE(VERBOSE_SDK, "Call plugin START");
     // Start any background activities the plugin shall perform.
     return this->mUpnpServer->start();
     //return true;
@@ -103,7 +110,7 @@ bool cPluginUpnp::Start(void)
 
 void cPluginUpnp::Stop(void)
 {
-    MESSAGE("Call plugin STOP");
+    MESSAGE(VERBOSE_SDK, "Call plugin STOP");
     // Stop any background activities the plugin is performing.
     this->mUpnpServer->stop();
 }

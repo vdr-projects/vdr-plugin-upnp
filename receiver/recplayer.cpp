@@ -25,7 +25,7 @@ cRecordingPlayer::~cRecordingPlayer() {
 }
 
 cRecordingPlayer::cRecordingPlayer(cRecording *Recording) {
-    MESSAGE("Created Recplayer");
+    MESSAGE(VERBOSE_SDK, "Created Recplayer");
     this->mFile      = NULL;
     this->mTotalLenght = 0;
     this->mRecording = Recording;
@@ -118,11 +118,11 @@ int cRecordingPlayer::seek(off_t offset, int origin){
 }
 
 void cRecordingPlayer::Scan(){
-    MESSAGE("Scanning video files...");
+    MESSAGE(VERBOSE_RECORDS, "Scanning video files...");
     // Reset the offsets
     int i = 1;
     while(this->mOffsets[i++]) this->mOffsets[i] = 0;
-    MESSAGE("Offsets reseted.");
+    MESSAGE(VERBOSE_RECORDS, "Offsets reseted.");
 
     i = 0;
     FILE *File;
@@ -133,7 +133,7 @@ void cRecordingPlayer::Scan(){
         }
         fseek(File, 0, SEEK_END);
         off_t offset = ftell(File);
-        MESSAGE("File %d has its last offset at %ld", i, offset);
+        MESSAGE(VERBOSE_RECORDS, "File %d has its last offset at %ld", i, offset);
         this->mOffsets[i+1] = this->mOffsets[i] + offset;
         this->mTotalLenght  = this->mOffsets[i+1];
         i++;
@@ -150,7 +150,7 @@ FILE *cRecordingPlayer::GetFile(int Index){
     if(this->mFile) fclose(this->mFile);
     char *filename = new char[VDR_FILENAME_BUFSIZE];
     snprintf(filename, VDR_FILENAME_BUFSIZE, VDR_RECORDFILE_PATTERN_TS, this->mRecording->FileName(), Index );
-    MESSAGE("Filename: %s", filename);
+    MESSAGE(VERBOSE_BUFFERS, "Filename: %s", filename);
     this->mFile = NULL;
     if(this->mFile = fopen(filename, "r")){
         this->mIndex = Index;

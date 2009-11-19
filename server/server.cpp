@@ -50,7 +50,7 @@ cUPnPServer::~cUPnPServer() {
 
 bool cUPnPServer::init(void){
 
-    MESSAGE("Loading configuration...");
+    MESSAGE(VERBOSE_SDK, "Loading configuration...");
     cUPnPConfig* config = cUPnPConfig::get();
     this->enable(config->mEnable == 1 ? true : false);
     if(!config->mAutoSetup){
@@ -80,7 +80,7 @@ bool cUPnPServer::init(void){
         }
     }
 
-    MESSAGE("Initializing Intel UPnP SDK on %s:%d",inet_ntoa(this->mServerAddr->sin_addr), ntohs(this->mServerAddr->sin_port));
+    MESSAGE(VERBOSE_SDK, "Initializing Intel UPnP SDK on %s:%d",inet_ntoa(this->mServerAddr->sin_addr), ntohs(this->mServerAddr->sin_port));
     int ret = 0;
     ret = UpnpInit(inet_ntoa(this->mServerAddr->sin_addr), ntohs(this->mServerAddr->sin_port));
 
@@ -98,18 +98,18 @@ bool cUPnPServer::init(void){
             ERROR("Unable to set IP address");
         }
         this->mServerAddr->sin_port = htons(UpnpGetServerPort());
-        MESSAGE("Initializing succesfully at %s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
+        MESSAGE(VERBOSE_SDK, "Initializing succesfully at %s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
     }
 
-    MESSAGE("Setting maximum packet size for SOAP requests");
+    MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Setting maximum packet size for SOAP requests");
     UpnpSetMaxContentLength(UPNP_SOAP_MAX_LEN);
 
     //set the root directory of the webserver
     cString WebserverRootDir = cString::sprintf("%s%s", cPluginUpnp::getConfigDirectory(), UPNP_WEB_SERVER_ROOT_DIR);
     
-    MESSAGE("Set web server root dir: %s", *WebserverRootDir );
+    MESSAGE(VERBOSE_SDK, "Set web server root dir: %s", *WebserverRootDir );
     this->mWebServer = cUPnPWebServer::getInstance(WebserverRootDir);
-    MESSAGE("Initializing web server.");
+    MESSAGE(VERBOSE_SDK, "Initializing web server.");
     if (!this->mWebServer->init()) {
         ERROR("Error while setting web server root dir - Errorcode: %d", ret);
         return false;
@@ -120,7 +120,7 @@ bool cUPnPServer::init(void){
 
     this->mDeviceDescription = cString(cDlna::getInstance()->getDeviceDescription(URLBase),true);
 
-    MESSAGE("Register Media Server Device");
+    MESSAGE(VERBOSE_SDK, "Register Media Server Device");
     ret = UpnpRegisterRootDevice2(UPNPREG_BUF_DESC,
             this->mDeviceDescription, sizeof(this->mDeviceDescription), 1,
             &cUPnPServer::upnpActionCallback,
@@ -131,14 +131,14 @@ bool cUPnPServer::init(void){
         return false;
     }
 
-    MESSAGE("Unregister server to cleanup previously started servers");
+    MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Unregister server to cleanup previously started servers");
     ret = UpnpUnRegisterRootDevice(this->mDeviceHandle);
     if (ret != UPNP_E_SUCCESS) {
         WARNING("Unregistering old devices failed");
         return false;
     }
 
-    MESSAGE("Register Media Server Device");
+    MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Register Media Server Device");
     ret = UpnpRegisterRootDevice2(UPNPREG_BUF_DESC,
             this->mDeviceDescription, sizeof(this->mDeviceDescription), 1,
             &cUPnPServer::upnpActionCallback,
@@ -149,16 +149,16 @@ bool cUPnPServer::init(void){
         return false;
     }
 
-    MESSAGE("Initializing media database");
+    MESSAGE(VERBOSE_SDK, "Initializing media database");
     this->mMediaDatabase = new cMediaDatabase;
     if(!this->mMediaDatabase->init()){
         ERROR("Error while initializing database");
         return false;
     }
 
-    MESSAGE("Initializing connection manager");
+    MESSAGE(VERBOSE_SDK, "Initializing connection manager");
     cUPnPServer::mConnectionManager = new cConnectionManager(this->mDeviceHandle);
-    MESSAGE("Initializing content directory");
+    MESSAGE(VERBOSE_SDK, "Initializing content directory");
     cUPnPServer::mContentDirectory  = new cContentDirectory(this->mDeviceHandle, this->mMediaDatabase);
     if(!cUPnPServer::mContentDirectory->Start()){
         ERROR("Unable to start content directory thread");
@@ -166,7 +166,7 @@ bool cUPnPServer::init(void){
     }
     
     //send first advertisments
-    MESSAGE("Send first advertisements to publish start in network");
+    MESSAGE(VERBOSE_SDK, "Send first advertisements to publish start in network");
     ret = UpnpSendAdvertisement(this->mDeviceHandle, UPNP_ANNOUNCE_MAX_AGE);
     if (ret != UPNP_E_SUCCESS) {
         ERROR("Error while sending first advertisments - Errorcode: %d", ret);
@@ -177,20 +177,20 @@ bool cUPnPServer::init(void){
 }
 
 bool cUPnPServer::uninit(void) {
-    MESSAGE("Shuting down content directory");
+    MESSAGE(VERBOSE_SDK, "Shuting down content directory");
     delete cUPnPServer::mContentDirectory; cUPnPServer::mContentDirectory = NULL;
 
-    MESSAGE("Shuting down connection manager");
+    MESSAGE(VERBOSE_SDK, "Shuting down connection manager");
     delete cUPnPServer::mConnectionManager; cUPnPServer::mConnectionManager = NULL;
 
-    MESSAGE("Closing metadata database");
+    MESSAGE(VERBOSE_SDK, "Closing metadata database");
     delete this->mMediaDatabase; this->mMediaDatabase = NULL;
 
-    MESSAGE("Closing the web server");
+    MESSAGE(VERBOSE_SDK, "Closing the web server");
     this->mWebServer->uninit();
     delete this->mWebServer;
 
-    MESSAGE("Close Intel SDK");
+    MESSAGE(VERBOSE_SDK, "Close Intel SDK");
     // unregiser media server device from UPnP SDK
     int ret = UpnpUnRegisterRootDevice(this->mDeviceHandle);
     if (ret != UPNP_E_SUCCESS) {
@@ -200,7 +200,7 @@ bool cUPnPServer::uninit(void) {
     ret = UpnpFinish();
 
     if (ret == UPNP_E_SUCCESS) {
-        MESSAGE("Close Intel SDK Successfull");
+        MESSAGE(VERBOSE_SDK, "Close Intel SDK Successfull");
         return true;
     } else {
         ERROR("Intel SDK unintialized or already closed - Errorcode: %d", ret);
@@ -277,7 +277,7 @@ bool cUPnPServer::autoDetectSettings(void){
     char** Ifaces = getNetworkInterfaces(&count);
     int i=0;
     bool ret = false;
-    MESSAGE("AUTODETECT: Found %d possible interfaces.", sizeof(Ifaces));
+    MESSAGE(VERBOSE_CUSTOM_OUTPUT, "AUTODETECT: Found %d possible interfaces.", sizeof(Ifaces));
     while(Ifaces[i]){
         if(strcmp(Ifaces[i],"lo")!=0){
             //    true || false == true
@@ -288,7 +288,7 @@ bool cUPnPServer::autoDetectSettings(void){
     }
     delete [] Ifaces;
     if(!ret){
-        MESSAGE("AUTODETECT: No suitable interface. Giving up.");
+        MESSAGE(VERBOSE_CUSTOM_OUTPUT, "AUTODETECT: No suitable interface. Giving up.");
         return false;
     }
     this->setServerPort(0);
@@ -299,8 +299,8 @@ bool cUPnPServer::start(void){
     if(!this->isRunning()){
         // Put all the stuff which shall be started with the server in here
         // if the startup failed due any reason return false!
-        MESSAGE("Starting UPnP Server on %s:%d",inet_ntoa(this->getServerAddress()->sin_addr), ntohs(this->getServerAddress()->sin_port));
-        MESSAGE("Using DLNA version: %s", DLNA_PROTOCOL_VERSION_STR);
+        MESSAGE(VERBOSE_SDK, "Starting UPnP Server on %s:%d",inet_ntoa(this->getServerAddress()->sin_addr), ntohs(this->getServerAddress()->sin_port));
+        MESSAGE(VERBOSE_SDK, "Using DLNA version: %s", DLNA_PROTOCOL_VERSION_STR);
         this->mIsRunning = true;
         // Start Media database thread
         this->mMediaDatabase->Start();
@@ -310,7 +310,7 @@ bool cUPnPServer::start(void){
 
 void cUPnPServer::stop(void){
     if(this->isRunning()){
-        MESSAGE("Call upnpServer STOP");
+        MESSAGE(VERBOSE_SDK, "Call upnpServer STOP");
         this->uninit();
         this->mIsRunning = false;
     }
@@ -318,7 +318,7 @@ void cUPnPServer::stop(void){
 }
 
 bool cUPnPServer::restart(void){
-    MESSAGE("Call upnpServer RESTART");
+    MESSAGE(VERBOSE_SDK, "Call upnpServer RESTART");
     this->stop();
     return this->start();
 }
@@ -331,11 +331,11 @@ bool cUPnPServer::setInterface(const char* Interface){
     if(Interface != NULL) this->mInterface = Interface;
     
     if(*this->mInterface!=NULL){
-        MESSAGE("Try to retrieve address for NIC %s",Interface);
+        MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Try to retrieve address for NIC %s",Interface);
         const sockaddr_in* ipAddress = getIPFromInterface(Interface);
         if(ipAddress!=NULL){
             memcpy(&this->mServerAddr->sin_addr,&ipAddress->sin_addr,sizeof(ipAddress->sin_addr));
-            MESSAGE("NIC %s has the following IP: %s", *this->mInterface, inet_ntoa(this->mServerAddr->sin_addr));
+            MESSAGE(VERBOSE_CUSTOM_OUTPUT, "NIC %s has the following IP: %s", *this->mInterface, inet_ntoa(this->mServerAddr->sin_addr));
             this->stop();
             return true;
         }

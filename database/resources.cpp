@@ -75,11 +75,11 @@ int cUPnPResources::getResourcesOfObject(cUPnPClassObject* Object){
 cUPnPResource* cUPnPResources::getResource(unsigned int ResourceID){
     cUPnPResource* Resource;
     if((Resource = this->mResources->Get(ResourceID))){
-        MESSAGE("Found cached resource");
+        MESSAGE(VERBOSE_METADATA, "Found cached resource");
         return Resource;
     }
     else if((Resource = this->mMediator->getResource(ResourceID))){
-        MESSAGE("Found resource in database");
+        MESSAGE(VERBOSE_METADATA, "Found resource in database");
         this->mResources->Add(Resource, ResourceID);
         return Resource;
     }
@@ -107,12 +107,12 @@ int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording*
     }
 
     delete Detector;
-    MESSAGE("To be continued, may it work with DLNA?! Guess, not!");
+    MESSAGE(VERBOSE_SDK, "To be continued, may it work with DLNA?! Guess, not!");
     return 0;
 }
 
 int cUPnPResources::createFromFile(cUPnPClassItem* , cString ){
-    MESSAGE("To be done");
+    MESSAGE(VERBOSE_SDK, "To be done");
     return -1;
 }
 
@@ -131,12 +131,12 @@ int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel
 
     const char* ProtocolInfo = cDlna::getInstance()->getProtocolInfo(Profile);
 
-    MESSAGE("Protocol info: %s", ProtocolInfo);
+    MESSAGE(VERBOSE_METADATA, "Protocol info: %s", ProtocolInfo);
 
     // Adapted from streamdev
     int index = 0;
     for(int i=0; Channel->Apid(i)!=0; i++, index++){
-        MESSAGE("Analog channel %d", i);
+        MESSAGE(VERBOSE_METADATA, "Analog channel %d", i);
         cString ResourceFile     = cString::sprintf("%s:%d", *Channel->GetChannelID().ToString(), index);
         cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_CHANNEL,ResourceFile, Profile->mime, ProtocolInfo);
         Resource->mBitrate       = 0;
@@ -153,7 +153,7 @@ int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel
         this->mResources->Add(Resource, Resource->getID());
     }
     for(int i=0; Channel->Dpid(i)!=0; i++, index++){
-        MESSAGE("Digital channel %d", i);
+        MESSAGE(VERBOSE_METADATA, "Digital channel %d", i);
         cString ResourceFile     = cString::sprintf("%s:%d", *Channel->GetChannelID().ToString(), index);
         cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_CHANNEL,ResourceFile, Profile->mime, ProtocolInfo);
         Resource->mBitrate       = 0;

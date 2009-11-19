@@ -150,7 +150,7 @@ void cUPnPClassObject::clearSortCriteria(){
 }
 
 int cUPnPClassObject::setID(cUPnPObjectID ID){
-    MESSAGE("Set ID from %s to %s", *this->getID(),*ID);
+    MESSAGE(VERBOSE_MODIFICATIONS, "Set ID from %s to %s", *this->getID(),*ID);
     if((int)ID < 0){
         ERROR("Invalid object ID '%s'",*ID);
         return -1;
@@ -162,7 +162,7 @@ int cUPnPClassObject::setID(cUPnPObjectID ID){
 
 int cUPnPClassObject::setParent(cUPnPClassContainer* Parent){
     if(Parent==NULL){
-        MESSAGE("Object '%s' elected as root object", *this->getID());
+        MESSAGE(VERBOSE_MODIFICATIONS, "Object '%s' elected as root object", *this->getID());
     }
     // unregister from old parent
     if(this->mParent && Parent != this->mParent){
@@ -316,7 +316,7 @@ bool cUPnPClassObject::setProperty(const char* Property, const char* Value){
 }
 
 int cUPnPClassObject::addResource(cUPnPResource* Resource){
-    MESSAGE("Adding resource #%d", Resource->getID());
+    MESSAGE(VERBOSE_MODIFICATIONS, "Adding resource #%d", Resource->getID());
     if(!Resource){
         ERROR("No resource");
         return -1;
@@ -374,10 +374,10 @@ bool cUPnPClassItem::setProperty(const char* Property, const char* Value){
 IXML_Node* cUPnPClassItem::createDIDLFragment(IXML_Document* Document, cStringList* Filter){
     this->mDIDLFragment = Document;
 
-    MESSAGE("==(%s)= %s =====", *this->getID(), this->getTitle());
-    MESSAGE("ParentID: %s", *this->getParentID());
-    MESSAGE("Restricted: %s", this->isRestricted()?"1":"0");
-    MESSAGE("Class: %s", this->getClass());
+    MESSAGE(VERBOSE_DIDL, "==(%s)= %s =====", *this->getID(), this->getTitle());
+    MESSAGE(VERBOSE_DIDL, "ParentID: %s", *this->getParentID());
+    MESSAGE(VERBOSE_DIDL, "Restricted: %s", this->isRestricted()?"1":"0");
+    MESSAGE(VERBOSE_DIDL, "Class: %s", this->getClass());
 
     IXML_Node* Didl = ixmlNode_getFirstChild((IXML_Node*) this->mDIDLFragment);
 
@@ -404,13 +404,13 @@ IXML_Node* cUPnPClassItem::createDIDLFragment(IXML_Document* Document, cStringLi
 //    if(Filter==NULL || Filter->Find(UPNP_PROP_REFERENCEID)) ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_REFERENCEID, *this->getReferenceID());
 
     for(cUPnPResource* Resource = this->getResources()->First(); Resource; Resource = this->getResources()->Next(Resource)){
-        MESSAGE("Resource: %s", Resource->getResource());
-        MESSAGE("Protocolinfo: %s", Resource->getProtocolInfo());
+        MESSAGE(VERBOSE_DIDL, "Resource: %s", Resource->getResource());
+        MESSAGE(VERBOSE_DIDL, "Protocolinfo: %s", Resource->getProtocolInfo());
 
         cString URLBase = cString::sprintf("http://%s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
         cString ResourceURL = cString::sprintf("%s%s/get?resId=%d", *URLBase, UPNP_DIR_SHARES, Resource->getID());
 
-        MESSAGE("Resource-URI: %s", *ResourceURL);
+        MESSAGE(VERBOSE_DIDL, "Resource-URI: %s", *ResourceURL);
 
         IXML_Element* eRes = ixmlDocument_createElement(this->mDIDLFragment, UPNP_PROP_RESOURCE);
         IXML_Node*    Res  = ixmlDocument_createTextNode(this->mDIDLFragment, *ResourceURL);
@@ -451,10 +451,10 @@ cUPnPClassContainer::~cUPnPClassContainer(){
 IXML_Node* cUPnPClassContainer::createDIDLFragment(IXML_Document* Document, cStringList* Filter){
     this->mDIDLFragment = Document;
 
-    MESSAGE("===(%s)= %s =====", *this->getID(), this->getTitle());
-    MESSAGE("ParentID: %s", *this->getParentID());
-    MESSAGE("Restricted: %s", this->isRestricted()?"1":"0");
-    MESSAGE("Class: %s", this->getClass());
+    MESSAGE(VERBOSE_DIDL, "===(%s)= %s =====", *this->getID(), this->getTitle());
+    MESSAGE(VERBOSE_DIDL, "ParentID: %s", *this->getParentID());
+    MESSAGE(VERBOSE_DIDL, "Restricted: %s", this->isRestricted()?"1":"0");
+    MESSAGE(VERBOSE_DIDL, "Class: %s", this->getClass());
 
     IXML_Node* Didl = ixmlNode_getFirstChild((IXML_Node*) this->mDIDLFragment);
     IXML_Element* eItem = ixmlDocument_createElement(this->mDIDLFragment, "container");
@@ -521,7 +521,7 @@ bool cUPnPClassContainer::getProperty(const char* Property, char** Value) const 
 }
 
 void cUPnPClassContainer::addObject(cUPnPClassObject* Object){
-    MESSAGE("Adding object (ID:%s) to container (ID:%s)", *Object->getID(), *this->getID());
+    MESSAGE(VERBOSE_MODIFICATIONS, "Adding object (ID:%s) to container (ID:%s)", *Object->getID(), *this->getID());
     Object->setParent(this);
     this->mChildren->Add(Object);
     this->mChildrenID->Add(Object, (unsigned int)Object->getID());
@@ -531,11 +531,11 @@ void cUPnPClassContainer::removeObject(cUPnPClassObject* Object){
     this->mChildrenID->Del(Object, (unsigned int)Object->getID());
     this->mChildren->Del(Object, false);
     Object->mParent = NULL;
-    MESSAGE("Removed object (ID:%s) from container (ID:%s)", *Object->getID(), *this->getID());
+    MESSAGE(VERBOSE_MODIFICATIONS, "Removed object (ID:%s) from container (ID:%s)", *Object->getID(), *this->getID());
 }
 
 cUPnPClassObject* cUPnPClassContainer::getObject(cUPnPObjectID ID) const {
-    MESSAGE("Getting object (ID:%s)", *ID);
+    MESSAGE(VERBOSE_METADATA, "Getting object (ID:%s)", *ID);
     if((int)ID < 0){
         ERROR("Invalid object ID");
         return NULL;
@@ -1011,9 +1011,9 @@ void cUPnPObjectFactory::registerMediator(const char* UPnPClass, cMediatorInterf
         ERROR("Mediator is undefined");
         return;
     }
-    MESSAGE("Registering mediator for class '%s'", UPnPClass);
+    MESSAGE(VERBOSE_SDK, "Registering mediator for class '%s'", UPnPClass);
     this->mMediators[UPnPClass] = Mediator;
-    MESSAGE("Now %d mediators registered", this->mMediators.size());
+    MESSAGE(VERBOSE_SDK, "Now %d mediators registered", this->mMediators.size());
     return;
 }
 
@@ -1027,10 +1027,10 @@ void cUPnPObjectFactory::unregisterMediator(const char* UPnPClass, bool freeMedi
         ERROR("No such mediator found for class '%s'", UPnPClass);
         return;
     }
-    MESSAGE("Unregistering mediator for class '%s'", UPnPClass);
+    MESSAGE(VERBOSE_SDK, "Unregistering mediator for class '%s'", UPnPClass);
     this->mMediators.erase(MediatorIterator);
     if(freeMediator) delete MediatorIterator->second;
-    MESSAGE("Now %d mediators registered", this->mMediators.size());
+    MESSAGE(VERBOSE_SDK, "Now %d mediators registered", this->mMediators.size());
     return;
 }
 
@@ -1057,7 +1057,7 @@ cMediatorInterface* cUPnPObjectFactory::findMediatorByID(cUPnPObjectID ID){
 
 cMediatorInterface* cUPnPObjectFactory::findMediatorByClass(const char* Class){
     if(!Class){ ERROR("No class specified"); return NULL; }
-    MESSAGE("Searching for mediator '%s' in %d mediators", Class, this->mMediators.size());
+    MESSAGE(VERBOSE_SQL, "Searching for mediator '%s' in %d mediators", Class, this->mMediators.size());
     tMediatorMap::iterator MediatorIterator = this->mMediators.find(Class);
     if(MediatorIterator==this->mMediators.end()){
         ERROR("No matching mediator for class '%s'",Class);
@@ -1212,7 +1212,7 @@ cUPnPClassObject* cUPnPObjectMediator::getObject(cUPnPObjectID){ WARNING("Gettin
 cUPnPClassObject* cUPnPObjectMediator::createObject(const char*, bool){ WARNING("Getting instance of class 'Object' forbidden"); return NULL; }
 
 int cUPnPObjectMediator::objectToDatabase(cUPnPClassObject* Object){
-    MESSAGE("Updating object #%s", *Object->getID());
+    MESSAGE(VERBOSE_MODIFICATIONS, "Updating object #%s", *Object->getID());
     cString Format = "UPDATE %s SET %s WHERE %s='%s'";
     //cString Format = "INSERT OR REPLACE INTO %s (%s) VALUES (%s);";
     cString Set=NULL;
@@ -1261,41 +1261,47 @@ int cUPnPObjectMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectI
     }
     while(Row->fetchColumn(&Column, &Value)){
         if(!strcasecmp(Column, SQLITE_COL_OBJECTID)){
-            if(Object->setID(atoi(Value))){
+            if(!*Value || Object->setID(atoi(Value))){
                 ERROR("Error while setting object ID");
                 return -1;
             }
             this->mMediaDatabase->cacheObject(Object);
         }
         else if(!strcasecmp(Column, SQLITE_COL_PARENTID)){
-            cUPnPObjectID RefID = atoi(Value);
-            cUPnPClassContainer* ParentObject;
-            if(RefID == -1){
-                ParentObject = NULL;
+            if(*Value){
+                cUPnPObjectID RefID = atoi(Value);
+                cUPnPClassContainer* ParentObject;
+                if(RefID == -1){
+                    ParentObject = NULL;
+                }
+                else {
+                    ParentObject = (cUPnPClassContainer*)this->mMediaDatabase->getObjectByID(RefID);
+                    if(!ParentObject){
+                        ERROR("No such parent with ID '%s' found.",*RefID);
+                        return -1;
+                    }
+                }
+                Object->setParent(ParentObject);
             }
             else {
-                ParentObject = (cUPnPClassContainer*)this->mMediaDatabase->getObjectByID(RefID);
-                if(!ParentObject){
-                    ERROR("No such parent with ID '%s' found.",*RefID);
-                    return -1;
-                }
+                ERROR("Invalid parent ID");
+                return -1;
             }
-            Object->setParent(ParentObject);
         }
         else if(!strcasecmp(Column, SQLITE_COL_CLASS)){
-            if(Object->setClass(Value)){
+            if(!*Value || Object->setClass(Value)){
                 ERROR("Error while setting class");
                 return -1;
             }
         }
         else if(!strcasecmp(Column, SQLITE_COL_TITLE)){
-            if(Object->setTitle(Value)){
+            if(!*Value || Object->setTitle(Value)){
                 ERROR("Error while setting title");
                 return -1;
             }
         }
         else if(!strcasecmp(Column, SQLITE_COL_RESTRICTED)){
-            if(Object->setRestricted(atoi(Value)==1?true:false)){
+            if(!*Value || Object->setRestricted(atoi(Value)==1?true:false)){
                 ERROR("Error while setting restriction");
                 return -1;
             }
@@ -1307,7 +1313,7 @@ int cUPnPObjectMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectI
             }
         }
         else if(!strcasecmp(Column, SQLITE_COL_WRITESTATUS)){
-            if(Object->setWriteStatus(atoi(Value))){
+            if(*Value && Object->setWriteStatus(atoi(Value))){
                 ERROR("Error while setting write status");
                 return -1;
             }
@@ -1369,7 +1375,7 @@ int cUPnPItemMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID 
     }
     Rows = this->mDatabase->getResultRows();
     if(!Rows->fetchRow(&Row)){
-        MESSAGE("No item properties found");
+        MESSAGE(VERBOSE_SQL, "No item properties found");
         return 0;
     }
     while(Row->fetchColumn(&Column, &Value)){
@@ -1393,14 +1399,14 @@ int cUPnPItemMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID 
 }
 
 cUPnPClassItem* cUPnPItemMediator::getObject(cUPnPObjectID ID){
-    MESSAGE("Getting Item with ID '%s'",*ID);
+    MESSAGE(VERBOSE_METADATA, "Getting Item with ID '%s'",*ID);
     cUPnPClassItem* Object = new cUPnPClassItem;
     if(this->databaseToObject(Object, ID)) return NULL;
     return Object;
 }
 
 cUPnPClassItem* cUPnPItemMediator::createObject(const char* Title, bool Restricted){
-    MESSAGE("Creating Item '%s'",Title);
+    MESSAGE(VERBOSE_MODIFICATIONS, "Creating Item '%s'",Title);
     cUPnPClassItem* Object = new cUPnPClassItem;
     if(this->initializeObject(Object, UPNP_CLASS_ITEM, Title, Restricted)) return NULL;
     return Object;
@@ -1468,7 +1474,7 @@ int cUPnPContainerMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
     }
     Rows = this->mDatabase->getResultRows();
     if(!Rows->fetchRow(&Row)){
-        MESSAGE("No item properties found");
+        MESSAGE(VERBOSE_SQL, "No item properties found");
         return 0;
     }
     while(Row->fetchColumn(&Column, &Value)){
@@ -1532,14 +1538,14 @@ int cUPnPContainerMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
 }
 
 cUPnPClassContainer* cUPnPContainerMediator::createObject(const char* Title, bool Restricted){
-    MESSAGE("Creating Container '%s'",Title);
+    MESSAGE(VERBOSE_MODIFICATIONS, "Creating Container '%s'",Title);
     cUPnPClassContainer* Object = new cUPnPClassContainer;
     if(this->initializeObject(Object, UPNP_CLASS_CONTAINER, Title, Restricted)) return NULL;
     return Object;
 }
 
 cUPnPClassContainer* cUPnPContainerMediator::getObject(cUPnPObjectID ID){
-    MESSAGE("Getting Container with ID '%s'",*ID);
+    MESSAGE(VERBOSE_METADATA, "Getting Container with ID '%s'",*ID);
     cUPnPClassContainer* Object = new cUPnPClassContainer;
     if(this->databaseToObject(Object, ID)) return NULL;
     return Object;
@@ -1555,14 +1561,14 @@ cUPnPVideoItemMediator::cUPnPVideoItemMediator(cMediaDatabase* MediaDatabase) :
     cUPnPItemMediator(MediaDatabase){}
 
 cUPnPClassVideoItem* cUPnPVideoItemMediator::createObject(const char* Title, bool Restricted){
-    MESSAGE("Creating Video item '%s'",Title);
+    MESSAGE(VERBOSE_MODIFICATIONS, "Creating Video item '%s'",Title);
     cUPnPClassVideoItem* Object = new cUPnPClassVideoItem;
     if(this->initializeObject(Object, UPNP_CLASS_VIDEO, Title, Restricted)) return NULL;
     return Object;
 }
 
 cUPnPClassVideoItem* cUPnPVideoItemMediator::getObject(cUPnPObjectID ID){
-    MESSAGE("Getting Video item with ID '%s'",*ID);
+    MESSAGE(VERBOSE_METADATA, "Getting Video item with ID '%s'",*ID);
     cUPnPClassVideoItem* Object = new cUPnPClassVideoItem;
     if(this->databaseToObject(Object, ID)) return NULL;
     return Object;
@@ -1618,7 +1624,7 @@ int cUPnPVideoItemMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObje
     }
     Rows = this->mDatabase->getResultRows();
     if(!Rows->fetchRow(&Row)){
-        MESSAGE("No item properties found");
+        MESSAGE(VERBOSE_SQL, "No item properties found");
         return 0;
     }
     while(Row->fetchColumn(&Column, &Value)){
@@ -1696,14 +1702,14 @@ cUPnPVideoBroadcastMediator::cUPnPVideoBroadcastMediator(cMediaDatabase* MediaDa
     cUPnPVideoItemMediator(MediaDatabase){}
 
 cUPnPClassVideoBroadcast* cUPnPVideoBroadcastMediator::createObject(const char* Title, bool Restricted){
-    MESSAGE("Creating Video broadcast '%s'",Title);
+    MESSAGE(VERBOSE_MODIFICATIONS, "Creating Video broadcast '%s'",Title);
     cUPnPClassVideoBroadcast* Object = new cUPnPClassVideoBroadcast;
     if(this->initializeObject(Object, UPNP_CLASS_VIDEOBC, Title, Restricted)) return NULL;
     return Object;
 }
 
 cUPnPClassVideoBroadcast* cUPnPVideoBroadcastMediator::getObject(cUPnPObjectID ID){
-    MESSAGE("Getting Video broadcast with ID '%s'",*ID);
+    MESSAGE(VERBOSE_METADATA, "Getting Video broadcast with ID '%s'",*ID);
     cUPnPClassVideoBroadcast* Object = new cUPnPClassVideoBroadcast;
     if(this->databaseToObject(Object, ID)) return NULL;
     return Object;
@@ -1753,7 +1759,7 @@ int cUPnPVideoBroadcastMediator::databaseToObject(cUPnPClassObject* Object, cUPn
     }
     Rows = this->mDatabase->getResultRows();
     if(!Rows->fetchRow(&Row)){
-        MESSAGE("No item properties found");
+        MESSAGE(VERBOSE_SQL, "No item properties found");
         return 0;
     }
     while(Row->fetchColumn(&Column, &Value)){
@@ -1795,14 +1801,14 @@ cUPnPMovieMediator::cUPnPMovieMediator(cMediaDatabase* MediaDatabase) :
     cUPnPVideoItemMediator(MediaDatabase){}
 
 cUPnPClassMovie* cUPnPMovieMediator::createObject(const char* Title, bool Restricted){
-    MESSAGE("Creating movie '%s'",Title);
+    MESSAGE(VERBOSE_MODIFICATIONS, "Creating movie '%s'",Title);
     cUPnPClassMovie* Object = new cUPnPClassMovie;
     if(this->initializeObject(Object, UPNP_CLASS_MOVIE, Title, Restricted)) return NULL;
     return Object;
 }
 
 cUPnPClassMovie* cUPnPMovieMediator::getObject(cUPnPObjectID ID){
-    MESSAGE("Getting movie with ID '%s'",*ID);
+    MESSAGE(VERBOSE_METADATA, "Getting movie with ID '%s'",*ID);
     cUPnPClassMovie* Object = new cUPnPClassMovie;
     if(this->databaseToObject(Object, ID)) return NULL;
     return Object;
@@ -1850,7 +1856,7 @@ int cUPnPMovieMediator::databaseToObject(cUPnPClassObject* Object, cUPnPObjectID
     }
     Rows = this->mDatabase->getResultRows();
     if(!Rows->fetchRow(&Row)){
-        MESSAGE("No item properties found");
+        MESSAGE(VERBOSE_SQL, "No item properties found");
         return 0;
     }
     while(Row->fetchColumn(&Column, &Value)){

@@ -46,6 +46,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  *
  ******************************************************************************/
+/** @private */
 struct File_Info_
 {
   /** The length of the file. A length less than 0 indicates the size
@@ -73,6 +74,7 @@ struct File_Info_
 
 };
 
+/** @private */
 struct cWebFileHandle {
     cString      Filename;
     off64_t      Size;
@@ -108,13 +110,13 @@ UpnpVirtualDirCallbacks cUPnPWebServer::mVirtualDirCallbacks = {
 };
 
 bool cUPnPWebServer::init(){
-    MESSAGE("Initialize callbacks for virtual directories.");
+    MESSAGE(VERBOSE_WEBSERVER, "Initialize callbacks for virtual directories.");
 
     if(UpnpSetWebServerRootDir(this->mRootdir) == UPNP_E_INVALID_ARGUMENT){
         ERROR("The root directory of the webserver is invalid.");
         return false;
     }
-    MESSAGE("Setting up callbacks");
+    MESSAGE(VERBOSE_WEBSERVER, "Setting up callbacks");
 
     if(UpnpSetVirtualDirCallbacks(&cUPnPWebServer::mVirtualDirCallbacks) == UPNP_E_INVALID_ARGUMENT){
         ERROR("The virtual directory callbacks are invalid.");
@@ -126,7 +128,7 @@ bool cUPnPWebServer::init(){
         return false;
     }
 
-    MESSAGE("Add virtual directories.");
+    MESSAGE(VERBOSE_WEBSERVER, "Add virtual directories.");
     if(UpnpAddVirtualDir(UPNP_DIR_SHARES) == UPNP_E_INVALID_ARGUMENT){
         ERROR("The virtual directory %s is invalid.",UPNP_DIR_SHARES);
         return false;
@@ -135,7 +137,7 @@ bool cUPnPWebServer::init(){
 }
 
 bool cUPnPWebServer::uninit(){
-    MESSAGE("Disabling the internal webserver");
+    MESSAGE(VERBOSE_WEBSERVER, "Disabling the internal webserver");
     UpnpEnableWebserver(FALSE);
 
     return true;
@@ -152,7 +154,7 @@ cUPnPWebServer* cUPnPWebServer::getInstance(const char* rootdir){
 }
 
 int cUPnPWebServer::getInfo(const char* filename, File_Info* info){
-    MESSAGE("Getting information of file '%s'", filename);
+    MESSAGE(VERBOSE_WEBSERVER, "Getting information of file '%s'", filename);
 
     propertyMap Properties;
     int Method;
@@ -164,7 +166,7 @@ int cUPnPWebServer::getInfo(const char* filename, File_Info* info){
                 switch(Method){
                     case UPNP_WEB_METHOD_STREAM:
                         {
-                            MESSAGE("Stream request");
+                            MESSAGE(VERBOSE_WEBSERVER, "Stream request");
                             propertyMap::iterator It = Properties.find("resId");
                             unsigned int ResourceID = 0;
                             if(It == Properties.end()){
@@ -188,12 +190,12 @@ int cUPnPWebServer::getInfo(const char* filename, File_Info* info){
                                     finfo.last_modified = Resource->getLastModification();
                                     memcpy(info, &finfo, sizeof(File_Info_));
 
-                                    MESSAGE("==== File info of Resource #%d ====", Resource->getID());
-                                    MESSAGE("Size: %lld", finfo.file_length);
-                                    MESSAGE("Dir: %s", finfo.is_directory?"yes":"no");
-                                    MESSAGE("Read: %s", finfo.is_readable?"allowed":"not allowed");
-                                    MESSAGE("Last modified: %s", ctime(&(finfo.last_modified)));
-                                    MESSAGE("Content-type: %s", finfo.content_type);
+                                    MESSAGE(VERBOSE_METADATA, "==== File info of Resource #%d ====", Resource->getID());
+                                    MESSAGE(VERBOSE_METADATA, "Size: %lld", finfo.file_length);
+                                    MESSAGE(VERBOSE_METADATA, "Dir: %s", finfo.is_directory?"yes":"no");
+                                    MESSAGE(VERBOSE_METADATA, "Read: %s", finfo.is_readable?"allowed":"not allowed");
+                                    MESSAGE(VERBOSE_METADATA, "Last modified: %s", ctime(&(finfo.last_modified)));
+                                    MESSAGE(VERBOSE_METADATA, "Content-type: %s", finfo.content_type);
                                 }
                             }
                         }
@@ -222,7 +224,7 @@ int cUPnPWebServer::getInfo(const char* filename, File_Info* info){
 }
 
 UpnpWebFileHandle cUPnPWebServer::open(const char* filename, UpnpOpenFileMode mode){
-    MESSAGE("File %s was opened for %s.",filename,mode==UPNP_READ ? "reading" : "writing");
+    MESSAGE(VERBOSE_WEBSERVER, "File %s was opened for %s.",filename,mode==UPNP_READ ? "reading" : "writing");
 
     propertyMap Properties;
     int Method;
@@ -235,7 +237,7 @@ UpnpWebFileHandle cUPnPWebServer::open(const char* filename, UpnpOpenFileMode mo
                 switch(Method){
                     case UPNP_WEB_METHOD_STREAM:
                         {
-                            MESSAGE("Stream request");
+                            MESSAGE(VERBOSE_WEBSERVER, "Stream request");
                             propertyMap::iterator It = Properties.find("resId");
                             unsigned int ResourceID = 0;
                             if(It == Properties.end()){
@@ -258,7 +260,7 @@ UpnpWebFileHandle cUPnPWebServer::open(const char* filename, UpnpOpenFileMode mo
                                             {
                                                 char* ChannelID = strtok(strdup(Resource->getResource()),":");
                                                 int     AudioID = atoi(strtok(NULL,":"));
-                                                MESSAGE("Try to create Receiver for Channel %s with Audio ID %d", ChannelID, AudioID);
+                                                MESSAGE(VERBOSE_LIVE_TV, "Try to create Receiver for Channel %s with Audio ID %d", ChannelID, AudioID);
                                                 cChannel* Channel = Channels.GetByChannelID(tChannelID::FromString(ChannelID));
                                                 if(!Channel){
                                                     ERROR("No such channel with ID %s", ChannelID);
@@ -303,32 +305,32 @@ UpnpWebFileHandle cUPnPWebServer::open(const char* filename, UpnpOpenFileMode mo
     else {
         return NULL;
     }
-    MESSAGE("Open the file handle");
+    MESSAGE(VERBOSE_WEBSERVER, "Open the file handle");
     WebFileHandle->FileHandle->open(mode);
     return (UpnpWebFileHandle)WebFileHandle;
 }
 
 int cUPnPWebServer::write(UpnpWebFileHandle fh, char* buf, size_t buflen){
     cWebFileHandle* FileHandle = (cWebFileHandle*)fh;
-    MESSAGE("Writing to %s", *FileHandle->Filename);
+    MESSAGE(VERBOSE_BUFFERS, "Writing to %s", *FileHandle->Filename);
     return FileHandle->FileHandle->write(buf, buflen);
 }
 
 int cUPnPWebServer::read(UpnpWebFileHandle fh, char* buf, size_t buflen){
     cWebFileHandle* FileHandle = (cWebFileHandle*)fh;
-    MESSAGE("Reading from %s", *FileHandle->Filename);
+    MESSAGE(VERBOSE_BUFFERS, "Reading from %s", *FileHandle->Filename);
     return FileHandle->FileHandle->read(buf, buflen);
 }
 
 int cUPnPWebServer::seek(UpnpWebFileHandle fh, off_t offset, int origin){
     cWebFileHandle* FileHandle = (cWebFileHandle*)fh;
-    MESSAGE("Seeking on %s", *FileHandle->Filename);
+    MESSAGE(VERBOSE_BUFFERS, "Seeking on %s", *FileHandle->Filename);
     return FileHandle->FileHandle->seek(offset, origin);
 }
 
 int cUPnPWebServer::close(UpnpWebFileHandle fh){
     cWebFileHandle *FileHandle = (cWebFileHandle *)fh;
-    MESSAGE("Closing file %s", *FileHandle->Filename);
+    MESSAGE(VERBOSE_WEBSERVER, "Closing file %s", *FileHandle->Filename);
     FileHandle->FileHandle->close();
     delete FileHandle->FileHandle;
     delete FileHandle;

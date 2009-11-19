@@ -32,6 +32,7 @@ cUPnPConfig* cUPnPConfig::get(){
 }
 
 cUPnPConfig* cUPnPConfig::mInstance = NULL;
+int cUPnPConfig::verbosity = 0;
 
 bool cUPnPConfig::processArgs(int argc, char* argv[]){
   // Implement command line argument processing here if applicable.
@@ -39,7 +40,9 @@ bool cUPnPConfig::processArgs(int argc, char* argv[]){
         {"int",     required_argument, NULL, 'i'},
         {"address", required_argument, NULL, 'a'},
         {"port",    required_argument, NULL, 'p'},
-        {"autodetect", no_argument,    NULL, 'd'}
+        {"autodetect", no_argument,    NULL, 'd'},
+        {"verbose",    no_argument,    NULL, 'v'},
+        {0, 0, 0, 0}
     };
 
     int c = 0;
@@ -55,8 +58,9 @@ bool cUPnPConfig::processArgs(int argc, char* argv[]){
     bool success = true;
     bool ifaceExcistent = false;
     bool addExcistent = false;
+    static int verbose = 0;
 
-    while((c = getopt_long(argc, argv, "i:a:p:v",long_options, NULL)) != -1){
+    while((c = getopt_long(argc, argv, "i:a:p:dv",long_options, NULL)) != -1){
         switch(c){
             case 'i': 
                 if(addExcistent) { ERROR("Address given but must be absent!"); return false; }
@@ -78,6 +82,12 @@ bool cUPnPConfig::processArgs(int argc, char* argv[]){
                 break;
             case 'd':
                 success = this->parseSetup(SETUP_SERVER_AUTO, optarg) && success;
+                break;
+            case 'v':
+                cUPnPConfig::verbosity++;
+                verbose++;
+                WARNING("Verbosity level: %i ", verbose);
+                break;
             default:
                 return false;
         }
@@ -90,11 +100,11 @@ bool cUPnPConfig::parseSetup(const char *Name, const char *Value)
 {
     const char* ptr;
     if(*this->mParsedArgs && (ptr = strstr(this->mParsedArgs,Name))!=NULL){
-        MESSAGE("Skipping %s=%s, was overridden in command line.",Name, Value);
+        MESSAGE(VERBOSE_SDK, "Skipping %s=%s, was overridden in command line.",Name, Value);
         return true;
     }
 
-    MESSAGE("VARIABLE %s has value %s", Name, Value);
+    MESSAGE(VERBOSE_SDK, "VARIABLE %s has value %s", Name, Value);
     // Parse your own setup parameters and store their values.
     if      (!strcasecmp(Name, SETUP_SERVER_ENABLED))    this->mEnable = atoi(Value);
     else if (!strcasecmp(Name, SETUP_SERVER_AUTO))       this->mAutoSetup = atoi(Value);

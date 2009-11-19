@@ -17,17 +17,42 @@
  *
  * This class shows and manages the settings within the VDR setup OSD
  *
- * @author Denis Loh
- * @version 0.0.1
  */
 class cMenuSetupUPnP : public cMenuSetupPage {
 public:
     cMenuSetupUPnP();
 //    virtual ~cMenuSetupUPnP();
-    virtual eOSState ProcessKey(eKeys Key);
+    /**
+     * Processes a keystroke
+     *
+     * This processes a keystroke which is done by the user and updates the
+     * menu accordingly
+     *
+     * It returns the current state of the VDR after pressing a key
+     *
+     * @return The current state of the VDR
+     */
+    virtual eOSState ProcessKey(
+        eKeys Key       ///< Key, pressed by the user
+    );
 protected:
+    /**
+     * Stores the setup information
+     *
+     * This stores the setup information in the configuration file
+     */
     virtual void Store(void);
+    /**
+     * Update the menu
+     *
+     * This updates the menu osd and refreshes the screen.
+     */
     void Update(void);
+    /**
+     * Loads the setup information
+     *
+     * This loads the setup information from the configuration file
+     */
     void Load(void);
 private:
     const char* const* getInterfaceList(int *count);

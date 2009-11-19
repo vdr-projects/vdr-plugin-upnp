@@ -55,7 +55,7 @@ int cAudioVideoDetector::detectVideoProperties(cUPnPResource* Resource, const ch
     unsigned int bitrate = CodecCtx->bit_rate;
     const char* codecName = (Codec)?Codec->name:"unknown";
 
-    MESSAGE("AVDetector: %s-stream %dx%d at %d bit/s", codecName, width, height, bitrate);
+    MESSAGE(VERBOSE_METADATA, "AVDetector: %s-stream %dx%d at %d bit/s", codecName, width, height, bitrate);
 
     Resource->mBitrate = bitrate;
     Resource->mSampleFrequency = CodecCtx->sample_rate;

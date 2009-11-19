@@ -11,6 +11,13 @@
 #include "../common.h"
 #include <upnp/upnp.h>
 
+/**
+ * The internal webserver
+ *
+ * This is the internal webserver. It distributes all the contents of the
+ * UPnP-Server.
+ *
+ */
 class cUPnPWebServer {
     friend class cUPnPServer;
 private:
@@ -19,11 +26,40 @@ private:
     const char* mRootdir;
     cUPnPWebServer(const char* root = "/");
 protected:
-    bool enable(bool enable);
 public:
+    /**
+     * Initializes the webserver
+     *
+     * It enables the webserver which comes with the <em>Intel SDK</em> and creates
+     * virtual directories for shares media.
+     *
+     * @return returns
+     * - \bc true, if initializing was successful
+     * - \bc false, otherwise
+     */
     bool init();
+    /**
+     * Uninitializes the webserver
+     *
+     * This stops the webserver.
+     *
+     * @return returns
+     * - \bc true, if initializing was successful
+     * - \bc false, otherwise
+     */
     bool uninit();
-    static cUPnPWebServer* getInstance(const char* rootdir = "/");
+    /**
+     * Returns the instance of the webserver
+     *
+     * Returns the instance of the webserver. This will create a single
+     * instance of none is existing on the very first call. A subsequent call
+     * will return the same instance.
+     *
+     * @return the instance of webserver
+     */
+    static cUPnPWebServer* getInstance(
+        const char* rootdir = "/" /**< the root directory of the webserver */
+    );
     virtual ~cUPnPWebServer();
 //};
 
@@ -32,6 +68,7 @@ public:
      *  The callback functions for the webserver
      *
      ****************************************************/
+    
     /**
      * Retrieve file information
      *
@@ -48,8 +85,8 @@ public:
      * Opens a file in a virtual directory with the specified mode.
      *
      * Possible modes are:
-     * - UPNP_READ :    Opens the file for reading
-     * - UPNP_WRITE:    Opens the file for writing
+     * - \b UPNP_READ,    Opens the file for reading
+     * - \b UPNP_WRITE,    Opens the file for writing
      *
      * It returns a file handle to the opened file, NULL otherwise
      *

@@ -28,6 +28,7 @@ typedef function1<void, const char> charCallback;
 typedef function1<void, int> intCallback;
 
 // The defined ColumnNames
+/** @private */
 struct cProperties : symbols<const char*> {
 //struct cProperties : symbols<> {
     cProperties(){
@@ -107,6 +108,7 @@ struct cProperties : symbols<const char*> {
     }
 } Properties;
 
+/** @private */
 struct cOperators : symbols<const char*> {
     cOperators(){
         add
@@ -123,6 +125,7 @@ struct cOperators : symbols<const char*> {
     }
 } Operators;
 
+/** @private */
 struct cConcatOperators : symbols<const char*> {
     cConcatOperators(){
         add
@@ -132,6 +135,7 @@ struct cConcatOperators : symbols<const char*> {
     }
 } ConcatOperators;
 
+/** @private */
 struct cExistanceOperator : symbols<const char*> {
     cExistanceOperator(){
         add
@@ -145,6 +149,7 @@ struct cExistanceOperator : symbols<const char*> {
 // This is the grammar including the functors which calls the member functions
 // of search. The callback definitions at the end of the constructor are
 // essential. DO NOT MODIFY if you don't know how!
+/** @private */
 struct cSearchGrammar : public boost::spirit::grammar<cSearchGrammar> {
     // The callbacks members
     charCallback &endBrackedExp;
@@ -176,6 +181,7 @@ struct cSearchGrammar : public boost::spirit::grammar<cSearchGrammar> {
                     startBrackedExp(startBrackedExp){}
 
     template <typename scanner>
+    /** @private */
     struct definition {
         boost::spirit::rule<scanner> searchCrit, searchExp, logOp, \
                                      relExp, binOp, relOp, stringOp, \
@@ -278,6 +284,7 @@ struct cSearchGrammar : public boost::spirit::grammar<cSearchGrammar> {
     };
 };
 
+/** @private */
 struct cSortGrammar : public boost::spirit::grammar<cSortGrammar> {
     // The callback members
     propCallback &pushProperty;
@@ -290,6 +297,7 @@ struct cSortGrammar : public boost::spirit::grammar<cSortGrammar> {
             pushDirection(pushDirection){}
 
     template <typename scanner>
+    /** @private */
     struct definition {
         boost::spirit::rule<scanner> sortCrit, sortExp, property, direction;
 
@@ -312,6 +320,7 @@ struct cSortGrammar : public boost::spirit::grammar<cSortGrammar> {
     };
 };
 
+/** @private */
 struct cFilterGrammar : public boost::spirit::grammar<cFilterGrammar> {
     // The callback members
     propCallback &pushProperty;
@@ -324,6 +333,7 @@ struct cFilterGrammar : public boost::spirit::grammar<cFilterGrammar> {
             pushAsterisk(pushAsterisk){}
 
     template <typename scanner>
+    /** @private */
     struct definition {
         boost::spirit::rule<scanner> filterCrit, filterExp, property;
 
@@ -351,7 +361,7 @@ struct cFilterGrammar : public boost::spirit::grammar<cFilterGrammar> {
  \**********************************************/
 
 void cSearch::pushEndBrackedExp(const char){
-    MESSAGE("Pushing closing bracket");
+    MESSAGE(VERBOSE_PARSERS, "Pushing closing bracket");
     if(asprintf(&this->SQLWhereStmt, "%s)", this->SQLWhereStmt)==-1){
         ERROR("Unable to allocate SQL Statement");
         return;
@@ -369,21 +379,21 @@ void cSearch::pushExpression(const char*, const char*){
         long int IntegerValue;
 
         if(sscanf(Value, "%ld", &IntegerValue)!=EOF && sscanf(Value, "%*4d-%*2d-%*2d")==EOF){
-            MESSAGE("Popping '%s %s %ld'",Property, Operator, IntegerValue);
+            MESSAGE(VERBOSE_PARSERS, "Popping '%s %s %ld'",Property, Operator, IntegerValue);
             if(asprintf(&Statement, "%s %s %ld", Property, Operator, IntegerValue)==-1){
                 ERROR("Failed to allocated memory for statement.");
                 return;
             }
         }
         else if(!strcasecmp(Operator, "IS")){
-            MESSAGE("Popping '%s %s %s'", Property, Operator, Value);
+            MESSAGE(VERBOSE_PARSERS, "Popping '%s %s %s'", Property, Operator, Value);
             if(asprintf(&Statement, "%s %s %s", Property, Operator, Value)==-1){
                 ERROR("Failed to allocated memory for statement.");
                 return;
             }
         }
         else {
-            MESSAGE("Popping '%s %s \"%s\"'",Property, Operator, Value);
+            MESSAGE(VERBOSE_PARSERS, "Popping '%s %s \"%s\"'",Property, Operator, Value);
             if(asprintf(&Statement, "%s %s '%s'", Property, Operator, Value)==-1){
                 ERROR("Failed to allocated memory for statement.");
                 return;
@@ -401,12 +411,12 @@ void cSearch::pushExpression(const char*, const char*){
 
 void cSearch::pushProperty(const char* Property){
     this->CurrentProperty = strdup(Property);
-    MESSAGE("Property %s added",Property);
+    MESSAGE(VERBOSE_PARSERS, "Property %s added",Property);
 }
 
 void cSearch::pushOperator(const char* Operator){
     this->CurrentOperator = strdup(Operator);
-    MESSAGE("Operator %s added",Operator);
+    MESSAGE(VERBOSE_PARSERS, "Operator %s added",Operator);
 }
 
 void cSearch::pushValue(const char* Start, const char* End){
@@ -414,13 +424,13 @@ void cSearch::pushValue(const char* Start, const char* End){
     if(!Value || !strcmp(Value,"")) return;
 
     this->CurrentValue = strdup(Value);
-    MESSAGE("Value %s added", Value);
+    MESSAGE(VERBOSE_PARSERS, "Value %s added", Value);
 }
 
 void cSearch::pushExistance(const char* Exists){
     this->CurrentValue = strdup(Exists);
     this->CurrentOperator = strdup("IS");
-    MESSAGE("Existance expression called. '%s'", Exists);
+    MESSAGE(VERBOSE_PARSERS, "Existance expression called. '%s'", Exists);
 }
 
 void cSearch::pushConcatOp(const char* Operator){
@@ -429,11 +439,11 @@ void cSearch::pushConcatOp(const char* Operator){
         return;
     }
 
-    MESSAGE("Concatenation expression called. '%s'", Operator);
+    MESSAGE(VERBOSE_PARSERS, "Concatenation expression called. '%s'", Operator);
 }
 
 void cSearch::pushStartBrackedExp(const char){
-    MESSAGE("Pushing opening bracket");
+    MESSAGE(VERBOSE_PARSERS, "Pushing opening bracket");
     if(asprintf(&this->SQLWhereStmt, "%s(", this->SQLWhereStmt)==-1){
         ERROR("Unable to allocate SQL Statement");
         return;
@@ -478,13 +488,13 @@ bool cSearch::parseCriteria(const char* Search){
                            pushConcatOpCB,
                            startBrackedExpCB);
 
-    MESSAGE("Starting search parsing");
+    MESSAGE(VERBOSE_PARSERS, "Starting search parsing");
 
     if(boost::spirit::parse(Search, Grammar).full){
-        MESSAGE("Parsing successful");
+        MESSAGE(VERBOSE_DIDL, "Parsed search expression successfuly");
     }
     else {
-        ERROR("Parsing failed");
+        ERROR("Parsing search expression failed");
         return false;
     }
     return true;
@@ -532,7 +542,7 @@ bool cFilterCriteria::parseFilter(const char* Filter){
     this->mFilterList = new cStringList;
 
     if(Filter && !strcasecmp(Filter, "")){
-        MESSAGE("Empty filter");
+        MESSAGE(VERBOSE_PARSERS, "Empty filter");
         return true;
     }
 
@@ -542,7 +552,7 @@ bool cFilterCriteria::parseFilter(const char* Filter){
     cFilterGrammar Grammar(pushPropertyCB, pushAsteriskCB);
 
     if(boost::spirit::parse(Filter, Grammar).full){
-        MESSAGE("Parse filter successful");
+        MESSAGE(VERBOSE_PARSERS, "Parse filter successful");
     }
     else {
         ERROR("Parsing filter failed");
@@ -558,12 +568,12 @@ bool cFilterCriteria::parseFilter(const char* Filter){
  \**********************************************/
 
 void cFilterCriteria::pushProperty(const char* Property){
-    MESSAGE("Pushing property");
+    MESSAGE(VERBOSE_PARSERS, "Pushing property");
     this->mFilterList->Append(strdup(Property));
 }
 
 void cFilterCriteria::pushAsterisk(const char){
-    MESSAGE("Pushing asterisk (*)");
+    MESSAGE(VERBOSE_PARSERS, "Pushing asterisk (*)");
     if(this->mFilterList) delete this->mFilterList;
     this->mFilterList = NULL;
     return;
@@ -596,7 +606,7 @@ cList<cSortCrit>* cSortCriteria::parse(const char* Sort){
 
 bool cSortCriteria::parseSort(const char* Sort){
     if(!Sort || !strcasecmp(Sort, "")){
-        MESSAGE("Empty Sort");
+        MESSAGE(VERBOSE_PARSERS, "Empty Sort");
         return true;
     }
 
@@ -606,7 +616,7 @@ bool cSortCriteria::parseSort(const char* Sort){
     cSortGrammar Grammar(pushPropertyCB, pushDirectionCB);
 
     if(boost::spirit::parse(Sort, Grammar).full){
-        MESSAGE("Parse Sort successful");
+        MESSAGE(VERBOSE_PARSERS, "Parse Sort successful");
     }
     else {
         ERROR("Parsing Sort failed");
@@ -622,14 +632,14 @@ bool cSortCriteria::parseSort(const char* Sort){
  \**********************************************/
 
 void cSortCriteria::pushProperty(const char* Property){
-    MESSAGE("Pushing property '%s'", Property);
+    MESSAGE(VERBOSE_PARSERS, "Pushing property '%s'", Property);
     this->mCurrentCrit->Property = strdup(Property);
     this->mCriteriaList->Add(this->mCurrentCrit);
     return;
 }
 
 void cSortCriteria::pushDirection(const char Direction){
-    MESSAGE("Pushing direction '%c'", Direction);
+    MESSAGE(VERBOSE_PARSERS, "Pushing direction '%c'", Direction);
     this->mCurrentCrit = new cSortCrit;
     this->mCurrentCrit->SortDescending = (Direction=='-')?true:false;
     return;
@@ -641,6 +651,7 @@ void cSortCriteria::pushDirection(const char Direction){
  *                                              *
  \**********************************************/
 
+/** @private */
 struct cWebserverSections : symbols<> {
     cWebserverSections(){
         add
@@ -649,6 +660,7 @@ struct cWebserverSections : symbols<> {
     }
 } WebserverSections;
 
+/** @private */
 struct cWebserverMethods : symbols<int> {
     cWebserverMethods(){
         add
@@ -661,6 +673,7 @@ struct cWebserverMethods : symbols<int> {
     }
 } WebserverMethods;
 
+/** @private */
 struct cPathParserGrammar : public boost::spirit::grammar<cPathParserGrammar> {
 
     intCallback &pushSection;
@@ -678,6 +691,7 @@ struct cPathParserGrammar : public boost::spirit::grammar<cPathParserGrammar> {
                       pushPropertyValue(pushPropertyValue){}
 
     template <typename scanner>
+    /** @private */
     struct definition {
         boost::spirit::rule<scanner> pathExp, section, method, methodProperties,
                                      property, key, value, uncriticalChar;
@@ -742,7 +756,7 @@ bool cPathParser::parsePath(const char* Path, int* Section, int* Method, propert
     cPathParserGrammar Grammar(pushSectionCB, pushMethodCB, pushPropertyKeyCB, pushPropertyValueCB);
 
     if(boost::spirit::parse(Path, Grammar).full){
-        MESSAGE("Parse path successful");
+        MESSAGE(VERBOSE_PARSERS, "Parse path successful");
         *Section = this->mSection;
         *Method = this->mMethod;
         *Properties = this->mProperties;
@@ -765,7 +779,7 @@ bool cPathParser::parsePath(const char* Path, int* Section, int* Method, propert
 void cPathParser::pushPropertyKey(const char* Start, const char* End){
     char* Key = strndup(Start, End-Start);
     
-    MESSAGE("Pushing key '%s'", Key);
+    MESSAGE(VERBOSE_PARSERS, "Pushing key '%s'", Key);
 
     this->mKey = Key;
 
@@ -775,7 +789,7 @@ void cPathParser::pushPropertyKey(const char* Start, const char* End){
 void cPathParser::pushPropertyValue(const char* Start, const char* End){
     char* Value = strndup(Start, End-Start);
     
-    MESSAGE("Pushing value '%s'", Value);
+    MESSAGE(VERBOSE_PARSERS, "Pushing value '%s'", Value);
     // TODO: urlDecode Value
 
     if(*this->mKey){
@@ -785,11 +799,11 @@ void cPathParser::pushPropertyValue(const char* Start, const char* End){
 }
 
 void cPathParser::pushMethod(int Method){
-    MESSAGE("Pushing method '%d'", Method);
+    MESSAGE(VERBOSE_PARSERS, "Pushing method '%d'", Method);
     this->mMethod = Method;
 }
 
 void cPathParser::pushSection(int Section){
-    MESSAGE("Pushing section '%d'", Section);
+    MESSAGE(VERBOSE_PARSERS, "Pushing section '%d'", Section);
     this->mSection = Section;
 }

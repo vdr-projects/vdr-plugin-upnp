@@ -13,7 +13,7 @@ cUpnpService::cUpnpService(UpnpDevice_Handle DeviceHandle) {
     this->mDeviceHandle = DeviceHandle;
 }
 
-int cUpnpService::parseIntegerValue(IXML_Document* Document, const char* Item, int* Value){
+int cUpnpService::parseIntegerValue(IN IXML_Document* Document, IN const char* Item, OUT int* Value){
     char* Val = NULL;
     int Error = 0;
 
@@ -34,7 +34,7 @@ int cUpnpService::parseIntegerValue(IXML_Document* Document, const char* Item, i
     return Error;
 }
 
-int cUpnpService::parseStringValue(IXML_Document* Document, const char* Item, char** Value){
+int cUpnpService::parseStringValue(IN IXML_Document* Document, IN const char* Item, OUT char** Value){
     char* Val = NULL;
     int Error = 0;
 

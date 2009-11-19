@@ -240,25 +240,6 @@ eOSState cMenuEditIpItem::ProcessKey(eKeys Key) {
 	return osContinue;
 }
 
-const char* escapeSQLite(const char* Data, char** Buf){
-    if(!Data){
-        *Buf = NULL;
-    }
-    else {
-        std::string NewData = "";
-        int Char = 0;
-        for(unsigned int i = 0; i < strlen(Data); i++){
-            Char = Data[i];
-            switch(Char){
-                case L'\'': NewData += "''"; break;
-                default: NewData += Data[i]; break;
-            }
-        }
-        *Buf = strdup(NewData.c_str());
-    }
-    return (*Buf);
-}
-
 const char* escapeXMLCharacters(const char* Data, char** Buf){
     if(Data==NULL){
         ERROR("Escape XML: No data to escape");

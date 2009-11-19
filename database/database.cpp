@@ -46,9 +46,7 @@ int cSQLiteDatabase::exec(const char* Statement){
         return -1;
     }
     this->mRows = new cRows;
-#ifdef SQLITE_PRINT_STATEMENTS
-    MESSAGE("SQLite: %s", Statement);
-#endif
+    MESSAGE(VERBOSE_SQL_STATEMENTS,"SQLite: %s", Statement);
     if(sqlite3_exec(this->mDatabase, Statement, cSQLiteDatabase::getResultRow, (cSQLiteDatabase*)this, &Error)!=SQLITE_OK){
         ERROR("Database error: %s", Error);
         ERROR("Statement was: %s", Statement);
@@ -143,13 +141,12 @@ bool cRow::fetchColumn(cString* Column, cString* Value){
     return ret;
 }
 
+
 bool cRow::fetchColumn(char** Column, char** Value){
     if(currentCol>=this->ColCount){
         return false;
     }
-    #ifdef SQLITE_PRINT_FETCHES
-    MESSAGE("Fetching column %s='%s' (%d/%d)", this->Columns[currentCol], this->Values[currentCol], currentCol+1, this->ColCount);
-    #endif
+    MESSAGE(VERBOSE_SQL_FETCHES,"Fetching column %s='%s' (%d/%d)", this->Columns[currentCol], this->Values[currentCol], currentCol+1, this->ColCount);
     *Column = strdup0(this->Columns[currentCol]);
     if(this->Values[currentCol]){
         *Value = strcasecmp(this->Values[currentCol],"NULL")?strdup(this->Values[currentCol]):NULL;
@@ -169,7 +166,7 @@ int cSQLiteDatabase::initialize(){
         sqlite3_close(this->mDatabase);
         return -1;
     }
-    MESSAGE("Database file %s opened.", *File);
+    MESSAGE(VERBOSE_SDK,"Database file %s opened.", *File);
     if(this->initializeTables()){
         ERROR("Error while creating tables");
         return -1;
@@ -191,17 +188,19 @@ void cSQLiteDatabase::startTransaction(){
         }
     }
     this->execStatement("BEGIN TRANSACTION");
-    MESSAGE("Start new transaction");
+    MESSAGE(VERBOSE_SQL,"Start new transaction");
     this->mActiveTransaction = true;
 }
 
 void cSQLiteDatabase::commitTransaction(){
     this->execStatement("COMMIT TRANSACTION");
+    MESSAGE(VERBOSE_SQL,"Commited transaction");
     this->mActiveTransaction = false;
 }
 
 void cSQLiteDatabase::rollbackTransaction(){
     this->execStatement("ROLLBACK TRANSACTION");
+    MESSAGE(VERBOSE_SQL,"Rolled back transaction");
     this->mActiveTransaction = false;
 }
 

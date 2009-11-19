@@ -22,7 +22,7 @@ cLiveReceiver* cLiveReceiver::newInstance(cChannel* Channel, int Priority){
 
     cLiveReceiver *Receiver = new cLiveReceiver(Channel, Device);
     if(Receiver){
-        MESSAGE("Receiver for channel \"%s\" created successfully.", Channel->Name());
+        MESSAGE(VERBOSE_SDK, "Receiver for channel \"%s\" created successfully.", Channel->Name());
         return Receiver;
     }
     else {
@@ -62,13 +62,13 @@ void cLiveReceiver::open(UpnpOpenFileMode){
 void cLiveReceiver::Activate(bool On){
     if(On){
         this->Start();
-        MESSAGE("Live receiver started.");
+        MESSAGE(VERBOSE_LIVE_TV, "Live receiver started.");
     }
     else {
         if(this->Running()){
             this->Cancel(2);
         }
-        MESSAGE("Live receiver stopped");
+        MESSAGE(VERBOSE_LIVE_TV, "Live receiver stopped");
     }
 }
 
@@ -82,20 +82,20 @@ void cLiveReceiver::Receive(uchar* Data, int Length){
 }
 
 void cLiveReceiver::Action(void){
-    MESSAGE("Started buffering...");
+    MESSAGE(VERBOSE_LIVE_TV, "Started buffering...");
     while(this->Running()){
         int bytesRead;
-        //MESSAGE("Buffer is filled with %d bytes", this->mLiveBuffer->Available());
+        MESSAGE(VERBOSE_BUFFERS, "Buffer is filled with %d bytes", this->mLiveBuffer->Available());
         uchar* bytes = this->mLiveBuffer->Get(bytesRead);
         if(bytes){
             int count = this->mFrameDetector->Analyze(bytes, bytesRead);
             if(count){
-                //MESSAGE("%d bytes analyzed", count);
-                //MESSAGE("%2.2f FPS", this->mFrameDetector->FramesPerSecond());
+                MESSAGE(VERBOSE_BUFFERS, "%d bytes analyzed", count);
+                MESSAGE(VERBOSE_BUFFERS, "%2.2f FPS", this->mFrameDetector->FramesPerSecond());
                 if(!this->Running() && this->mFrameDetector->IndependentFrame())
                     break;
                 if(this->mFrameDetector->Synced()){
-                    //MESSAGE("Frame detector synced to data stream");
+                    MESSAGE(VERBOSE_BUFFERS, "Frame detector synced to data stream");
                     if(this->mFrameDetector->IndependentFrame()){
                         this->mOutputBuffer->Put(this->mPatPmtGenerator.GetPat(), TS_SIZE);
                         int i = 0;
@@ -107,7 +107,7 @@ void cLiveReceiver::Action(void){
                     if(bytesWrote != count){
                         this->mLiveBuffer->ReportOverflow(count - bytesWrote);
                     }
-                    //MESSAGE("Wrote %d to output buffer", bytesWrote);
+                    MESSAGE(VERBOSE_BUFFERS, "Wrote %d to output buffer", bytesWrote);
                     if(bytesWrote){
                         this->mLiveBuffer->Del(bytesWrote);
                     }
@@ -121,7 +121,7 @@ void cLiveReceiver::Action(void){
             }
         }
     }
-    MESSAGE("Receiver was detached from device");
+    MESSAGE(VERBOSE_LIVE_TV, "Receiver was detached from device");
 }
 
 int cLiveReceiver::read(char* buf, size_t buflen){
@@ -135,7 +135,7 @@ int cLiveReceiver::read(char* buf, size_t buflen){
             WARNING("Too few data, waiting...");
             cCondWait::SleepMs(RECEIVER_WAIT_ON_NODATA);
             if(!this->IsAttached()){
-                MESSAGE("Lost device...");
+                MESSAGE(VERBOSE_LIVE_TV, "Lost device...");
                 return 0;
             }
             WaitTimeout-=RECEIVER_WAIT_ON_NODATA;
@@ -160,7 +160,7 @@ int cLiveReceiver::read(char* buf, size_t buflen){
         }
 
     }
-    MESSAGE("Read %d bytes from live feed", bytesRead);
+    MESSAGE(VERBOSE_BUFFERS, "Read %d bytes from live feed", bytesRead);
     return bytesRead;
 }
 
@@ -175,10 +175,10 @@ int cLiveReceiver::write(char*, size_t){
 }
 
 void cLiveReceiver::close(){
-    MESSAGE("Closing live receiver");
+    MESSAGE(VERBOSE_SDK, "Closing live receiver");
     this->Detach();
     delete this->mOutputBuffer; this->mOutputBuffer = NULL;
     delete this->mLiveBuffer; this->mLiveBuffer = NULL;
     this->mFrameDetector = NULL;
-    MESSAGE("Live receiver closed.");
+    MESSAGE(VERBOSE_LIVE_TV, "Live receiver closed.");
 }

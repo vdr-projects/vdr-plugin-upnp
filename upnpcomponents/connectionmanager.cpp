@@ -70,7 +70,7 @@ int cConnectionManager::execute(Upnp_Action_Request* Request){
 }
 
 int cConnectionManager::getProtocolInfo(Upnp_Action_Request* Request){
-    MESSAGE("Protocol info requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
+    MESSAGE(VERBOSE_CMS, "Protocol info requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
     cString Result = cString::sprintf(
             "<u:%sResponse xmlns:u=\"%s\"> \
                 <Source>%s</Source> \
@@ -87,7 +87,7 @@ int cConnectionManager::getProtocolInfo(Upnp_Action_Request* Request){
 }
 
 int cConnectionManager::getCurrentConnectionIDs(Upnp_Action_Request* Request){
-    MESSAGE("Current connection IDs requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
+    MESSAGE(VERBOSE_CMS, "Current connection IDs requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
     cString Result;
     const char* IDs = this->getConnectionIDsCVS();
     if(!IDs){
@@ -109,7 +109,7 @@ int cConnectionManager::getCurrentConnectionIDs(Upnp_Action_Request* Request){
 }
 
 int cConnectionManager::getCurrentConnectionInfo(Upnp_Action_Request* Request){
-    MESSAGE("Current connection info requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
+    MESSAGE(VERBOSE_CMS, "Current connection info requested by %s.", inet_ntoa(Request->CtrlPtIPAddr));
     int ConnectionID;
 
     if(this->parseIntegerValue(Request->ActionRequest, "ConnectionID", &ConnectionID) != 0){
@@ -156,7 +156,7 @@ int cConnectionManager::getCurrentConnectionInfo(Upnp_Action_Request* Request){
 }
 
 int cConnectionManager::prepareForConnection(Upnp_Action_Request* Request){
-    MESSAGE("Request for a new connection by %s.", inet_ntoa(Request->CtrlPtIPAddr));
+    MESSAGE(VERBOSE_CMS, "Request for a new connection by %s.", inet_ntoa(Request->CtrlPtIPAddr));
     //char* Result = NULL;
     char* RemoteProtocolInfo = NULL;
     char* PeerConnectionManager = NULL;
@@ -198,7 +198,7 @@ int cConnectionManager::prepareForConnection(Upnp_Action_Request* Request){
 }
 
 int cConnectionManager::connectionComplete(Upnp_Action_Request* Request){
-    MESSAGE("Request for closing an open connection by %s.", inet_ntoa(Request->CtrlPtIPAddr));
+    MESSAGE(VERBOSE_CMS, "Request for closing an open connection by %s.", inet_ntoa(Request->CtrlPtIPAddr));
     //char* Result = NULL;
     int ConnectionID;
 
@@ -216,27 +216,27 @@ int cConnectionManager::connectionComplete(Upnp_Action_Request* Request){
     return Request->ErrCode;
 }
 
-bool cConnectionManager::setProtocolInfo(const char* ProtocolInfo){
-    if(strcmp(this->mSupportedProtocols, ProtocolInfo)){
-        // ProtocolInfo changed, save and invoke a event notification
-        this->mSupportedProtocols = ProtocolInfo;
-
-        IXML_Document* PropertySet = NULL;
-        UpnpAddToPropertySet(&PropertySet, "SourceProtocolInfo", this->mSupportedProtocols);
-        int ret = UpnpNotifyExt(this->mDeviceHandle, UPNP_DEVICE_UDN, UPNP_CMS_SERVICE_ID, PropertySet);
-        ixmlDocument_free(PropertySet);
-
-        if(ret != UPNP_E_SUCCESS){
-            ERROR("State change notification failed (Error code: %d)",ret);
-            return false;
-        }
-    }
-    return true;
-}
+//bool cConnectionManager::setProtocolInfo(const char* ProtocolInfo){
+//    if(strcmp(this->mSupportedProtocols, ProtocolInfo)){
+//        // ProtocolInfo changed, save and invoke a event notification
+//        this->mSupportedProtocols = ProtocolInfo;
+//
+//        IXML_Document* PropertySet = NULL;
+//        UpnpAddToPropertySet(&PropertySet, "SourceProtocolInfo", this->mSupportedProtocols);
+//        int ret = UpnpNotifyExt(this->mDeviceHandle, UPNP_DEVICE_UDN, UPNP_CMS_SERVICE_ID, PropertySet);
+//        ixmlDocument_free(PropertySet);
+//
+//        if(ret != UPNP_E_SUCCESS){
+//            ERROR("State change notification failed (Error code: %d)",ret);
+//            return false;
+//        }
+//    }
+//    return true;
+//}
 
 cVirtualConnection* cConnectionManager::createVirtualConnection(const char* RemoteProtocolInfo, const char* RemoteConnectionManager, int RemoteConnectionID, eDirection Direction){
     static int lastConnectionID = 0;
-    MESSAGE("Create virtual connection");
+    MESSAGE(VERBOSE_CMS, "Create virtual connection");
     if(lastConnectionID == 2147483647) lastConnectionID = 1;
     cVirtualConnection* Connection = new cVirtualConnection;
     // AVT is available
@@ -268,7 +268,7 @@ cVirtualConnection* cConnectionManager::createVirtualConnection(const char* Remo
         ERROR("State change notification failed (Error code: %d)",ret);
         return NULL;
     }
-    MESSAGE("Notification of connection creation sent");
+    MESSAGE(VERBOSE_CMS, "Notification of connection creation sent");
     this->mVirtualConnections->Add(Connection);
     return Connection;
 }

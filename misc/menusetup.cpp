@@ -18,7 +18,7 @@
 
 cMenuSetupUPnP::cMenuSetupUPnP(){
     // Get server acitve state
-    MESSAGE("Creating menu");
+    MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Creating menu");
     this->mCtrlBind = NULL;
     this->mCtrlAutoMode = NULL;
     this->mCtrlEnabled = NULL;
@@ -63,7 +63,7 @@ const char* const* cMenuSetupUPnP::getInterfaceList(int* count){
 }
 
 int cMenuSetupUPnP::getInterfaceIndex(const char* Interface){
-    MESSAGE("Getting Index of %s", Interface);
+    MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Getting Index of %s", Interface);
     if(!Interface) return 0;
     int count;
     int Index = 0;
