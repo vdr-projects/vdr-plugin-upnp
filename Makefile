@@ -52,6 +52,7 @@ LIBS += -lupnp -lixml -lsqlite3 -lavformat -lavcodec
 INCLUDES += -I$(VDRDIR)/include	-I/usr/include \
 
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
 ### The object files (add further files here):
 
@@ -62,12 +63,12 @@ OBJS = $(PLUGIN).o \
 		misc/util.o \
 		misc/config.o \
 		misc/search.o \
+		misc/avdetector.o \
 		database/database.o \
 		database/metadata.o \
 		database/object.o \
 		database/resources.o \
 		server/server.o \
-		misc/avdetector.o \
 		upnpcomponents/dlna.o \
 		upnpcomponents/upnpwebserver.o \
 		upnpcomponents/upnpservice.o \

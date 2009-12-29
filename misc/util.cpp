@@ -16,6 +16,50 @@
 #include <upnp/ixml.h>
 #include <arpa/inet.h>
 #include <iosfwd>
+#include <time.h>
+
+#define DURATION_MAX_STRING_LENGTH      13              // DLNA: 1-5 DIGIT hours :
+                                                        //         2 DIGIT minutes :
+                                                        //         2 DIGIT seconds .
+                                                        //         3 DIGIT fraction
+
+char* duration(off64_t duration, unsigned int timeBase){
+    if (timeBase == 0) timeBase = 1;
+
+    int seconds, minutes, hours, fraction;
+
+    seconds     = duration / timeBase;
+    fraction    = duration % timeBase;
+    minutes     = seconds / 60;
+    seconds    %= 60;
+    hours       = minutes / 60;
+    minutes    %= 60;
+
+    char* output = new char[DURATION_MAX_STRING_LENGTH];
+
+    if(!snprintf(
+            output,
+            DURATION_MAX_STRING_LENGTH,
+            UPNP_DURATION_FORMAT_STRING,
+            hours, minutes, seconds)
+      ){
+        delete output;
+        return NULL;
+    }
+    else {
+        if(timeBase > 1 && 
+           !snprintf(
+                output,
+                DURATION_MAX_STRING_LENGTH,
+                "%s" UPNP_DURATION_FRAME_FORMAT,
+                output, fraction)
+          ){
+            delete output;
+            return NULL;
+        }
+        else return output;
+    }
+}
 
 char* substr(const char* str, unsigned int offset, unsigned int length){
     if(offset > strlen(str)) return NULL;

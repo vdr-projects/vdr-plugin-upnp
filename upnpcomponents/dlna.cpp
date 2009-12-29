@@ -69,32 +69,6 @@ const char* cDlna::getProtocolInfo(DLNAProfile *Prof){
     return NULL;
 }
 
-DLNAProfile* cDlna::getProfileOfChannel(cChannel* Channel){
-    if(Channel == NULL) return NULL;
-    // Switching the video types of the DVB-Stream
-    switch(Channel->Vtype()){
-        case 0x02:
-            // MPEG2 Video
-            return &DLNA_PROFILE_MPEG_TS_SD_EU_ISO;
-        case 0x1B:
-            return &DLNA_PROFILE_AVC_TS_HD_EU_ISO;
-        default:
-            ERROR("Unknown video type %d for channel %s!", Channel->Vtype(), Channel->Name());
-            return NULL;
-    }
-}
-
-DLNAProfile* cDlna::getProfileOfRecording(cRecording* Recording){
-    // Get the data of the first file of the recording
-    cString File = cString::sprintf(VDR_RECORDFILE_PATTERN_TS, Recording->FileName(), 1);
-    return this->getProfileOfFile(File);
-}
-
-DLNAProfile* cDlna::getProfileOfFile(cString){
-    WARNING("Not yet supported");
-    return NULL;
-}
-
 const char* cDlna::getRegisteredProtocolInfoString(cRegisteredProfile *Profile){
     cString DLNA4thField = NULL;
     DLNA4thField = cString::sprintf("DLNA.ORG_PN=%s", Profile->Profile->ID);

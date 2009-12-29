@@ -259,8 +259,8 @@ UpnpWebFileHandle cUPnPWebServer::open(const char* filename, UpnpOpenFileMode mo
                                         case UPNP_RESOURCE_CHANNEL:
                                             {
                                                 char* ChannelID = strtok(strdup(Resource->getResource()),":");
-                                                int     AudioID = atoi(strtok(NULL,":"));
-                                                MESSAGE(VERBOSE_LIVE_TV, "Try to create Receiver for Channel %s with Audio ID %d", ChannelID, AudioID);
+                                                int    StreamID = atoi(strtok(NULL,":"));
+                                                MESSAGE(VERBOSE_LIVE_TV, "Try to create Receiver for Channel %s with Stream ID %d", ChannelID, StreamID);
                                                 cChannel* Channel = Channels.GetByChannelID(tChannelID::FromString(ChannelID));
                                                 if(!Channel){
                                                     ERROR("No such channel with ID %s", ChannelID);

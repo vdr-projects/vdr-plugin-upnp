@@ -90,24 +90,45 @@ cUPnPResource* cUPnPResources::getResource(unsigned int ResourceID){
 }
 
 int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording* Recording){
-    cString VideoFile = cString::sprintf(VDR_RECORDFILE_PATTERN_TS, Recording->FileName(), 1);
-
-    cAudioVideoDetector* Detector = new cAudioVideoDetector();
-
-    // TODO: add DLNA-Support to detector
-
-    cString ContentType = "video/mpeg";
-    cString ProtocolInfo = "http-get:*:video/mpeg:*";
-
-    cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_RECORDING, Recording->FileName(), ContentType, ProtocolInfo);
-
-    if(Detector->detectVideoProperties(Resource, VideoFile)){
-        ERROR("Error while detecting video properties");
+    if(!Object || !Recording){
+        ERROR("Invalid input arguments");
         return -1;
     }
 
+    cAudioVideoDetector* Detector = new cAudioVideoDetector(Recording);
+
+    if(Detector->detectProperties()){
+        ERROR("Error while detecting video properties");
+        delete Detector;
+        return -1;
+    }
+
+    if(!Detector->getDLNAProfile()){
+        ERROR("No DLNA profile found for Recording %s", Recording->Name());
+        delete Detector;
+        return -1;
+    }
+
+    const char* ProtocolInfo = cDlna::getInstance()->getProtocolInfo(Detector->getDLNAProfile());
+
+    MESSAGE(VERBOSE_METADATA, "Protocol info: %s", ProtocolInfo);
+    
+    cString ResourceFile     = Recording->FileName();
+    cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_RECORDING,ResourceFile, Detector->getDLNAProfile()->mime, ProtocolInfo);
+    Resource->mBitrate       = Detector->getBitrate();
+    Resource->mBitsPerSample = Detector->getBitsPerSample();
+    Resource->mDuration      = duration(Detector->getDuration());
+    Resource->mResolution    = (Detector->getWidth() && Detector->getHeight()) ? *cString::sprintf("%dx%d",Detector->getWidth(), Detector->getHeight()) : NULL;
+    Resource->mSampleFrequency = Detector->getSampleFrequency();
+    Resource->mSize          = Detector->getFileSize();
+    Resource->mNrAudioChannels = Detector->getNumberOfAudioChannels();
+    Resource->mImportURI     = NULL;
+    Resource->mColorDepth    = 0;
+    Object->addResource(Resource);
+    this->mMediator->saveResource(Resource);
+    this->mResources->Add(Resource, Resource->getID());
+
     delete Detector;
-    MESSAGE(VERBOSE_SDK, "To be continued, may it work with DLNA?! Guess, not!");
     return 0;
 }
 
@@ -122,53 +143,45 @@ int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel
         return -1;
     }
 
-    DLNAProfile* Profile = cDlna::getInstance()->getProfileOfChannel(Channel);
+    cAudioVideoDetector* Detector = new cAudioVideoDetector(Channel);
 
-    if(!Profile){
-        ERROR("No profile found for Channel %s", *Channel->GetChannelID().ToString());
+    if(!Detector->detectProperties()){
+        ERROR("Cannot detect channel properties");
+        delete Detector;
         return -1;
     }
 
-    const char* ProtocolInfo = cDlna::getInstance()->getProtocolInfo(Profile);
+    if(!Detector->getDLNAProfile()){
+        ERROR("No DLNA profile found for Channel %s", *Channel->GetChannelID().ToString());
+        delete Detector;
+        return -1;
+    }
+
+    const char* ProtocolInfo = cDlna::getInstance()->getProtocolInfo(Detector->getDLNAProfile());
 
     MESSAGE(VERBOSE_METADATA, "Protocol info: %s", ProtocolInfo);
 
-    // Adapted from streamdev
+    // Index which may be used to indicate different resources with same channel ID
+    // For instance a different DVB card
+    // Not used yet.
     int index = 0;
-    for(int i=0; Channel->Apid(i)!=0; i++, index++){
-        MESSAGE(VERBOSE_METADATA, "Analog channel %d", i);
-        cString ResourceFile     = cString::sprintf("%s:%d", *Channel->GetChannelID().ToString(), index);
-        cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_CHANNEL,ResourceFile, Profile->mime, ProtocolInfo);
-        Resource->mBitrate       = 0;
-        Resource->mBitsPerSample = 0;
-        Resource->mColorDepth    = 0;
-        Resource->mDuration      = NULL;
-        Resource->mImportURI     = NULL;
-        Resource->mResolution    = NULL;
-        Resource->mSampleFrequency = 0;
-        Resource->mSize          = 0;
-        Resource->mNrAudioChannels = 0;
-        Object->addResource(Resource);
-        this->mMediator->saveResource(Resource);
-        this->mResources->Add(Resource, Resource->getID());
-    }
-    for(int i=0; Channel->Dpid(i)!=0; i++, index++){
-        MESSAGE(VERBOSE_METADATA, "Digital channel %d", i);
-        cString ResourceFile     = cString::sprintf("%s:%d", *Channel->GetChannelID().ToString(), index);
-        cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_CHANNEL,ResourceFile, Profile->mime, ProtocolInfo);
-        Resource->mBitrate       = 0;
-        Resource->mBitsPerSample = 0;
-        Resource->mColorDepth    = 0;
-        Resource->mDuration      = NULL;
-        Resource->mImportURI     = NULL;
-        Resource->mResolution    = NULL;
-        Resource->mSampleFrequency = 0;
-        Resource->mSize          = 0;
-        Object->addResource(Resource);
-        this->mMediator->saveResource(Resource);
-        this->mResources->Add(Resource, Resource->getID());
-    }
+    
+    cString ResourceFile     = cString::sprintf("%s:%d", *Channel->GetChannelID().ToString(), index);
+    cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_CHANNEL,ResourceFile, Detector->getDLNAProfile()->mime, ProtocolInfo);
+    Resource->mBitrate       = Detector->getBitrate();
+    Resource->mBitsPerSample = Detector->getBitsPerSample();
+    Resource->mDuration      = duration(Detector->getDuration());
+    Resource->mResolution    = (Detector->getWidth() && Detector->getHeight()) ? *cString::sprintf("%dx%d",Detector->getWidth(), Detector->getHeight()) : NULL;
+    Resource->mSampleFrequency = Detector->getSampleFrequency();
+    Resource->mSize          = Detector->getFileSize();
+    Resource->mNrAudioChannels = Detector->getNumberOfAudioChannels();
+    Resource->mImportURI     = NULL;
+    Resource->mColorDepth    = 0;
+    Object->addResource(Resource);
+    this->mMediator->saveResource(Resource);
+    this->mResources->Add(Resource, Resource->getID());
 
+    delete Detector;
     return 0;
 }
 
@@ -205,7 +218,7 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
             Resource->mResource = Value;
         }
         else if(!strcasecmp(SQLITE_COL_SIZE, Column)){
-            Resource->mSize = *Value?atol(Value):0;
+            Resource->mSize = (off64_t)(*Value?atol(Value):0);
         }
         else if(!strcasecmp(SQLITE_COL_DURATION, Column)){
             Resource->mDuration = Value;
@@ -243,7 +256,7 @@ int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
     cString Format = "UPDATE %s SET %s=%Q,"
                                    "%s=%Q,"
                                    "%s=%Q,"
-                                   "%s=%ld,"
+                                   "%s=%lld,"
                                    "%s=%Q,"
                                    "%s=%d,"
                                    "%s=%d,"

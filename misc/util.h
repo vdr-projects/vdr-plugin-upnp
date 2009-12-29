@@ -105,6 +105,8 @@ int ixmlAddProperty(IN IXML_Document* document, IN IXML_Element* node, const cha
  * @param length the length of the new string
  */
 char* substr(const char* str, unsigned int offset, unsigned int length);
+
+char* duration(off64_t duration, unsigned int timeBase = 1);
 #if 0
 {
 #endif

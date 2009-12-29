@@ -105,39 +105,6 @@ public:
     const char* getProtocolInfo(
         DLNAProfile *Prof       ///< the Profile of which the protocol info shall be returned
     );
-    /**
-     * Profile of a channel
-     *
-     * Returns the DLNA profile of a VDR channel. It checks the video type to determine
-     * which profile will match.
-     *
-     * @return the matching DLNA profile
-     */
-    DLNAProfile* getProfileOfChannel(
-        cChannel* Channel       ///< the channel of which the profile should created from
-    );
-    /**
-     * Profile of a recording
-     *
-     * Returns the DLNA profile of a VDR recording. It checks the video file to determine
-     * which profile will match.
-     *
-     * @return the matching DLNA profile
-     */
-    DLNAProfile* getProfileOfRecording(
-        cRecording* Recording       ///< the recording of which the profile should be created from
-    );
-    /**
-     * Profile of a file
-     *
-     * Returns the DLNA profile of a file. It checks the content of the file with \em ffmpeg to
-     * determine which profile will match.
-     *
-     * @return the matching DLNA profile
-     */
-    DLNAProfile* getProfileOfFile(
-        cString File                ///< the file of which the profile should be created from
-    );
 private:
     const char* getRegisteredProtocolInfoString(cRegisteredProfile *Profile);
     cDlna();

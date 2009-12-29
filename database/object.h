@@ -137,7 +137,7 @@ private:
     cString mProtocolInfo;
     cString mContentType;
     cString mImportURI;
-    unsigned long mSize;
+    off64_t mSize;
     unsigned int mBitrate;
     unsigned int mSampleFrequency;
     unsigned int mBitsPerSample;
@@ -212,14 +212,6 @@ public:
      */
     int         getResourceType() const { return this->mResourceType; }
     /**
-     * Get the size
-     *
-     * Returns the resource size or -1 if its unknown
-     *
-     * @return the resource size or -1 if unknown
-     */
-    unsigned long getSize() const { return this->mSize; }
-    /**
      * Get the file size
      *
      * Returns the file size in bytes of the resource or 0 if its unknown or a
@@ -227,7 +219,7 @@ public:
      *
      * @return the file size
      */
-    off64_t     getFileSize() const;
+    off64_t     getFileSize() const { return this->mSize; };
     /**
      * Get the last modification
      *

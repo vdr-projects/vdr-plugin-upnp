@@ -102,7 +102,7 @@ int cRecordingPlayer::seek(off_t offset, int origin){
     while(this->mOffset > (fileEndOffset = this->mOffsets[this->mIndex])){
         // If its not possible to switch to next file, there was an error
         if(!this->NextFile()){
-            ERROR("Offset %ld not in the range of a file!", offset);
+            ERROR("Offset %lld not in the range of a file!", offset);
             return -1;
         }
     }
@@ -133,7 +133,7 @@ void cRecordingPlayer::Scan(){
         }
         fseek(File, 0, SEEK_END);
         off_t offset = ftell(File);
-        MESSAGE(VERBOSE_RECORDS, "File %d has its last offset at %ld", i, offset);
+        MESSAGE(VERBOSE_RECORDS, "File %d has its last offset at %lld", i, offset);
         this->mOffsets[i+1] = this->mOffsets[i] + offset;
         this->mTotalLenght  = this->mOffsets[i+1];
         i++;

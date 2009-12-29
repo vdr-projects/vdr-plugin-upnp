@@ -66,6 +66,7 @@
 #define INOUT
 
 //#define DEBUG
+//#define WITH_WINDOWS_MEDIA
 
 #define TOSTRING(s)             #s
 
@@ -177,24 +178,24 @@ void message(int level, const char* File, int Line, const char* Format, ...) __a
  * - \-vvvvv   Log level 4
  * - \-vvvvvv  Log level 5
  */
-#define VERBOSE_SQL               4
-#define VERBOSE_SQL_FETCHES       5
-#define VERBOSE_SQL_STATEMENTS    5
-#define VERBOSE_DIDL              4
-#define VERBOSE_LIVE_TV           3
-#define VERBOSE_RECORDS           3
-#define VERBOSE_CUSTOMFILES       3
-#define VERBOSE_SDK               1
-#define VERBOSE_EPG_UPDATES       3
-#define VERBOSE_WEBSERVER         2
-#define VERBOSE_MODIFICATIONS     2
-#define VERBOSE_METADATA          3
-#define VERBOSE_CUSTOM_OUTPUT     5
-#define VERBOSE_PARSERS           5
-#define VERBOSE_BUFFERS           5
-#define VERBOSE_CDS               2
-#define VERBOSE_CMS               2
-#define VERBOSE_OBJECTS           3
+#define VERBOSE_SQL               4                 ///< SQL messages (open DB, close DB etc.)
+#define VERBOSE_SQL_FETCHES       0                 ///< SQL fetch messages (SELECT only)
+#define VERBOSE_SQL_STATEMENTS    0                 ///< all SQL statements
+#define VERBOSE_DIDL              4                 ///< print DIDL related messages
+#define VERBOSE_LIVE_TV           3                 ///< print live TV related messages
+#define VERBOSE_RECORDS           3                 ///< print messages related to records
+#define VERBOSE_CUSTOMFILES       3                 ///< print messages related to custom files and sometimes records
+#define VERBOSE_SDK               1                 ///< print important messages of the program flow
+#define VERBOSE_EPG_UPDATES       3                 ///< show information on EPG changes
+#define VERBOSE_WEBSERVER         2                 ///< print actions done by the webserver
+#define VERBOSE_MODIFICATIONS     2                 ///< show modifications to objects or anything else
+#define VERBOSE_METADATA          3                 ///< print additional metadata information
+#define VERBOSE_CUSTOM_OUTPUT     5                 ///< everything else...
+#define VERBOSE_PARSERS           5                 ///< print the parsers output
+#define VERBOSE_BUFFERS           5                 ///< print the buffer output
+#define VERBOSE_CDS               2                 ///< print messages from the content directory
+#define VERBOSE_CMS               2                 ///< print messages from the connection manager
+#define VERBOSE_OBJECTS           3                 ///< print messages related to objects
 
 /****************************************************
  *
@@ -468,6 +469,10 @@ enum    UPNP_WEB_METHODS {
                                         UPNP_PROP_LONGDESCRIPTION ","\
                                         UPNP_PROP_PUBLISHER
 
+#define UPNP_DURATION_FORMAT_STRING     "%5d:%02d:%02d"
+#define UPNP_DURATION_FRAME_FORMAT      ".%03d"
+#define AVDETECTOR_TIME_BASE            1000
+
 /****************************************************
  *
  * The UPnP CDS actions
@@ -731,45 +736,7 @@ enum UPnPWriteStatus {
  *
  ****************************************************/
 
-/**
- * The combination of DLNA profile ID and the corresponding mime type
- *
- * This complies with the DLNA media format guidelines. Though this is very
- * similar to the profile structure of libdlna, it comes without the additional
- * label field as it seams to be not needed.
- */
-struct DLNAProfile {
-    const char* ID;     ///< the DLNA profile ID
-    const char* mime;   ///< the mime type of the resource
-};
-
-/**
- * The DLNA profile for a icon image
- *
- * This complies with the DLNA media format guidelines. It contains a valid
- * mime type, the resolution of the image and the corresponding bit depth
- */
-struct DLNAIconProfile {
-    const char* mime;       ///< the mime type of the image
-    unsigned short width;   ///< image width in pixel
-    unsigned short height;  ///< image height in pixel
-    unsigned char bitDepth; ///< bit depth in bits per pixel
-};
-
-/* Images */
-/* Audio */
-extern DLNAProfile DLNA_PROFILE_MPEG1_L3;              ///< DLNA MP3 Profile
-/* Video */
-extern DLNAProfile DLNA_PROFILE_MPEG_TS_SD_EU;         ///< DLNA Profile for DVB Television broadcasts
-extern DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU;          ///< DLNA Profile for HD DVB Television broadcasts
-extern DLNAProfile DLNA_PROFILE_MPEG_TS_SD_EU_ISO;     ///< DLNA Profile for DVB Television broadcasts without timestamp
-extern DLNAProfile DLNA_PROFILE_AVC_TS_HD_EU_ISO;      ///< DLNA Profile for HD DVB Television broadcasts without timestamp
-
-/* Icons */
-extern DLNAIconProfile DLNA_ICON_JPEG_SM_24;           ///< DLNA icon profile of small jpeg images
-extern DLNAIconProfile DLNA_ICON_JPEG_LRG_24;          ///< DLNA icon profile of large jpeg images
-extern DLNAIconProfile DLNA_ICON_PNG_SM_24A;           ///< DLNA icon profile of small png images
-extern DLNAIconProfile DLNA_ICON_PNG_LRG_24A;          ///< DLNA icon profile of large png images
+/** @see dlna/profiles.h */
 
 /****************************************************
  *

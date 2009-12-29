@@ -35,10 +35,6 @@ cUPnPResource::cUPnPResource(){
     this->mContentType = NULL;
 }
 
-off64_t cUPnPResource::getFileSize() const {
-    return (this->mSize) ? this->mSize : (off64_t)-1;
-}
-
 time_t cUPnPResource::getLastModification() const {
     time_t Time;
     const cRecording* Recording;
