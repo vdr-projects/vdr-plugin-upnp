@@ -12,7 +12,7 @@
 #include "resources.h"
 #include "metadata.h"
 #include "../common.h"
-#include "../misc/search.h"
+#include "search.h"
 #include <vdr/channels.h>
 #include <vdr/epg.h>
 #include <upnp/upnp.h>
@@ -49,14 +49,18 @@ bool cMediaDatabase::init(){
         ERROR("Initializing of database failed.");
         return false;
     }
+#ifndef WITHOUT_TV
     if(this->loadChannels()){
         ERROR("Loading channels failed");
         return false;
     }
+#endif
+#ifndef WITHOUT_RECORDS
     if(this->loadRecordings()){
         ERROR("Loading records failed");
         return false;
     }
+#endif
     return true;
 }
 
@@ -195,58 +199,65 @@ int cMediaDatabase::prepareDatabase(){
         cUPnPClassContainer* Root = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _(PLUGIN_SHORT_NAME));
         Root->setID(0);
         if(this->mFactory->saveObject(Root)) return -1;
-        
-        cClass VideoClass = { UPNP_CLASS_VIDEO, true };
-        cClass AudioClass = { UPNP_CLASS_AUDIO, true };
-        cClass VideoBCClass = { UPNP_CLASS_VIDEOBC, true };
-        cClass AudioBCClass = { UPNP_CLASS_AUDIOBC, true };
-        
+
+#ifndef WITHOUT_VIDEO
         cUPnPClassContainer* Video  = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("Video"));
         Video->setID(1);
         Root->addObject(Video);
+        cClass VideoClass = { UPNP_CLASS_VIDEO, true };
         Video->addSearchClass(VideoClass);
         Video->setSearchable(true);
         if(this->mFactory->saveObject(Video)) return -1;
-        
+#endif
+#ifndef WITHOUT_AUDIO
         cUPnPClassContainer* Audio  = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("Audio"));
         Audio->setID(2);
         Root->addObject(Audio);
+        cClass AudioClass = { UPNP_CLASS_AUDIO, true };
         Audio->addSearchClass(AudioClass);
         Audio->setSearchable(true);
         if(this->mFactory->saveObject(Audio)) return -1;
-        
+#endif
+#ifndef WITHOUT_TV
         cUPnPClassContainer* TV     = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("TV"));
         TV->setID(3);
         TV->setContainerType(DLNA_CONTAINER_TUNER);
         TV->setSearchable(true);
+        cClass VideoBCClass = { UPNP_CLASS_VIDEOBC, true };
         TV->addSearchClass(VideoBCClass);
         Video->addObject(TV);
         if(this->mFactory->saveObject(TV)) return -1;
-        
+#endif
+#ifndef WITHOUT_RECORDS
         cUPnPClassContainer* Records = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("Records"));
         Records->setID(4);
         Video->addObject(Records);
         Records->addSearchClass(VideoClass);
         Records->setSearchable(true);
         if(this->mFactory->saveObject(Records)) return -1;
-        
+#endif
+#ifndef WITHOUT_RADIO
         cUPnPClassContainer* Radio  = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("Radio"));
         Radio->setID(5);
         Audio->addObject(Radio);
+        cClass AudioBCClass = { UPNP_CLASS_AUDIOBC, true };
         Radio->addSearchClass(AudioBCClass);
         Radio->setSearchable(true);
         if(this->mFactory->saveObject(Radio)) return -1;
-
+#endif
+#ifndef WITHOUT_CUSTOM_VIDEOS
         cUPnPClassContainer* CustomVideos = (cUPnPClassContainer*)this->mFactory->createObject(UPNP_CLASS_CONTAINER, _("User videos"));
         CustomVideos->setID(6);
         Video->addObject(CustomVideos);
         CustomVideos->addSearchClass(VideoClass);
         CustomVideos->setSearchable(true);
         if(this->mFactory->saveObject(CustomVideos)) return -1;
+#endif
     }
     return 0;
 }
 
+#ifndef WITHOUT_TV
 int cMediaDatabase::loadChannels(){
     MESSAGE(VERBOSE_LIVE_TV ,"Loading channels");
     cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
@@ -317,6 +328,70 @@ int cMediaDatabase::loadChannels(){
     return 0;
 }
 
+void cMediaDatabase::updateChannelEPG(){
+    cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
+    if(TV){
+        // Iterating channels
+        MESSAGE(VERBOSE_EPG_UPDATES, "Getting schedule...");
+        cSchedulesLock SchedulesLock;
+        const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
+
+        cList<cUPnPClassObject>* List = TV->getObjectList();
+        MESSAGE(VERBOSE_EPG_UPDATES, "TV folder has %d items", List->Count());
+        for(cUPnPClassVideoBroadcast* ChannelItem = (cUPnPClassVideoBroadcast*)List->First();
+            ChannelItem;
+            ChannelItem = (cUPnPClassVideoBroadcast*)List->Next(ChannelItem)
+            ){
+            MESSAGE(VERBOSE_EPG_UPDATES, "Find channel by number %d", ChannelItem->getChannelNr());
+            cChannel* Channel = Channels.GetByNumber(ChannelItem->getChannelNr());
+
+            if(!Channel){
+                continue;
+            }
+            else {
+                MESSAGE(VERBOSE_EPG_UPDATES, "Found channel with ID %s", *Channel->GetChannelID().ToString());
+
+                const cSchedule* Schedule = Schedules->GetSchedule(Channel);
+                const cEvent* Event = Schedule?Schedule->GetPresentEvent():NULL;
+                if(Event){
+
+                    time_t LastEPGChange = Event->StartTime();
+                    time_t LastObjectChange = ChannelItem->modified();
+
+                    MESSAGE(VERBOSE_EPG_UPDATES, "Last event start: %s", ctime(&LastEPGChange));
+                    MESSAGE(VERBOSE_EPG_UPDATES, "Last object modification:   %s", ctime(&LastObjectChange));
+                    if(LastEPGChange >= LastObjectChange){
+                        MESSAGE(VERBOSE_EPG_UPDATES, "Updating details");
+
+                        if(Event){
+                            ChannelItem->setTitle(Event->Title()?Event->Title():Channel->Name());
+                            ChannelItem->setLongDescription(Event->Description());
+                            ChannelItem->setDescription(Event->ShortText());
+                        }
+                        else {
+                            ChannelItem->setTitle(Channel->Name());
+                            ChannelItem->setLongDescription(NULL);
+                            ChannelItem->setDescription(NULL);
+                        }
+
+                        this->mFactory->saveObject(ChannelItem);
+                    }
+                    else {
+                        MESSAGE(VERBOSE_EPG_UPDATES, "Channel did not change");
+                    }
+                }
+                else {
+                    MESSAGE(VERBOSE_EPG_UPDATES, "No EPG data");
+                    ChannelItem->setTitle(Channel->Name());
+                    ChannelItem->setLongDescription(NULL);
+                    ChannelItem->setDescription(NULL);
+                }
+            }
+        }
+    }
+}
+#endif
+#ifndef WITHOUT_RECORDS
 int cMediaDatabase::loadRecordings(){
     MESSAGE(VERBOSE_RECORDS, "Loading recordings");
     cUPnPClassContainer* Records = (cUPnPClassContainer*)this->getObjectByID(4);
@@ -344,7 +419,7 @@ int cMediaDatabase::loadRecordings(){
 
                 MESSAGE(VERBOSE_RECORDS, "Adding movie '%s' File name:%s", RecInfo->Title(), Recording->FileName());
 
-                MovieItem = (cUPnPClassMovie*)this->mFactory->createObject(UPNP_CLASS_MOVIE, RecInfo->Title());
+                MovieItem = (cUPnPClassMovie*)this->mFactory->createObject(UPNP_CLASS_MOVIE, RecInfo->Title()?RecInfo->Title():Recording->Name());
                 MovieItem->setDescription(RecInfo->ShortText());
                 MovieItem->setLongDescription(RecInfo->Description());
                 MovieItem->setStorageMedium(UPNP_STORAGE_HDD);
@@ -380,6 +455,7 @@ int cMediaDatabase::loadRecordings(){
     }
     return 0;
 }
+#endif
 
 void cMediaDatabase::Action(){
     time_t LastEPGUpdate = 0;
@@ -392,63 +468,6 @@ void cMediaDatabase::Action(){
         }
 
         cCondWait::SleepMs(60 * 1000); // sleep a minute
-    }
-}
-
-void cMediaDatabase::updateChannelEPG(){
-    cUPnPClassContainer* TV = (cUPnPClassContainer*)this->getObjectByID(3);
-    if(TV){
-        // Iterating channels
-        MESSAGE(VERBOSE_EPG_UPDATES, "Getting schedule...");
-        cSchedulesLock SchedulesLock;
-        const cSchedules *Schedules = cSchedules::Schedules(SchedulesLock);
-
-        cList<cUPnPClassObject>* List = TV->getObjectList();
-        MESSAGE(VERBOSE_EPG_UPDATES, "TV folder has %d items", List->Count());
-        for(cUPnPClassVideoBroadcast* ChannelItem = (cUPnPClassVideoBroadcast*)List->First();
-            ChannelItem;
-            ChannelItem = (cUPnPClassVideoBroadcast*)List->Next(ChannelItem)
-            ){
-            MESSAGE(VERBOSE_EPG_UPDATES, "Find channel by number %d", ChannelItem->getChannelNr());
-            cChannel* Channel = Channels.GetByNumber(ChannelItem->getChannelNr());
-            MESSAGE(VERBOSE_EPG_UPDATES, "Found channel with ID %s", *Channel->GetChannelID().ToString());
-
-            const cSchedule* Schedule = Schedules->GetSchedule(Channel);
-            const cEvent* Event = Schedule?Schedule->GetPresentEvent():NULL;
-            if(Event){
-                
-                time_t LastEPGChange = Event->StartTime();
-                time_t LastObjectChange = ChannelItem->modified();
-
-                MESSAGE(VERBOSE_EPG_UPDATES, "Last event start: %s", ctime(&LastEPGChange));
-                MESSAGE(VERBOSE_EPG_UPDATES, "Last object modification:   %s", ctime(&LastObjectChange));
-                if(LastEPGChange >= LastObjectChange){
-                    MESSAGE(VERBOSE_EPG_UPDATES, "Updating details");
-
-                    if(Event){
-                        ChannelItem->setTitle(Event->Title()?Event->Title():Channel->Name());
-                        ChannelItem->setLongDescription(Event->Description());
-                        ChannelItem->setDescription(Event->ShortText());
-                    }
-                    else {
-                        ChannelItem->setTitle(Channel->Name());
-                        ChannelItem->setLongDescription(NULL);
-                        ChannelItem->setDescription(NULL);
-                    }
-
-                    this->mFactory->saveObject(ChannelItem);
-                }
-                else {
-                    MESSAGE(VERBOSE_EPG_UPDATES, "Channel did not change");
-                }
-            }
-            else {
-                MESSAGE(VERBOSE_EPG_UPDATES, "No EPG data");
-                ChannelItem->setTitle(Channel->Name());
-                ChannelItem->setLongDescription(NULL);
-                ChannelItem->setDescription(NULL);
-            }
-        }
     }
 }
 

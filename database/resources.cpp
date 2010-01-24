@@ -7,10 +7,49 @@
 
 #include <string.h>
 #include <vdr/channels.h>
-#include "../upnpcomponents/dlna.h"
+#include "upnp/dlna.h"
 #include <vdr/tools.h>
 #include "resources.h"
-#include "../misc/avdetector.h"
+#include "avdetector.h"
+
+cUPnPResource::cUPnPResource(){
+    this->mBitrate = 0;
+    this->mBitsPerSample = 0;
+    this->mColorDepth = 0;
+    this->mDuration = NULL;
+    this->mImportURI = NULL;
+    this->mNrAudioChannels = 0;
+    this->mProtocolInfo = NULL;
+    this->mResolution = NULL;
+    this->mResource = NULL;
+    this->mResourceID = 0;
+    this->mSampleFrequency = 0;
+    this->mSize = 0;
+    this->mContentType = NULL;
+}
+
+time_t cUPnPResource::getLastModification() const {
+    time_t Time;
+    const cRecording* Recording;
+    const cEvent* Event;
+    switch(this->mResourceType){
+        case UPNP_RESOURCE_CHANNEL:
+        case UPNP_RESOURCE_URL:
+            Time = time(NULL);
+            break;
+        case UPNP_RESOURCE_RECORDING:
+            Recording = Recordings.GetByName(this->mResource);
+            Event = (Recording)?Recording->Info()->GetEvent():NULL;
+            Time = (Event)?Event->EndTime():time(NULL);
+            break;
+        case UPNP_RESOURCE_FILE:
+            //break;
+        default:
+            ERROR("Invalid resource type. This resource might be broken");
+            Time = -1;
+    }
+    return Time;
+}
 
 cUPnPResources* cUPnPResources::mInstance = NULL;
 
@@ -125,7 +164,7 @@ int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording*
     Resource->mImportURI     = NULL;
     Resource->mColorDepth    = 0;
     Object->addResource(Resource);
-    this->mMediator->saveResource(Resource);
+    this->mMediator->saveResource(Object, Resource);
     this->mResources->Add(Resource, Resource->getID());
 
     delete Detector;
@@ -178,7 +217,7 @@ int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel
     Resource->mImportURI     = NULL;
     Resource->mColorDepth    = 0;
     Object->addResource(Resource);
-    this->mMediator->saveResource(Resource);
+    this->mMediator->saveResource(Object, Resource);
     this->mResources->Add(Resource, Resource->getID());
 
     delete Detector;
@@ -208,10 +247,7 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
     }
     cString Column = NULL, Value = NULL;
     while(Row->fetchColumn(&Column, &Value)){
-        if(!strcasecmp(SQLITE_COL_OBJECTID, Column)){
-            Resource->mObjectID = *Value?atoi(Value):-1;
-        }
-        else if(!strcasecmp(SQLITE_COL_PROTOCOLINFO, Column)){
+        if(!strcasecmp(SQLITE_COL_PROTOCOLINFO, Column)){
             Resource->mProtocolInfo = Value;
         }
         else if(!strcasecmp(SQLITE_COL_RESOURCE, Column)){
@@ -251,7 +287,7 @@ cUPnPResource* cUPnPResourceMediator::getResource(unsigned int ResourceID){
     return Resource;
 }
 
-int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
+int cUPnPResourceMediator::saveResource(cUPnPClassObject* Object, cUPnPResource* Resource){
 
     cString Format = "UPDATE %s SET %s=%Q,"
                                    "%s=%Q,"
@@ -270,7 +306,7 @@ int cUPnPResourceMediator::saveResource(cUPnPResource* Resource){
 
     if(this->mDatabase->execStatement(Format,
                                          SQLITE_TABLE_RESOURCES,
-                                         SQLITE_COL_OBJECTID, *Resource->mObjectID,
+                                         SQLITE_COL_OBJECTID, *Object->getID(),
                                          SQLITE_COL_PROTOCOLINFO, *Resource->mProtocolInfo,
                                          SQLITE_COL_RESOURCE, *Resource->mResource,
                                          SQLITE_COL_SIZE, Resource->mSize,
@@ -310,7 +346,6 @@ cUPnPResource* cUPnPResourceMediator::newResource(cUPnPClassObject* Object, int 
         return NULL;
     }
     Resource->mResourceID = (unsigned int)this->mDatabase->getLastInsertRowID();
-    Resource->mObjectID = Object->getID();
     Resource->mResource = ResourceFile;
     Resource->mProtocolInfo = ProtocolInfo;
     Resource->mContentType = ContentType;

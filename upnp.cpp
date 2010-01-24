@@ -8,12 +8,12 @@
 
 #include <stdio.h>
 #include "upnp.h"
-#include "misc/menusetup.h"
-#include "misc/config.h"
+#include "menusetup.h"
+#include "config.h"
 
 cCondWait DatabaseLocker;
 
-static const char *VERSION        = "0.0.1";
+static const char *VERSION        = "0.0.2";
 static const char *DESCRIPTION    = PLUGIN_DESCRIPTION;
 
 const char* cPluginUpnp::mConfigDirectory = NULL;
@@ -49,30 +49,34 @@ const char *cPluginUpnp::CommandLineHelp(void)
     // Return a string that describes all known command line options.
     cString cmdHelp;
     
-    cmdHelp = cString::sprintf(
+    cmdHelp = cString::sprintf(_(
             "  The server can automatically detect both IP address and an\n"
             "  appropriate port, assuming that the first network interface\n"
             "  is connected to the internal network. However, it is possible\n"
             "  to specify alternative settings with the following options:\n\n"
-            "  -i <interface>  --int=<interface>   The server network\n"
-            "                                      interface\n"
-            "                                      e.g: eth0, wlan1 etc.\n"
-            "                                      If given option '-a' must\n"
-            "                                      be absent.\n"
-            "  -a <address>    --address=<address> The server IPv4 address.\n"
-            "                                      If given option '-i' must\n"
-            "                                      be absent.\n"
-            "  -p <port>       --port=<port>       The server port\n"
-            "                                      Supported ports:\n"
-            "                                            %5d (auto detect)\n"
-            "                                      %5d-%5d (user defined)\n"
-            "  -d              --autodetect        Force auto detection\n"
-            "                                      Use this option to\n"
-            "                                      overwrite the setup menu\n"
-            "                                      options.\n"
-            "  -v              --verbose           Increase verbosity level\n"
-            "                                      The more v options the\n"
-            "                                      higher the output level\n",
+            "  -i <interface>  --int=<interface>     The server network\n"
+            "                                        interface\n"
+            "                                        e.g: eth0, wlan1 etc.\n"
+            "                                        If given option '-a' must\n"
+            "                                        be absent.\n"
+            "  -a <address>    --address=<address>   The server IPv4 address.\n"
+            "                                        If given option '-i' must\n"
+            "                                        be absent.\n"
+            "  -p <port>       --port=<port>         The server port\n"
+            "                                        Supported ports:\n"
+            "                                              %5d (auto detect)\n"
+            "                                        %5d-%5d (user defined)\n"
+            "  -d              --autodetect          Force auto detection\n"
+            "                                        Use this option to\n"
+            "                                        overwrite the setup menu\n"
+            "                                        options.\n"
+            "  -v              --verbose             Increase verbosity level\n"
+            "                                        The more v options the\n"
+            "                                        higher the output level\n"
+            "                  --dbdir=<directory>   The directory in which the\n"
+            "                                        metadata database is stored\n"
+            "                  --httpdir=<directory> The directory where the\n"
+            "                                        http documents are located\n"),
             0,
             SERVER_MIN_PORT,
             SERVER_MAX_PORT

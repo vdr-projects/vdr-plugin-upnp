@@ -1,6 +1,21 @@
 VDR Plugin 'upnp' Revision History
 ----------------------------------
 
+2009-01-24: Version 0.0.2-alpha0
+
+ - New: Added record streaming support for SDTV
+        HDTV is not working yet, as it requires different DLNA profiles
+ - Bug: Improved live-tv streaming quality, which will hopefully fix the
+        problem with the buffer strategy and channels with bad bandwidth
+ - New: Rearranged folder structure to meet future features
+ - New: Added german translation
+ - New: support for DLNA compatible devices. For those devices a special
+        patch is required which must be applied to libupnp-1.6.6.
+        See README for more information
+ - New: Added new command line option to specify the destination folder
+        for the metadata database and the webfolder.
+        See README for more information
+
 2009-11-19: Version 0.0.1-alpha4
 
 - New: Added options for verbosity level and autodetect settings.

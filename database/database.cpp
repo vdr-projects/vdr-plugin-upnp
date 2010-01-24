@@ -12,6 +12,7 @@
 #include "../common.h"
 #include "object.h"
 #include "../upnp.h"
+#include "config.h"
 
 cSQLiteDatabase* cSQLiteDatabase::mInstance = NULL;
 
@@ -160,7 +161,8 @@ bool cRow::fetchColumn(char** Column, char** Value){
 
 int cSQLiteDatabase::initialize(){
     int ret;
-    cString File = cString::sprintf("%s/%s", cPluginUpnp::getConfigDirectory(), SQLITE_DB_FILE);
+    const char* dbdir = (cUPnPConfig::get()->mDatabaseFolder) ? cUPnPConfig::get()->mDatabaseFolder : cPluginUpnp::getConfigDirectory();
+    cString File = cString::sprintf("%s/%s", dbdir, SQLITE_DB_FILE);
     if((ret = sqlite3_open(File, &this->mDatabase))){
         ERROR("Unable to open database file %s (Error code: %d)!", *File, ret);
         sqlite3_close(this->mDatabase);

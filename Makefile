@@ -27,14 +27,9 @@ VDRDIR = ../../..
 LIBDIR = ../../lib
 TMPDIR = /tmp
 
-WEBDIR = $(shell grep '\#define UPNP_DIR_PRESENTATION*' $(COMMON) | awk '{ print $$3 }' | sed -e 's/["/]//g')
-
 ### Allow user defined options to overwrite defaults:
 
 -include $(VDRDIR)/Make.config
-
-#DESDIR = /var/lib/vdrdevel/plugins/$(PLUGIN)
-DESDIR = $(CONFDIR)/plugins/$(PLUGIN)
 
 ### The version number of VDR's plugin API (taken from VDR's "config.h"):
 
@@ -49,12 +44,43 @@ PACKAGE = vdr-$(ARCHIVE)
 
 LIBS += -lupnp -lixml -lsqlite3 -lavformat -lavcodec
 
-INCLUDES += -I$(VDRDIR)/include	-I/usr/include \
+INCLUDES += -I$(VDRDIR)/include	-I/usr/include -Iinc \
 
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 DEFINES += -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
+ifdef WITH_WINDOWS_MEDIA
+	DEFINES += -DWITH_WINDOWS_MEDIA
+endif
+
+DEFINES += -DWITHOUT_AUDIO -DWITHOUT_CUSTOM_VIDEOS
+
 ### The object files (add further files here):
+
+# DLNA Profiles
+DLNA_PROFILES =	dlna/profiles/aac.o \
+		dlna/profiles/ac3.o \
+		dlna/profiles/amr.o \
+		dlna/profiles/atrac3plus.o \
+		dlna/profiles/jpeg.o \
+		dlna/profiles/lpcm.o \
+		dlna/profiles/mpa.o \
+		dlna/profiles/mpeg1.o \
+		dlna/profiles/mpeg2.o \
+		dlna/profiles/mpeg4_p2.o \
+		dlna/profiles/mpeg4_p10.o \
+		dlna/profiles/png.o \
+		dlna/profiles/container.o
+
+# Windows Media Formats
+ifdef WITH_WINDOWS_MEDIA
+	DLNA_PROFILES +=	dlna/profiles/wma.o \
+				dlna/profiles/wmv9.o
+endif
+
+DLNA_OBJS =	dlna/dlna.o \
+		dlna/avdetector.o \
+		$(DLNA_PROFILES)
 
 # Root folder
 OBJS = $(PLUGIN).o \
@@ -63,20 +89,18 @@ OBJS = $(PLUGIN).o \
 		misc/util.o \
 		misc/config.o \
 		misc/search.o \
-		misc/avdetector.o \
 		database/database.o \
 		database/metadata.o \
 		database/object.o \
 		database/resources.o \
 		server/server.o \
-		upnpcomponents/dlna.o \
-		upnpcomponents/upnpwebserver.o \
-		upnpcomponents/upnpservice.o \
-		upnpcomponents/connectionmanager.o \
-		upnpcomponents/contentdirectory.o \
+		server/webserver.o \
+		upnp/service.o \
+		upnp/connectionmanager.o \
+		upnp/contentdirectory.o \
 		receiver/livereceiver.o \
 		receiver/recplayer.o \
-		receiver/filehandle.o \
+		$(DLNA_OBJS)
 
 ### The main target:
 
@@ -109,7 +133,7 @@ I18Npot   = $(PODIR)/$(PLUGIN).pot
 	msgfmt -c -o $@ $<
 
 $(I18Npot): $(wildcard *.cpp)
-	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --msgid-bugs-address='<see README>' -o $@ $^
+	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -k_ -ktr -ktrNOOP --msgid-bugs-address='<see README>' -o $@ $(OBJS:%.o=%.cpp)
 
 %.po: $(I18Npot)
 	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
@@ -127,15 +151,12 @@ i18n: $(I18Nmsgs) $(I18Npot)
 libvdr-$(PLUGIN).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LIBS) -shared $(OBJS) -o $@ -lc
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
-	@-rm -rf $(DESDIR)/$(WEBDIR)
-	@mkdir -p $(DESDIR)/$(WEBDIR)
-	@cp --remove-destination -r $(WEBDIR)/* $(DESDIR)/$(WEBDIR)
 
 dist: clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@mkdir $(TMPDIR)/$(ARCHIVE)
 	@cp -a * $(TMPDIR)/$(ARCHIVE)
-	@tar czf $(PACKAGE).tgz -C $(TMPDIR) $(ARCHIVE)
+	@tar --exclude="doc" -czf $(PACKAGE).tgz -C $(TMPDIR) $(ARCHIVE)
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@echo Distribution package created as $(PACKAGE).tgz
 

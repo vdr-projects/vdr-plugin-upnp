@@ -18,46 +18,6 @@
 #include "../common.h"
 #include "resources.h"
 
-cUPnPResource::cUPnPResource(){
-    this->mBitrate = 0;
-    this->mBitsPerSample = 0;
-    this->mColorDepth = 0;
-    this->mDuration = NULL;
-    this->mImportURI = NULL;
-    this->mNrAudioChannels = 0;
-    this->mObjectID = 0;
-    this->mProtocolInfo = NULL;
-    this->mResolution = NULL;
-    this->mResource = NULL;
-    this->mResourceID = 0;
-    this->mSampleFrequency = 0;
-    this->mSize = 0;
-    this->mContentType = NULL;
-}
-
-time_t cUPnPResource::getLastModification() const {
-    time_t Time;
-    const cRecording* Recording;
-    const cEvent* Event;
-    switch(this->mResourceType){
-        case UPNP_RESOURCE_CHANNEL:
-        case UPNP_RESOURCE_URL:
-            Time = time(NULL);
-            break;
-        case UPNP_RESOURCE_RECORDING:
-            Recording = Recordings.GetByName(this->mResource);
-            Event = (Recording)?Recording->Info()->GetEvent():NULL;
-            Time = (Event)?Event->EndTime():time(NULL);
-            break;
-        case UPNP_RESOURCE_FILE:
-            //break;
-        default:
-            ERROR("Invalid resource type. This resource might be broken");
-            Time = -1;
-    }
-    return Time;
-}
-
 static int CompareUPnPObjects(const void *a, const void *b){
   const cUPnPClassObject *la = *(const cUPnPClassObject **)a;
   const cUPnPClassObject *lb = *(const cUPnPClassObject **)b;

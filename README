@@ -25,6 +25,7 @@ http://www.hft-leipzig.de
 
 All rights reserved.
 
+
 Description:
 
 UPnP/DLNA Plugin for Video Disk Recorder
@@ -41,25 +42,29 @@ options or by editing the setup via the VDRs setup page. The command line
 options have a higher priority and substitute the menu settings.
 
 The command line settings are:
-  -i <interface>  --int=<interface>   The server network
-                                      interface
-                                      e.g: eth0, wlan1 etc.
-                                      If given option '-a' must
-                                      be absent.
-  -a <address>    --address=<address> The server IPv4 address.
-                                      If given option '-i' must
-                                      be absent.
-  -p <port>       --port=<port>       The server port
-                                      Supported ports:
-                                      0           (auto detect)
-                                      49152-65535 (user defined)
-  -d              --autodetect        Force auto detection
-                                      Use this option to
-                                      overwrite the setup menu
-                                      options.
-  -v              --verbose           Increase verbosity level
-                                      The more v options the
-                                      higher the output level
+  -i <interface>  --int=<interface>     The server network
+                                        interface
+                                        e.g: eth0, wlan1 etc.
+                                        If given option '-a' must
+                                        be absent.
+  -a <address>    --address=<address>   The server IPv4 address.
+                                        If given option '-i' must
+                                        be absent.
+  -p <port>       --port=<port>         The server port
+                                        Supported ports:
+                                        0           (auto detect)
+                                        49152-65535 (user defined)
+  -d              --autodetect          Force auto detection
+                                        Use this option to
+                                        overwrite the setup menu
+                                        options.
+  -v              --verbose             Increase verbosity level
+                                        The more v options the
+                                        higher the output level
+                  --dbdir=<directory>   The directory in which the
+                                        metadata database is stored
+                  --httpdir=<directory> The directory where the
+                                        http documents are located
 
 The verbose option can be more than once. With each option the verbosity level
 will be increased. The maximum level is 5. Further options are silently ignored.
@@ -86,6 +91,7 @@ be found automatically and being listed under the supported media server
 devices. If not, please report this as a bug on the project homepage or send an
 email to the developers of this plugin with the full device description and, if
 applicable, the errors thrown by the media player device and/or the server.
+
 
 Dependencies:
 
@@ -114,3 +120,10 @@ are explained.
 I appreciate, if you help making the plugin better. If you find any project
 related errors or missing features, please open a new ticket at the plugin
 website with a detailed description of what you want or what happened.
+
+
+Patching the libupnp:
+
+If you have a DLNA compliant device such as TVs or streaming clients, you may
+require a patched version of libupnp. You can download the patch on the project
+website.

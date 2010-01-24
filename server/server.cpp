@@ -11,11 +11,11 @@
 #include <arpa/inet.h>
 #include <upnp/upnp.h>
 #include "server.h"
-#include "../misc/util.h"
-#include "../misc/config.h"
+#include "util.h"
+#include "config.h"
 #include "../common.h"
-#include "../upnpcomponents/dlna.h"
-#include "../database/object.h"
+#include "upnp/dlna.h"
+#include "object.h"
 
 /****************************************************
  *
@@ -104,8 +104,9 @@ bool cUPnPServer::init(void){
     MESSAGE(VERBOSE_CUSTOM_OUTPUT, "Setting maximum packet size for SOAP requests");
     UpnpSetMaxContentLength(UPNP_SOAP_MAX_LEN);
 
+    const char* httpdir = (cUPnPConfig::get()->mHTTPFolder) ? cUPnPConfig::get()->mHTTPFolder : cPluginUpnp::getConfigDirectory();
     //set the root directory of the webserver
-    cString WebserverRootDir = cString::sprintf("%s%s", cPluginUpnp::getConfigDirectory(), UPNP_WEB_SERVER_ROOT_DIR);
+    cString WebserverRootDir = cString::sprintf("%s%s", httpdir, UPNP_WEB_SERVER_ROOT_DIR);
     
     MESSAGE(VERBOSE_SDK, "Set web server root dir: %s", *WebserverRootDir );
     this->mWebServer = cUPnPWebServer::getInstance(WebserverRootDir);

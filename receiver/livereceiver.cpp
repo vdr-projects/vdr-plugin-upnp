@@ -125,14 +125,18 @@ void cLiveReceiver::Action(void){
 }
 
 int cLiveReceiver::read(char* buf, size_t buflen){
-    int bytesRead;    
+    int bytesRead = 0;
     if(!this->IsAttached())
         bytesRead = -1;
     else {
         int WaitTimeout = RECEIVER_WAIT_ON_NODATA_TIMEOUT;
         // Wait until the buffer size is at least half the requested buffer length
-        while((unsigned)this->mOutputBuffer->Available() < (buflen / 2) ){
+
+        double MinBufSize = buflen * RECEIVER_MIN_BUFFER_FILLAGE/100;
+        int Available = 0;
+        while((double)(Available = this->mOutputBuffer->Available()) < MinBufSize){
             WARNING("Too few data, waiting...");
+            WARNING("Only %d bytes available, need %10f more bytes.", Available, (double)(MinBufSize-Available));
             cCondWait::SleepMs(RECEIVER_WAIT_ON_NODATA);
             if(!this->IsAttached()){
                 MESSAGE(VERBOSE_LIVE_TV, "Lost device...");

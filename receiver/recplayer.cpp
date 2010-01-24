@@ -21,27 +21,31 @@ cRecordingPlayer *cRecordingPlayer::newInstance(cRecording* Recording){
     return Player;
 }
 cRecordingPlayer::~cRecordingPlayer() {
-    delete this->mOffsets;
+    delete this->mRecordingFile;
+    delete [] this->mLastOffsets;
 }
 
-cRecordingPlayer::cRecordingPlayer(cRecording *Recording) {
+cRecordingPlayer::cRecordingPlayer(cRecording *Recording) : mRecording(Recording) {
     MESSAGE(VERBOSE_SDK, "Created Recplayer");
-    this->mFile      = NULL;
-    this->mTotalLenght = 0;
-    this->mRecording = Recording;
-    this->mOffsets   = new off_t[VDR_MAX_FILES_PER_RECORDING];
-    this->mOffset    = 0;
-    this->mIndex     = 1;
-    
+
+    this->mRecordingFile = new cFileName(this->mRecording->FileName(), false, false, this->mRecording->IsPesRecording());
+    this->mLastOffsets = new off_t[((this->mRecording->IsPesRecording())?VDR_MAX_FILES_PER_PESRECORDING:VDR_MAX_FILES_PER_TSRECORDING)+1];
+    this->scanLastOffsets();
 }
 
 void cRecordingPlayer::open(UpnpOpenFileMode){
-    this->Scan();
+    // Open() does not work?!
+    this->mCurrentFile = this->mRecordingFile->SetOffset(1);
+    if(this->mCurrentFile){
+        MESSAGE(VERBOSE_RECORDS, "Record player opened");
+    }
+    else {
+        ERROR("Error while opening record player file");
+    }
 }
 
 void cRecordingPlayer::close(){
-    delete [] this->mOffsets;
-    if(this->mFile) fclose(this->mFile);
+    this->mRecordingFile->Close();
 }
 
 int cRecordingPlayer::write(char*, size_t){
@@ -50,122 +54,70 @@ int cRecordingPlayer::write(char*, size_t){
 }
 
 int cRecordingPlayer::read(char* buf, size_t buflen){
-    FILE *File;
-    off_t fileEndOffset = this->mOffsets[this->mIndex];
-    if(this->mOffset > fileEndOffset){
-        File = this->NextFile();
+    if(!this->mCurrentFile){
+        ERROR("Current part of record is not open");
+        return -1;
     }
-    else {
-        File = this->GetFile();
+    MESSAGE(VERBOSE_RECORDS, "Reading %d from record", buflen);
+    int bytesread = 0;
+    while((bytesread = this->mCurrentFile->Read(buf, buflen)) == 0){ // EOF, try next file
+        if(!(this->mCurrentFile = this->mRecordingFile->NextFile())){
+            // no more files to read... finished!
+            break;
+        }
     }
-                         // do not read more bytes than the actual file has
-    size_t bytesToRead = ((fileEndOffset - this->mOffset) < (off_t)buflen)? fileEndOffset - this->mOffset : buflen;
-    size_t bytesRead = fread((char*)buf, sizeof(char), bytesToRead, File);
-
-    this->mOffset += (off_t)bytesRead;
-    
-    return (int)bytesRead;
+    return bytesread;
 }
 
 int cRecordingPlayer::seek(off_t offset, int origin){
-    // Calculate the new offset
-    switch(origin){
-        case SEEK_CUR:
-            if(this->mOffset + offset > this->mTotalLenght){
-                ERROR("Can't read behind end of file!");
-                return -1;
-            }
-            this->mOffset += (off_t)offset;
-            break;
-        case SEEK_END:
-            if(offset > 0){
-                ERROR("Can't read behind end of file!");
-                return -1;
-            }
-            this->mOffset = this->mTotalLenght + offset;
-            break;
-        case SEEK_SET:
-            if(offset > this->mTotalLenght){
-                ERROR("Can't read behind end of file!");
-                return -1;
-            }
-            this->mOffset = (off_t)offset;
-            break;
-        default:
-            ERROR("Unknown seek mode (%d)!", origin);
-            return -1;
-    }
-    // Seek to the very first file;
-    this->SeekInFile(1,0);
-    off_t fileEndOffset = this->mOffsets[this->mIndex];
-    // Spin until the new offset is in range of a specific file
-    while(this->mOffset > (fileEndOffset = this->mOffsets[this->mIndex])){
-        // If its not possible to switch to next file, there was an error
-        if(!this->NextFile()){
-            ERROR("Offset %lld not in the range of a file!", offset);
-            return -1;
-        }
-    }
-    off_t relativeOffset =
-            this->mOffset - (this->mOffsets[this->mIndex-1])
-                            ? this->mOffsets[this->mIndex-1]
-                            : 0;
-    if(!this->SeekInFile(this->mIndex, relativeOffset)){
-        ERROR("Cannot set offset!");
+    if(!this->mCurrentFile){
+        ERROR("Current part of record is not open");
         return -1;
     }
+    
+    MESSAGE(VERBOSE_RECORDS, "Seeking...");
+
+    off_t relativeOffset;
+    off_t curpos = this->mCurrentFile->Seek(0, SEEK_CUR); // this should not change anything
+    int index;
+    // recalculate the absolute position in the record
+    switch(origin){
+        case SEEK_END:
+            offset = this->mLastOffsets[this->mLastFileNumber] + offset;
+            break;
+        case SEEK_CUR:
+            offset = this->mLastOffsets[this->mRecordingFile->Number()-1] + curpos +  offset;
+            break;
+        case SEEK_SET:
+            // Nothing to change
+            break;
+        default:
+            ERROR("Seek operation invalid");
+            return -1;
+    }
+    // finally, we can seek
+    // TODO: binary search
+    for(index = 1; this->mLastOffsets[index]; index++){
+        if(this->mLastOffsets[index-1] <= offset && offset <= this->mLastOffsets[index]){
+            relativeOffset = offset - this->mLastOffsets[index-1];
+            break;
+        }
+    }
+    if(!(this->mCurrentFile = this->mRecordingFile->SetOffset(index, relativeOffset))){
+        // seeking failed!!! should never happen.
+        this->mCurrentFile = this->mRecordingFile->SetOffset(1);
+        return -1;
+    }
+
     return 0;
 }
 
-void cRecordingPlayer::Scan(){
-    MESSAGE(VERBOSE_RECORDS, "Scanning video files...");
-    // Reset the offsets
-    int i = 1;
-    while(this->mOffsets[i++]) this->mOffsets[i] = 0;
-    MESSAGE(VERBOSE_RECORDS, "Offsets reseted.");
-
-    i = 0;
-    FILE *File;
-    while((File = this->GetFile(i))){
-        if(VDR_MAX_FILES_PER_RECORDING < i+1){
-            ERROR("Maximum file offsets exceeded!");
-            break;
-        }
-        fseek(File, 0, SEEK_END);
-        off_t offset = ftell(File);
-        MESSAGE(VERBOSE_RECORDS, "File %d has its last offset at %lld", i, offset);
-        this->mOffsets[i+1] = this->mOffsets[i] + offset;
-        this->mTotalLenght  = this->mOffsets[i+1];
-        i++;
+void cRecordingPlayer::scanLastOffsets(){
+    // rewind
+    this->mCurrentFile = this->mRecordingFile->SetOffset(1);
+    for(int i = 1; (this->mCurrentFile = this->mRecordingFile->NextFile()); i++){
+        this->mLastOffsets[i] = this->mLastOffsets[i-1] + this->mCurrentFile->Seek(0, SEEK_END);
+        this->mLastFileNumber = this->mRecordingFile->Number();
     }
-}
-
-FILE *cRecordingPlayer::GetFile(int Index){
-    // No Index given: set current index
-    if(Index == 0) Index = this->mIndex;
-    // Index not changed: return current file
-    if(this->mIndex == Index && this->mFile) return this->mFile;
-
-    // Index changed: close open file and open new file
-    if(this->mFile) fclose(this->mFile);
-    char *filename = new char[VDR_FILENAME_BUFSIZE];
-    snprintf(filename, VDR_FILENAME_BUFSIZE, VDR_RECORDFILE_PATTERN_TS, this->mRecording->FileName(), Index );
-    MESSAGE(VERBOSE_BUFFERS, "Filename: %s", filename);
-    this->mFile = NULL;
-    if(this->mFile = fopen(filename, "r")){
-        this->mIndex = Index;
-        return this->mFile;
-    }
-    return NULL;
-}
-
-FILE *cRecordingPlayer::NextFile(void){
-    return this->GetFile(this->mIndex++);
-}
-
-int cRecordingPlayer::SeekInFile(int Index, off_t Offset){
-    FILE *File = this->GetFile(Index);
-    fseek(File, Offset, SEEK_SET);
-    return ftell(File);
 }
 

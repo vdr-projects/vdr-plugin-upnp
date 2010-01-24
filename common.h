@@ -8,7 +8,7 @@
 #ifndef _COMMON_H
 #define	_COMMON_H
 
-#include "misc/util.h"
+#include "util.h"
 #include <libintl.h>
 #include <string.h>
 #include <vdr/tools.h>
@@ -65,9 +65,6 @@
 #define OUT
 #define INOUT
 
-//#define DEBUG
-//#define WITH_WINDOWS_MEDIA
-
 #define TOSTRING(s)             #s
 
 #define FALSE                   0
@@ -79,7 +76,7 @@
  * Translation with gettext()
  */
 #ifndef _
-#define _(s)                    tr(s)
+#define _(s)                    gettext(s)
 #endif
 
 #define KB(i)                   i*1024
@@ -92,6 +89,17 @@
 #define att(s)                  strchr(s,'@')!=NULL?strchr(s,'@')+1:NULL
 #define prop(s)                 substr(s, 0, strchr(s,'@')-s)
 
+#ifdef WITHOUT_AUDIO
+    #define WITHOUT_RADIO
+    #define WITHOUT_CUSTOM_AUDIO
+#endif
+
+#ifdef WITHOUT_VIDEO
+    #define WITHOUT_TV
+    #define WITHOUT_RECORDS
+    #define WITHOUT_CUSTOM_VIDEO
+#endif
+
 void message(int level, const char* File, int Line, const char* Format, ...) __attribute__ ((format (printf, 4, 5)));
 
 /****************************************************
@@ -100,10 +108,11 @@ void message(int level, const char* File, int Line, const char* Format, ...) __a
  *
  ****************************************************/
 
-#define VDR_RECORDFILE_PATTERN_PES  "%s/%03d.vdr"
-#define VDR_RECORDFILE_PATTERN_TS   "%s/%05d.ts"
-#define VDR_MAX_FILES_PER_RECORDING 65535
-#define VDR_FILENAME_BUFSIZE        2048
+//#define VDR_RECORDFILE_PATTERN_PES  "%s/%03d.vdr"
+//#define VDR_RECORDFILE_PATTERN_TS   "%s/%05d.ts"
+#define VDR_MAX_FILES_PER_TSRECORDING   65535
+#define VDR_MAX_FILES_PER_PESRECORDING  255
+//#define VDR_FILENAME_BUFSIZE        2048
 
 /****************************************************
  *
@@ -119,7 +128,7 @@ void message(int level, const char* File, int Line, const char* Format, ...) __a
  * string in the main file "upnp.c" as well to avoid errors with the makefile */
 #define PLUGIN_VERSION_MAJOR    0
 #define PLUGIN_VERSION_MINOR    0
-#define PLUGIN_VERSION_MICRO    1
+#define PLUGIN_VERSION_MICRO    2
 /* The plugin version as dot-separated string */
 #define PLUGIN_VERSION          VERSION_STR(PLUGIN_VERSION_MAJOR, \
                                         PLUGIN_VERSION_MINOR, \
@@ -189,10 +198,10 @@ void message(int level, const char* File, int Line, const char* Format, ...) __a
 #define VERBOSE_EPG_UPDATES       3                 ///< show information on EPG changes
 #define VERBOSE_WEBSERVER         2                 ///< print actions done by the webserver
 #define VERBOSE_MODIFICATIONS     2                 ///< show modifications to objects or anything else
-#define VERBOSE_METADATA          3                 ///< print additional metadata information
+#define VERBOSE_METADATA          4                 ///< print additional metadata information
 #define VERBOSE_CUSTOM_OUTPUT     5                 ///< everything else...
 #define VERBOSE_PARSERS           5                 ///< print the parsers output
-#define VERBOSE_BUFFERS           5                 ///< print the buffer output
+#define VERBOSE_BUFFERS           4                 ///< print the buffer output
 #define VERBOSE_CDS               2                 ///< print messages from the content directory
 #define VERBOSE_CMS               2                 ///< print messages from the connection manager
 #define VERBOSE_OBJECTS           3                 ///< print messages related to objects
@@ -222,11 +231,13 @@ void message(int level, const char* File, int Line, const char* Format, ...) __a
  *
  ****************************************************/
 
-#define SETUP_SERVER_ENABLED    "ServerEnabled"
-#define SETUP_SERVER_INT        "ServerInt"
-#define SETUP_SERVER_PORT       "ServerPort"
-#define SETUP_SERVER_AUTO       "ServerAutoDetect"
-#define SETUP_SERVER_ADDRESS    "ServerAddress"
+#define SETUP_SERVER_ENABLED    "Server.Enabled"
+#define SETUP_SERVER_INT        "Server.Int"
+#define SETUP_SERVER_PORT       "Server.Port"
+#define SETUP_SERVER_AUTO       "Server.AutoDetect"
+#define SETUP_SERVER_ADDRESS    "Server.Address"
+#define SETUP_WEBSERVER_DIR     "Webserver.Directory"
+#define SETUP_DATABASE_DIR      "Database.Directory"
 
 /* The server port range where the server interacts with clients */
 #define SERVER_MIN_PORT         49152
@@ -269,7 +280,7 @@ enum UPNP_RESOURCE_TYPES {
  ****************************************************/
 
 #define UPNP_XMLNS_UPNP         "urn:schemas-upnp-org:metadata-1-0/upnp/"
-#define UPNP_XMLNS_DIDL         "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite"
+#define UPNP_XMLNS_DIDL         "urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/"
 #define UPNP_XMLNS_DLNA_META    "urn:schemas-dlna-org:metadata-1-0/"
 #define UPNP_XMLNS_UPNP_DEV     "urn:schemas-upnp-org:device-1-0"
 #define UPNP_XMLNS_DLNA_DEV     "urn:schemas-dlna-org:device-1-0"
@@ -290,7 +301,7 @@ enum UPNP_RESOURCE_TYPES {
 #define UPNP_DIR_EVENT          "/event"
 #define UPNP_DIR_XML            "/xml"
 #define UPNP_DIR_SHARES         "/shares"
-#define UPNP_DIR_PRESENTATION   "/web"
+#define UPNP_DIR_PRESENTATION   "/http"
 #define UPNP_DIR_ICONS          "/icons"
 
 /****************************************************
@@ -410,10 +421,11 @@ enum    UPNP_WEB_METHODS {
 #define UPNP_PROP_DLNA_CONTAINERTYPE   "dlna:container"
 
 #define UPNP_DIDL_SKELETON             "<DIDL-Lite "\
+                                       "xmlns=\"" UPNP_XMLNS_DIDL "\" "\
                                        "xmlns:dc=\"" UPNP_XMLNS_DUBLINCORE "\" "\
                                        "xmlns:upnp=\"" UPNP_XMLNS_UPNP "\" "\
-                                       "xmlns:dlna=\"" UPNP_XMLNS_DLNA_META "\" "\
-                                       "xmlns=\"" UPNP_XMLNS_DIDL "\"></DIDL-Lite>"
+                                       "xmlns:dlna=\"" UPNP_XMLNS_DLNA_META "\">"\
+                                       "</DIDL-Lite>"
 
 /****************************************************
  *
@@ -723,7 +735,7 @@ enum UPnPWriteStatus {
 #define DLNA_FLAG_CLEARTEXT_BYTE_FULL_SEEK  1 << 15     ///< (Link Protection) currently not used
 #define DLNA_FLAG_CLEARTEXT_LIMITED_SEEK    1 << 14     ///< (Link Protection) currently not used
 
-#define DLNA_FLAGS_PLUGIN_SUPPORT           DLNA_FLAG_BYTE_BASED_SEEK | \
+#define DLNA_SUPPORTED_FLAGS                DLNA_FLAG_BYTE_BASED_SEEK | \
                                             DLNA_FLAG_SN_INCREASE | \
                                             DLNA_FLAG_STREAMING_TRANSFER | \
                                             DLNA_FLAG_BACKGROUND_TRANSFER | \

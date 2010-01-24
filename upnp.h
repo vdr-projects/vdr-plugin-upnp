@@ -11,7 +11,7 @@
 #include <vdr/thread.h>
 #include <vdr/plugin.h>
 #include "common.h"
-#include "server/server.h"
+#include "server.h"
 
 class cUPnPServer;
 

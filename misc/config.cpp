@@ -10,8 +10,11 @@
 #include <getopt.h>
 #include "config.h"
 #include "../common.h"
+#include "../upnp.h"
 
 cUPnPConfig::cUPnPConfig(){
+    this->mDatabaseFolder = NULL;
+    this->mHTTPFolder = NULL;
     this->mParsedArgs = NULL;
     this->mInterface = NULL;
     this->mAddress = NULL;
@@ -42,10 +45,13 @@ bool cUPnPConfig::processArgs(int argc, char* argv[]){
         {"port",    required_argument, NULL, 'p'},
         {"autodetect", no_argument,    NULL, 'd'},
         {"verbose",    no_argument,    NULL, 'v'},
+        {"httpdir", required_argument, NULL, 0},
+        {"dbdir",   required_argument, NULL, 0},
         {0, 0, 0, 0}
     };
 
-    int c = 0;
+    int c = 0; int index = -1;
+    struct option* opt = NULL;
 
     // Check if anything went wrong by setting 'success' to false
     // As there are multiple tests you may get a faulty behavior
@@ -60,7 +66,7 @@ bool cUPnPConfig::processArgs(int argc, char* argv[]){
     bool addExcistent = false;
     static int verbose = 0;
 
-    while((c = getopt_long(argc, argv, "i:a:p:dv",long_options, NULL)) != -1){
+    while((c = getopt_long(argc, argv, "i:a:p:dv",long_options, &index)) != -1){
         switch(c){
             case 'i': 
                 if(addExcistent) { ERROR("Address given but must be absent!"); return false; }
@@ -86,7 +92,15 @@ bool cUPnPConfig::processArgs(int argc, char* argv[]){
             case 'v':
                 cUPnPConfig::verbosity++;
                 verbose++;
-                WARNING("Verbosity level: %i ", verbose);
+                break;
+            case 0:
+                opt = &long_options[index];
+                if(!strcasecmp("httpdir", opt->name)){
+                    success = this->parseSetup(SETUP_WEBSERVER_DIR, optarg) && success;
+                }
+                else if(!strcasecmp("dbdir", opt->name)){
+                    success = this->parseSetup(SETUP_DATABASE_DIR, optarg) && success;
+                }
                 break;
             default:
                 return false;
@@ -111,6 +125,8 @@ bool cUPnPConfig::parseSetup(const char *Name, const char *Value)
     else if (!strcasecmp(Name, SETUP_SERVER_INT))        this->mInterface = strdup0(Value); // (Value) ? strn0cpy(this->mInterface, Value, strlen(this->mInterface)) : NULL;
     else if (!strcasecmp(Name, SETUP_SERVER_ADDRESS))    this->mAddress = strdup0(Value); //(Value) ? strn0cpy(this->mAddress, Value, strlen(this->mAddress)) : NULL;
     else if (!strcasecmp(Name, SETUP_SERVER_PORT))       this->mPort = atoi(Value);
+    else if (!strcasecmp(Name, SETUP_WEBSERVER_DIR))     this->mHTTPFolder = strdup0(Value);
+    else if (!strcasecmp(Name, SETUP_DATABASE_DIR))      this->mDatabaseFolder = strdup0(Value);
     else return false;
 
     this->mParsedArgs = cString::sprintf("%s%s",*this->mParsedArgs,Name);
