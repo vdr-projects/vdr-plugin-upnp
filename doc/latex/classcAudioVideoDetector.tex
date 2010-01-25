@@ -1,0 +1,45 @@
+\hypertarget{classcAudioVideoDetector}{
+\section{cAudioVideoDetector Class Reference}
+\label{classcAudioVideoDetector}\index{cAudioVideoDetector@{cAudioVideoDetector}}
+}
+{\tt \#include $<$avdetector.h$>$}
+
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{classcAudioVideoDetector_0a376b4d1421f0d799189d4e03c4cbcc}{detectVideoProperties} (\hyperlink{classcUPnPResource}{cUPnPResource} $\ast$Resource, const char $\ast$Filename)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The audio/video detector
+
+This is the audio video detector, which analizes the audio and video stream of a file to gather more information about the resource. This is also required for determination of a suitable DLNA profile. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcAudioVideoDetector_0a376b4d1421f0d799189d4e03c4cbcc}{
+\index{cAudioVideoDetector@{cAudioVideoDetector}!detectVideoProperties@{detectVideoProperties}}
+\index{detectVideoProperties@{detectVideoProperties}!cAudioVideoDetector@{cAudioVideoDetector}}
+\subsubsection[{detectVideoProperties}]{\setlength{\rightskip}{0pt plus 5cm}int cAudioVideoDetector::detectVideoProperties ({\bf cUPnPResource} $\ast$ {\em Resource}, \/  const char $\ast$ {\em Filename})}}
+\label{classcAudioVideoDetector_0a376b4d1421f0d799189d4e03c4cbcc}
+
+
+Detect video properties
+
+This detects video properties of a video stream and stores them in the Resource object.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Resource}]the resource, where to save the data \item[{\em Filename}]the file, which shall be read \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if the detection was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+misc/avdetector.h\item 
+misc/avdetector.cpp\end{CompactItemize}

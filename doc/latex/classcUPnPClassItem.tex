@@ -1,0 +1,223 @@
+\hypertarget{classcUPnPClassItem}{
+\section{cUPnPClassItem Class Reference}
+\label{classcUPnPClassItem}\index{cUPnPClassItem@{cUPnPClassItem}}
+}
+{\tt \#include $<$object.h$>$}
+
+Inheritance diagram for cUPnPClassItem:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUPnPClassItem__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cUPnPClassItem:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUPnPClassItem__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+virtual cStringList $\ast$ \hyperlink{classcUPnPClassItem_add0c9d378036e270e6f99d8d1409e3b}{getPropertyList} ()
+\item 
+virtual IXML\_\-Node $\ast$ \hyperlink{classcUPnPClassItem_5385975d79cd8e8b78429ecfe11b30a7}{createDIDLFragment} (IXML\_\-Document $\ast$Document, cStringList $\ast$Filter)
+\item 
+virtual bool \hyperlink{classcUPnPClassItem_ab17057659c17792a5b67f4297ade642}{setProperty} (const char $\ast$Property, const char $\ast$Value)
+\item 
+virtual bool \hyperlink{classcUPnPClassItem_31f7010baa65cc25b95a864f05eb4e62}{getProperty} (const char $\ast$Property, char $\ast$$\ast$Value) const 
+\item 
+int \hyperlink{classcUPnPClassItem_79153d8d7b4ac30af0af0146d69c8e83}{setReference} (\hyperlink{classcUPnPClassItem}{cUPnPClassItem} $\ast$Reference)
+\item 
+\hyperlink{classcUPnPClassItem}{cUPnPClassItem} $\ast$ \hyperlink{classcUPnPClassItem_153dcb71951d47891d1e066f97e6cd29}{getReference} () const 
+\item 
+\hyperlink{structcUPnPObjectID}{cUPnPObjectID} \hyperlink{classcUPnPClassItem_c269fe6cfe8846722b90810a21e42bfc}{getReferenceID} () const 
+\end{CompactItemize}
+\subsection*{Protected Member Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{classcUPnPClassItem_c7d477be76ca83891c990441b539935d}{cUPnPClassItem} ()
+\end{CompactItemize}
+\subsection*{Protected Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPClassItem_86a22ee98384003e3c09c43f15b3a58a}{
+\hyperlink{classcUPnPClassItem}{cUPnPClassItem} $\ast$ \hyperlink{classcUPnPClassItem_86a22ee98384003e3c09c43f15b3a58a}{mReference}}
+\label{classcUPnPClassItem_86a22ee98384003e3c09c43f15b3a58a}
+
+\begin{CompactList}\small\item\em The reference item. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPClassItem_3d0d0aedce8b1c661ea360b9a6d616f6}{
+class \hyperlink{classcUPnPClassItem_3d0d0aedce8b1c661ea360b9a6d616f6}{cMediaDatabase}}
+\label{classcUPnPClassItem_3d0d0aedce8b1c661ea360b9a6d616f6}
+
+\item 
+\hypertarget{classcUPnPClassItem_aefab39434a832c545ac75a79fa81d23}{
+class \hyperlink{classcUPnPClassItem_aefab39434a832c545ac75a79fa81d23}{cUPnPObjectMediator}}
+\label{classcUPnPClassItem_aefab39434a832c545ac75a79fa81d23}
+
+\item 
+\hypertarget{classcUPnPClassItem_9b56ac88275693464968ee30d903286a}{
+class \hyperlink{classcUPnPClassItem_9b56ac88275693464968ee30d903286a}{cUPnPItemMediator}}
+\label{classcUPnPClassItem_9b56ac88275693464968ee30d903286a}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The UPnP class Item
+
+This is a UPnP class Item representation with all its properties. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcUPnPClassItem_c7d477be76ca83891c990441b539935d}{
+\index{cUPnPClassItem@{cUPnPClassItem}!cUPnPClassItem@{cUPnPClassItem}}
+\index{cUPnPClassItem@{cUPnPClassItem}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{cUPnPClassItem}]{\setlength{\rightskip}{0pt plus 5cm}cUPnPClassItem::cUPnPClassItem ()\hspace{0.3cm}{\tt  \mbox{[}protected\mbox{]}}}}
+\label{classcUPnPClassItem_c7d477be76ca83891c990441b539935d}
+
+
+Constructor of an item
+
+This creates a new instance of an item 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPClassItem_5385975d79cd8e8b78429ecfe11b30a7}{
+\index{cUPnPClassItem@{cUPnPClassItem}!createDIDLFragment@{createDIDLFragment}}
+\index{createDIDLFragment@{createDIDLFragment}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{createDIDLFragment}]{\setlength{\rightskip}{0pt plus 5cm}IXML\_\-Node $\ast$ cUPnPClassItem::createDIDLFragment (IXML\_\-Document $\ast$ {\em Document}, \/  cStringList $\ast$ {\em Filter})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassItem_5385975d79cd8e8b78429ecfe11b30a7}
+
+
+Create the DIDL fragment
+
+This creates the DIDL-Lite fragment of the object. The DIDL is written to the specified {\em IXML\/} document. The details of the output can be controlled via the filter stringlist
+
+\begin{Desc}
+\item[Returns:]the DIDL fragment of the object \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Document}]the IXML document where to write the contents \item[{\em Filter}]the string list with the filter criteria \end{description}
+\end{Desc}
+
+
+Implements \hyperlink{classcUPnPClassObject_9090f5982129bc5aa15c6e19db627445}{cUPnPClassObject}.\hypertarget{classcUPnPClassItem_31f7010baa65cc25b95a864f05eb4e62}{
+\index{cUPnPClassItem@{cUPnPClassItem}!getProperty@{getProperty}}
+\index{getProperty@{getProperty}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{getProperty}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPClassItem::getProperty (const char $\ast$ {\em Property}, \/  char $\ast$$\ast$ {\em Value}) const\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassItem_31f7010baa65cc25b95a864f05eb4e62}
+
+
+Gets a property
+
+Returns the value of a specified property. The value is converted into a string.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the property exists\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Property}]the property which should be returned \item[{\em Value}]the value of that property \end{description}
+\end{Desc}
+
+
+Reimplemented from \hyperlink{classcUPnPClassObject_539cf36abc96b95bc8437601fed8a0f6}{cUPnPClassObject}.
+
+Reimplemented in \hyperlink{classcUPnPClassVideoItem_94ab2ffcbe14abb63c680e6748e70ef1}{cUPnPClassVideoItem}, \hyperlink{classcUPnPClassMovie_b4c1d5a973856469b93d2033b65d7ba2}{cUPnPClassMovie}, and \hyperlink{classcUPnPClassVideoBroadcast_e1d13a13de094337cea6be214c4da0f0}{cUPnPClassVideoBroadcast}.\hypertarget{classcUPnPClassItem_add0c9d378036e270e6f99d8d1409e3b}{
+\index{cUPnPClassItem@{cUPnPClassItem}!getPropertyList@{getPropertyList}}
+\index{getPropertyList@{getPropertyList}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{getPropertyList}]{\setlength{\rightskip}{0pt plus 5cm}cStringList $\ast$ cUPnPClassItem::getPropertyList ()\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassItem_add0c9d378036e270e6f99d8d1409e3b}
+
+
+Get the properties of the object
+
+This returns a property list with all the properties which can be obtained or set with {\tt getProperty} or {\tt setProperty}.
+
+\begin{Desc}
+\item[Returns:]a stringlist with the properties \end{Desc}
+
+
+Reimplemented from \hyperlink{classcUPnPClassObject_4a4d2cd2e59d364050bb64a3d9dced6e}{cUPnPClassObject}.
+
+Reimplemented in \hyperlink{classcUPnPClassVideoItem_9dc397419b45535a3e6a676667b619a4}{cUPnPClassVideoItem}, \hyperlink{classcUPnPClassMovie_b62e6dac175090b82c47f955e29c146c}{cUPnPClassMovie}, and \hyperlink{classcUPnPClassVideoBroadcast_192f6a04c87fe8d56f99c71337cf0f68}{cUPnPClassVideoBroadcast}.\hypertarget{classcUPnPClassItem_153dcb71951d47891d1e066f97e6cd29}{
+\index{cUPnPClassItem@{cUPnPClassItem}!getReference@{getReference}}
+\index{getReference@{getReference}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{getReference}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPClassItem}$\ast$ cUPnPClassItem::getReference () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassItem_153dcb71951d47891d1e066f97e6cd29}
+
+
+Get the referenced item
+
+This returns the referenced item of this item
+
+\begin{Desc}
+\item[Returns:]the referenced item \end{Desc}
+\hypertarget{classcUPnPClassItem_c269fe6cfe8846722b90810a21e42bfc}{
+\index{cUPnPClassItem@{cUPnPClassItem}!getReferenceID@{getReferenceID}}
+\index{getReferenceID@{getReferenceID}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{getReferenceID}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPObjectID} cUPnPClassItem::getReferenceID () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassItem_c269fe6cfe8846722b90810a21e42bfc}
+
+
+Get the reference ID
+
+This returns the object ID of the referenced item or {\bf -1}, if no reference exists.
+
+\begin{Desc}
+\item[Returns:]the reference ID \end{Desc}
+\hypertarget{classcUPnPClassItem_ab17057659c17792a5b67f4297ade642}{
+\index{cUPnPClassItem@{cUPnPClassItem}!setProperty@{setProperty}}
+\index{setProperty@{setProperty}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{setProperty}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPClassItem::setProperty (const char $\ast$ {\em Property}, \/  const char $\ast$ {\em Value})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassItem_ab17057659c17792a5b67f4297ade642}
+
+
+Sets a property
+
+Sets the value of a specified property. The value is converted from string into the propper data type
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the property exists\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Property}]the property which should be set \item[{\em Value}]the value of that property \end{description}
+\end{Desc}
+
+
+Reimplemented from \hyperlink{classcUPnPClassObject_6f2a803a0d0e148133edce23ed6c0e7c}{cUPnPClassObject}.
+
+Reimplemented in \hyperlink{classcUPnPClassVideoItem_3cbda6d87f5a9ff0475a75e76ba19924}{cUPnPClassVideoItem}, \hyperlink{classcUPnPClassMovie_d7f990edda85f2caabe822d2ceeb2b0d}{cUPnPClassMovie}, and \hyperlink{classcUPnPClassVideoBroadcast_ce7a341834e448479d3c8f4f0254ce43}{cUPnPClassVideoBroadcast}.\hypertarget{classcUPnPClassItem_79153d8d7b4ac30af0af0146d69c8e83}{
+\index{cUPnPClassItem@{cUPnPClassItem}!setReference@{setReference}}
+\index{setReference@{setReference}!cUPnPClassItem@{cUPnPClassItem}}
+\subsubsection[{setReference}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassItem::setReference ({\bf cUPnPClassItem} $\ast$ {\em Reference})}}
+\label{classcUPnPClassItem_79153d8d7b4ac30af0af0146d69c8e83}
+
+
+Set a reference item
+
+This sets a reference item. Its comparable with symlinks in $\ast$nix systems \begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Reference}]the reference item \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/object.h\item 
+database/object.cpp\end{CompactItemize}

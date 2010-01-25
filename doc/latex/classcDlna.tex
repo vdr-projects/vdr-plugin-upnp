@@ -1,0 +1,202 @@
+\hypertarget{classcDlna}{
+\section{cDlna Class Reference}
+\label{classcDlna}\index{cDlna@{cDlna}}
+}
+{\tt \#include $<$dlna.h$>$}
+
+Collaboration diagram for cDlna:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=274pt]{classcDlna__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+const char $\ast$ \hyperlink{classcDlna_a7ae0cc7b651bc6ccd82ef5da527d09a}{getDeviceDescription} (const char $\ast$URLBase)
+\item 
+void \hyperlink{classcDlna_0250d3903e7dcbdc8ebadfacd4e6fb50}{registerProfile} (\hyperlink{structDLNAProfile}{DLNAProfile} $\ast$Profile, int Op=-1, const char $\ast$Ps=NULL, int Ci=-1, unsigned int Flags=0)
+\item 
+void \hyperlink{classcDlna_e26b723ec63a60f397ce41bd95641dfa}{registerMainProfiles} ()
+\item 
+const char $\ast$ \hyperlink{classcDlna_68a9565f022c7037c51ad337274d8c3a}{getSupportedProtocols} ()
+\item 
+const char $\ast$ \hyperlink{classcDlna_992777f6c75dadd61bed6a75e03f1dfd}{getProtocolInfo} (\hyperlink{structDLNAProfile}{DLNAProfile} $\ast$Prof)
+\item 
+\hyperlink{structDLNAProfile}{DLNAProfile} $\ast$ \hyperlink{classcDlna_4eacc299d19fa20beba98d88d4230388}{getProfileOfChannel} (cChannel $\ast$Channel)
+\item 
+\hyperlink{structDLNAProfile}{DLNAProfile} $\ast$ \hyperlink{classcDlna_69dc71fe30130cafa399bb851ef5def8}{getProfileOfRecording} (cRecording $\ast$Recording)
+\item 
+\hyperlink{structDLNAProfile}{DLNAProfile} $\ast$ \hyperlink{classcDlna_4b5c30f707060b66c3980af70b7d8d08}{getProfileOfFile} (cString File)
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static \hyperlink{classcDlna}{cDlna} $\ast$ \hyperlink{classcDlna_1e30449831b903d508dae6640039fc25}{getInstance} (void)
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcDlna_02ebb94fd2cdff4bfb2da3267446d62b}{
+class \hyperlink{classcDlna_02ebb94fd2cdff4bfb2da3267446d62b}{cUPnPServer}}
+\label{classcDlna_02ebb94fd2cdff4bfb2da3267446d62b}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Enable DLNA compliant media transfer
+
+This class enables media transmission with DLNA conformity. Its compliant with version 1.5 of the DLNA guidelines. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcDlna_a7ae0cc7b651bc6ccd82ef5da527d09a}{
+\index{cDlna@{cDlna}!getDeviceDescription@{getDeviceDescription}}
+\index{getDeviceDescription@{getDeviceDescription}!cDlna@{cDlna}}
+\subsubsection[{getDeviceDescription}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ cDlna::getDeviceDescription (const char $\ast$ {\em URLBase})}}
+\label{classcDlna_a7ae0cc7b651bc6ccd82ef5da527d09a}
+
+
+Device description document
+
+This will return the device description document with service type definitions as well as some DLNA specific information
+
+\begin{Desc}
+\item[Returns:]The description document \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em URLBase}]the URLBase to be set in the document \end{description}
+\end{Desc}
+\hypertarget{classcDlna_1e30449831b903d508dae6640039fc25}{
+\index{cDlna@{cDlna}!getInstance@{getInstance}}
+\index{getInstance@{getInstance}!cDlna@{cDlna}}
+\subsubsection[{getInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cDlna} $\ast$ cDlna::getInstance (void)\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcDlna_1e30449831b903d508dae6640039fc25}
+
+
+Returns the instance of DLNA object
+
+This will create a DLNA object instance. It will return the same instance on subsequent calls.
+
+\begin{Desc}
+\item[Returns:]the DLNA object instance \end{Desc}
+\hypertarget{classcDlna_4eacc299d19fa20beba98d88d4230388}{
+\index{cDlna@{cDlna}!getProfileOfChannel@{getProfileOfChannel}}
+\index{getProfileOfChannel@{getProfileOfChannel}!cDlna@{cDlna}}
+\subsubsection[{getProfileOfChannel}]{\setlength{\rightskip}{0pt plus 5cm}{\bf DLNAProfile} $\ast$ cDlna::getProfileOfChannel (cChannel $\ast$ {\em Channel})}}
+\label{classcDlna_4eacc299d19fa20beba98d88d4230388}
+
+
+Profile of a channel
+
+Returns the DLNA profile of a VDR channel. It checks the video type to determine which profile will match.
+
+\begin{Desc}
+\item[Returns:]the matching DLNA profile \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Channel}]the channel of which the profile should created from \end{description}
+\end{Desc}
+\hypertarget{classcDlna_4b5c30f707060b66c3980af70b7d8d08}{
+\index{cDlna@{cDlna}!getProfileOfFile@{getProfileOfFile}}
+\index{getProfileOfFile@{getProfileOfFile}!cDlna@{cDlna}}
+\subsubsection[{getProfileOfFile}]{\setlength{\rightskip}{0pt plus 5cm}{\bf DLNAProfile} $\ast$ cDlna::getProfileOfFile (cString {\em File})}}
+\label{classcDlna_4b5c30f707060b66c3980af70b7d8d08}
+
+
+Profile of a file
+
+Returns the DLNA profile of a file. It checks the content of the file with {\em ffmpeg\/} to determine which profile will match.
+
+\begin{Desc}
+\item[Returns:]the matching DLNA profile \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em File}]the file of which the profile should be created from \end{description}
+\end{Desc}
+\hypertarget{classcDlna_69dc71fe30130cafa399bb851ef5def8}{
+\index{cDlna@{cDlna}!getProfileOfRecording@{getProfileOfRecording}}
+\index{getProfileOfRecording@{getProfileOfRecording}!cDlna@{cDlna}}
+\subsubsection[{getProfileOfRecording}]{\setlength{\rightskip}{0pt plus 5cm}{\bf DLNAProfile} $\ast$ cDlna::getProfileOfRecording (cRecording $\ast$ {\em Recording})}}
+\label{classcDlna_69dc71fe30130cafa399bb851ef5def8}
+
+
+Profile of a recording
+
+Returns the DLNA profile of a VDR recording. It checks the video file to determine which profile will match.
+
+\begin{Desc}
+\item[Returns:]the matching DLNA profile \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Recording}]the recording of which the profile should be created from \end{description}
+\end{Desc}
+\hypertarget{classcDlna_992777f6c75dadd61bed6a75e03f1dfd}{
+\index{cDlna@{cDlna}!getProtocolInfo@{getProtocolInfo}}
+\index{getProtocolInfo@{getProtocolInfo}!cDlna@{cDlna}}
+\subsubsection[{getProtocolInfo}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ cDlna::getProtocolInfo ({\bf DLNAProfile} $\ast$ {\em Prof})}}
+\label{classcDlna_992777f6c75dadd61bed6a75e03f1dfd}
+
+
+Protocol info of a specific DLNA profile
+
+Returns the protocol info string of a specific DLNA profile with its options and flags.
+
+\begin{Desc}
+\item[Returns:]the protocol info string of the profile \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Prof}]the Profile of which the protocol info shall be returned \end{description}
+\end{Desc}
+\hypertarget{classcDlna_68a9565f022c7037c51ad337274d8c3a}{
+\index{cDlna@{cDlna}!getSupportedProtocols@{getSupportedProtocols}}
+\index{getSupportedProtocols@{getSupportedProtocols}!cDlna@{cDlna}}
+\subsubsection[{getSupportedProtocols}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ cDlna::getSupportedProtocols ()}}
+\label{classcDlna_68a9565f022c7037c51ad337274d8c3a}
+
+
+CSV list of supported protocols
+
+Returns a comma separated list with all supported protocols. This means, it returns the list of protocols of the registered profiles.
+
+\begin{Desc}
+\item[Returns:]CSV list of registered protocols \end{Desc}
+\hypertarget{classcDlna_e26b723ec63a60f397ce41bd95641dfa}{
+\index{cDlna@{cDlna}!registerMainProfiles@{registerMainProfiles}}
+\index{registerMainProfiles@{registerMainProfiles}!cDlna@{cDlna}}
+\subsubsection[{registerMainProfiles}]{\setlength{\rightskip}{0pt plus 5cm}void cDlna::registerMainProfiles ()}}
+\label{classcDlna_e26b723ec63a60f397ce41bd95641dfa}
+
+
+Registeres all known DLNA profiles
+
+Registeres all well known DLNA profiles with its known options \hypertarget{classcDlna_0250d3903e7dcbdc8ebadfacd4e6fb50}{
+\index{cDlna@{cDlna}!registerProfile@{registerProfile}}
+\index{registerProfile@{registerProfile}!cDlna@{cDlna}}
+\subsubsection[{registerProfile}]{\setlength{\rightskip}{0pt plus 5cm}void cDlna::registerProfile ({\bf DLNAProfile} $\ast$ {\em Profile}, \/  int {\em Op} = {\tt -1}, \/  const char $\ast$ {\em Ps} = {\tt NULL}, \/  int {\em Ci} = {\tt -1}, \/  unsigned int {\em Flags} = {\tt 0})}}
+\label{classcDlna_0250d3903e7dcbdc8ebadfacd4e6fb50}
+
+
+Registeres a DLNA profile
+
+Registeres a DLNA profile with specific optional options
+
+\begin{Desc}
+\item[See also:]\hyperlink{common_8h-source}{common.h} \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Profile}]the DLNA profile \item[{\em Op}]operation mode \item[{\em Ps}]play speed (CSV list) \item[{\em Ci}]conversion indication flag \item[{\em Flags}]DLNA flags \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+upnpcomponents/dlna.h\item 
+upnpcomponents/dlna.cpp\end{CompactItemize}

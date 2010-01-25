@@ -1,0 +1,175 @@
+\hypertarget{classcRecordingPlayer}{
+\section{cRecordingPlayer Class Reference}
+\label{classcRecordingPlayer}\index{cRecordingPlayer@{cRecordingPlayer}}
+}
+{\tt \#include $<$recplayer.h$>$}
+
+Inheritance diagram for cRecordingPlayer:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcRecordingPlayer__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cRecordingPlayer:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcRecordingPlayer__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+virtual void \hyperlink{classcRecordingPlayer_e7ad4362d821f38db5143c0aeff15d97}{open} (UpnpOpenFileMode mode)
+\item 
+virtual int \hyperlink{classcRecordingPlayer_e0fda8b0be8e47133698f1763e649b3d}{read} (char $\ast$buf, size\_\-t buflen)
+\item 
+virtual int \hyperlink{classcRecordingPlayer_7dd0cb78ae8032eb677f01d71187d6e0}{write} (char $\ast$buf, size\_\-t buflen)
+\item 
+virtual int \hyperlink{classcRecordingPlayer_43f7ba867374d6be9e78c68c872bf608}{seek} (off\_\-t offset, int origin)
+\item 
+virtual void \hyperlink{classcRecordingPlayer_5e81aeecd16f89e432690a9b05d8dd6a}{close} ()
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static \hyperlink{classcRecordingPlayer}{cRecordingPlayer} $\ast$ \hyperlink{classcRecordingPlayer_59abdfe4e4339943afbd713d2fb35e40}{newInstance} (cRecording $\ast$Recording)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The recording player
+
+This class provides the ability to play VDR records. The difference between usual files and VDR recording files is, that recordings are possibly splitted into multiple files. The class will scan those files and tries to dynamically navigate in them like it would do, if it is a single file. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcRecordingPlayer_5e81aeecd16f89e432690a9b05d8dd6a}{
+\index{cRecordingPlayer@{cRecordingPlayer}!close@{close}}
+\index{close@{close}!cRecordingPlayer@{cRecordingPlayer}}
+\subsubsection[{close}]{\setlength{\rightskip}{0pt plus 5cm}void cRecordingPlayer::close ()\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcRecordingPlayer_5e81aeecd16f89e432690a9b05d8dd6a}
+
+
+Closes the open file
+
+This will close open file handles and frees the memory obtained by it. 
+
+Implements \hyperlink{classcFileHandle_d7eaed7d254a64c85a48c3968238b93d}{cFileHandle}.\hypertarget{classcRecordingPlayer_59abdfe4e4339943afbd713d2fb35e40}{
+\index{cRecordingPlayer@{cRecordingPlayer}!newInstance@{newInstance}}
+\index{newInstance@{newInstance}!cRecordingPlayer@{cRecordingPlayer}}
+\subsubsection[{newInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cRecordingPlayer} $\ast$ cRecordingPlayer::newInstance (cRecording $\ast$ {\em Recording})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcRecordingPlayer_59abdfe4e4339943afbd713d2fb35e40}
+
+
+Get a new instance of a recording player
+
+This returns a new instance of a recording player which plays the specified VDR recording.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Recording}]the recording to play \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]the new instance of the recording player \end{Desc}
+\hypertarget{classcRecordingPlayer_e7ad4362d821f38db5143c0aeff15d97}{
+\index{cRecordingPlayer@{cRecordingPlayer}!open@{open}}
+\index{open@{open}!cRecordingPlayer@{cRecordingPlayer}}
+\subsubsection[{open}]{\setlength{\rightskip}{0pt plus 5cm}void cRecordingPlayer::open (UpnpOpenFileMode {\em mode})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcRecordingPlayer_e7ad4362d821f38db5143c0aeff15d97}
+
+
+Opens the file
+
+Opens the file at the given mode. These can be:\begin{itemize}
+\item {\bf UPNP\_\-READ}, to read from the file\item {\bf UPNP\_\-WRITE}, to write to the file\end{itemize}
+
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mode}]The file mode, i.e. one of the following\begin{itemize}
+\item {\bf UPNP\_\-READ} \item {\bf UPNP\_\-WRITE} \end{itemize}
+\end{description}
+\end{Desc}
+
+
+Implements \hyperlink{classcFileHandle_cdf4f4d07382de675b498d85544ea1b6}{cFileHandle}.\hypertarget{classcRecordingPlayer_e0fda8b0be8e47133698f1763e649b3d}{
+\index{cRecordingPlayer@{cRecordingPlayer}!read@{read}}
+\index{read@{read}!cRecordingPlayer@{cRecordingPlayer}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}int cRecordingPlayer::read (char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcRecordingPlayer_e0fda8b0be8e47133698f1763e649b3d}
+
+
+Reads from the file
+
+Reads from the file a certain amount of bytes and stores them in a buffer
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+
+
+Implements \hyperlink{classcFileHandle_458f25a4c7f62d528cffc84e66d38e7d}{cFileHandle}.\hypertarget{classcRecordingPlayer_43f7ba867374d6be9e78c68c872bf608}{
+\index{cRecordingPlayer@{cRecordingPlayer}!seek@{seek}}
+\index{seek@{seek}!cRecordingPlayer@{cRecordingPlayer}}
+\subsubsection[{seek}]{\setlength{\rightskip}{0pt plus 5cm}int cRecordingPlayer::seek (off\_\-t {\em offset}, \/  int {\em whence})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcRecordingPlayer_43f7ba867374d6be9e78c68c872bf608}
+
+
+Seeks in the file
+
+Seeks in the file where the offset is the relativ position depending on the second parameter. This means, in case of
+
+\begin{itemize}
+\item {\bf SEEK\_\-SET}, the offset is relative to the beginning of the file\item {\bf SEEK\_\-CUR}, it is relative to the current position or\item {\bf SEEK\_\-END}, relative to the end of the file.\end{itemize}
+
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em offset}]The byte offset in the file \item[{\em whence}]one of the following\begin{itemize}
+\item {\bf SEEK\_\-SET},\item {\bf SEEK\_\-CUR},\item {\bf SEEK\_\-END} \end{itemize}
+\end{description}
+\end{Desc}
+
+
+Implements \hyperlink{classcFileHandle_d2dde523301abe5e79e6109a93ba705b}{cFileHandle}.\hypertarget{classcRecordingPlayer_7dd0cb78ae8032eb677f01d71187d6e0}{
+\index{cRecordingPlayer@{cRecordingPlayer}!write@{write}}
+\index{write@{write}!cRecordingPlayer@{cRecordingPlayer}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}int cRecordingPlayer::write (char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcRecordingPlayer_7dd0cb78ae8032eb677f01d71187d6e0}
+
+
+Writes to the file
+
+Writes to the file a certain amount of bytes which are stored in a buffer
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+
+
+Implements \hyperlink{classcFileHandle_e1495303f52f6f2d7ac37a030f78a937}{cFileHandle}.
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+receiver/recplayer.h\item 
+receiver/recplayer.cpp\end{CompactItemize}

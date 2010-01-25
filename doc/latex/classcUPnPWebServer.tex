@@ -1,0 +1,229 @@
+\hypertarget{classcUPnPWebServer}{
+\section{cUPnPWebServer Class Reference}
+\label{classcUPnPWebServer}\index{cUPnPWebServer@{cUPnPWebServer}}
+}
+{\tt \#include $<$upnpwebserver.h$>$}
+
+Collaboration diagram for cUPnPWebServer:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=224pt]{classcUPnPWebServer__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+bool \hyperlink{classcUPnPWebServer_a374ec8a84405fb2ee16dc00ba0218f5}{init} ()
+\item 
+bool \hyperlink{classcUPnPWebServer_cd20b60b929abfb205ec438127caed49}{uninit} ()
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static \hyperlink{classcUPnPWebServer}{cUPnPWebServer} $\ast$ \hyperlink{classcUPnPWebServer_59fb8d378eae0193665b51fdda5a4da0}{getInstance} (const char $\ast$rootdir=\char`\"{}/\char`\"{})
+\item 
+static int \hyperlink{classcUPnPWebServer_0540de6d9f111756593d202f30102ffb}{getInfo} (const char $\ast$filename, struct File\_\-Info $\ast$info)
+\item 
+static UpnpWebFileHandle \hyperlink{classcUPnPWebServer_5f9d44729464cab3e8bf74e4457dbb24}{open} (const char $\ast$filename, UpnpOpenFileMode mode)
+\item 
+static int \hyperlink{classcUPnPWebServer_7bdaa921f11a40da60c5fc99f577a017}{read} (UpnpWebFileHandle fh, char $\ast$buf, size\_\-t buflen)
+\item 
+static int \hyperlink{classcUPnPWebServer_46e282288394c8ba37e9d4846944c6a4}{write} (UpnpWebFileHandle fh, char $\ast$buf, size\_\-t buflen)
+\item 
+static int \hyperlink{classcUPnPWebServer_2d1ee3a89ea42cb9fd0669937061695f}{seek} (UpnpWebFileHandle fh, off\_\-t offset, int origin)
+\item 
+static int \hyperlink{classcUPnPWebServer_79d080eaf445325b7f8759dfb0744c26}{close} (UpnpWebFileHandle fh)
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPWebServer_02ebb94fd2cdff4bfb2da3267446d62b}{
+class \hyperlink{classcUPnPWebServer_02ebb94fd2cdff4bfb2da3267446d62b}{cUPnPServer}}
+\label{classcUPnPWebServer_02ebb94fd2cdff4bfb2da3267446d62b}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The internal webserver
+
+This is the internal webserver. It distributes all the contents of the UPnP-Server. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPWebServer_79d080eaf445325b7f8759dfb0744c26}{
+\index{cUPnPWebServer@{cUPnPWebServer}!close@{close}}
+\index{close@{close}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{close}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPWebServer::close (UpnpWebFileHandle {\em fh})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_79d080eaf445325b7f8759dfb0744c26}
+
+
+Closes the file
+
+closes the opened file
+
+Returns 0 on success, non-zero value otherwise
+
+\begin{Desc}
+\item[Returns:]0 on success, non-zero value otherwise \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fh}]the file handle of the opened file \end{description}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_0540de6d9f111756593d202f30102ffb}{
+\index{cUPnPWebServer@{cUPnPWebServer}!getInfo@{getInfo}}
+\index{getInfo@{getInfo}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{getInfo}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPWebServer::getInfo (const char $\ast$ {\em filename}, \/  struct File\_\-Info $\ast$ {\em info})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_0540de6d9f111756593d202f30102ffb}
+
+
+Retrieve file information
+
+Returns file related information for an virtual directory file
+
+\begin{Desc}
+\item[Returns:]0 on success, -1 otherwise \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em filename}]The filename of which the information is gathered \item[{\em info}]The File\_\-Info structure with the data \end{description}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_59fb8d378eae0193665b51fdda5a4da0}{
+\index{cUPnPWebServer@{cUPnPWebServer}!getInstance@{getInstance}}
+\index{getInstance@{getInstance}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{getInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPWebServer} $\ast$ cUPnPWebServer::getInstance (const char $\ast$ {\em rootdir} = {\tt \char`\"{}/\char`\"{}})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_59fb8d378eae0193665b51fdda5a4da0}
+
+
+Returns the instance of the webserver
+
+Returns the instance of the webserver. This will create a single instance of none is existing on the very first call. A subsequent call will return the same instance.
+
+\begin{Desc}
+\item[Returns:]the instance of webserver \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em rootdir}]the root directory of the webserver \end{description}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_a374ec8a84405fb2ee16dc00ba0218f5}{
+\index{cUPnPWebServer@{cUPnPWebServer}!init@{init}}
+\index{init@{init}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{init}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPWebServer::init (void)}}
+\label{classcUPnPWebServer_a374ec8a84405fb2ee16dc00ba0218f5}
+
+
+Initializes the webserver
+
+It enables the webserver which comes with the {\em Intel SDK\/} and creates virtual directories for shares media.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if initializing was successful\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_5f9d44729464cab3e8bf74e4457dbb24}{
+\index{cUPnPWebServer@{cUPnPWebServer}!open@{open}}
+\index{open@{open}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{open}]{\setlength{\rightskip}{0pt plus 5cm}UpnpWebFileHandle cUPnPWebServer::open (const char $\ast$ {\em filename}, \/  UpnpOpenFileMode {\em mode})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_5f9d44729464cab3e8bf74e4457dbb24}
+
+
+Opens a virtual directory file
+
+Opens a file in a virtual directory with the specified mode.
+
+Possible modes are:\begin{itemize}
+\item {\bf UPNP\_\-READ}, Opens the file for reading\item {\bf UPNP\_\-WRITE}, Opens the file for writing\end{itemize}
+
+
+It returns a file handle to the opened file, NULL otherwise
+
+\begin{Desc}
+\item[Returns:]FileHandle to the opened file, NULL otherwise \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em filename}]The file to open \item[{\em mode}]UPNP\_\-WRITE for writing, UPNP\_\-READ for reading. \end{description}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_7bdaa921f11a40da60c5fc99f577a017}{
+\index{cUPnPWebServer@{cUPnPWebServer}!read@{read}}
+\index{read@{read}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPWebServer::read (UpnpWebFileHandle {\em fh}, \/  char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_7bdaa921f11a40da60c5fc99f577a017}
+
+
+Reads from the opened file
+
+Reads {\tt buflen} bytes from the file and stores the content to the buffer
+
+Returns 0 no more bytes read (EOF) $>$0 bytes read from file
+
+\begin{Desc}
+\item[Returns:]number of bytes read, 0 on EOF \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fh}]the file handle of the opened file \item[{\em buf}]the buffer to write the bytes to \item[{\em buflen}]the maximum count of bytes to read \end{description}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_2d1ee3a89ea42cb9fd0669937061695f}{
+\index{cUPnPWebServer@{cUPnPWebServer}!seek@{seek}}
+\index{seek@{seek}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{seek}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPWebServer::seek (UpnpWebFileHandle {\em fh}, \/  off\_\-t {\em offset}, \/  int {\em origin})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_2d1ee3a89ea42cb9fd0669937061695f}
+
+
+Seek in the file
+
+Seeks in the opened file and sets the file pointer to the specified offset
+
+Returns 0 on success, non-zero value otherwise
+
+\begin{Desc}
+\item[Returns:]0 on success, non-zero value otherwise \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fh}]the file handle of the opened file \item[{\em offset}]a negative oder positive value which moves the pointer forward or backward \item[{\em origin}]SEEK\_\-CUR, SEEK\_\-END or SEEK\_\-SET \end{description}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_cd20b60b929abfb205ec438127caed49}{
+\index{cUPnPWebServer@{cUPnPWebServer}!uninit@{uninit}}
+\index{uninit@{uninit}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{uninit}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPWebServer::uninit (void)}}
+\label{classcUPnPWebServer_cd20b60b929abfb205ec438127caed49}
+
+
+Uninitializes the webserver
+
+This stops the webserver.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if initializing was successful\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPWebServer_46e282288394c8ba37e9d4846944c6a4}{
+\index{cUPnPWebServer@{cUPnPWebServer}!write@{write}}
+\index{write@{write}!cUPnPWebServer@{cUPnPWebServer}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPWebServer::write (UpnpWebFileHandle {\em fh}, \/  char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPWebServer_46e282288394c8ba37e9d4846944c6a4}
+
+
+Writes to the opened file
+
+Writes {\tt buflen} bytes from the buffer and stores the content in the file
+
+Returns $>$0 bytes wrote to file, maybe less the buflen in case of write errors
+
+\begin{Desc}
+\item[Returns:]number of bytes read, 0 on EOF \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em fh}]the file handle of the opened file \item[{\em buf}]the buffer to read the bytes from \item[{\em buflen}]the maximum count of bytes to write \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+upnpcomponents/upnpwebserver.h\item 
+upnpcomponents/upnpwebserver.cpp\end{CompactItemize}

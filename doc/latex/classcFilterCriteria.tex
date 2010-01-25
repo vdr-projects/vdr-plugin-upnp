@@ -1,0 +1,43 @@
+\hypertarget{classcFilterCriteria}{
+\section{cFilterCriteria Class Reference}
+\label{classcFilterCriteria}\index{cFilterCriteria@{cFilterCriteria}}
+}
+{\tt \#include $<$search.h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static cStringList $\ast$ \hyperlink{classcFilterCriteria_e327772fdf9f8db127c7ce1a737f1c7c}{parse} (const char $\ast$Filter)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Parses the filter criteria
+
+This parses the filter criteria which comes from a {\em Browse\/} or {\em Search\/} request. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcFilterCriteria_e327772fdf9f8db127c7ce1a737f1c7c}{
+\index{cFilterCriteria@{cFilterCriteria}!parse@{parse}}
+\index{parse@{parse}!cFilterCriteria@{cFilterCriteria}}
+\subsubsection[{parse}]{\setlength{\rightskip}{0pt plus 5cm}cStringList $\ast$ cFilterCriteria::parse (const char $\ast$ {\em Filter})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcFilterCriteria_e327772fdf9f8db127c7ce1a737f1c7c}
+
+
+Parses the filter criteria
+
+This parses the filter criteria. It may be a empty string list, a {\bf {\tt NULL} pointer} or a list with properties which shall be shown in the {\em DIDL-Lite\/} fragment.
+
+\begin{Desc}
+\item[Returns:]the stringlist containing the filter \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Filter}]the filter string \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+misc/search.h\item 
+misc/search.cpp\end{CompactItemize}

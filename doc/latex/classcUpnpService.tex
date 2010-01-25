@@ -1,0 +1,180 @@
+\hypertarget{classcUpnpService}{
+\section{cUpnpService Class Reference}
+\label{classcUpnpService}\index{cUpnpService@{cUpnpService}}
+}
+{\tt \#include $<$upnpservice.h$>$}
+
+Inheritance diagram for cUpnpService:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUpnpService__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+virtual int \hyperlink{classcUpnpService_e6d3522d580e5975f5a38d5bea88e29d}{subscribe} (Upnp\_\-Subscription\_\-Request $\ast$Request)=0
+\item 
+virtual int \hyperlink{classcUpnpService_bbffca233e6aa193eda223cb7bfc2917}{execute} (Upnp\_\-Action\_\-Request $\ast$Request)=0
+\end{CompactItemize}
+\subsection*{Protected Member Functions}
+\begin{CompactItemize}
+\item 
+virtual void \hyperlink{classcUpnpService_f0976057350505eca781aafcaf6b1d14}{setError} (Upnp\_\-Action\_\-Request $\ast$Request, int Error)
+\item 
+int \hyperlink{classcUpnpService_846cd44a1c014395278c3af339122656}{parseIntegerValue} (IN IXML\_\-Document $\ast$Document, IN const char $\ast$Item, OUT int $\ast$Value)
+\item 
+int \hyperlink{classcUpnpService_925b7a9628230ce69b803afb8fee212f}{parseStringValue} (IN IXML\_\-Document $\ast$Document, IN const char $\ast$Item, OUT char $\ast$$\ast$Value)
+\end{CompactItemize}
+\subsection*{Protected Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUpnpService_359ba19926aab21f7a2e3c77ffc7f7ea}{
+UpnpDevice\_\-Handle \hyperlink{classcUpnpService_359ba19926aab21f7a2e3c77ffc7f7ea}{mDeviceHandle}}
+\label{classcUpnpService_359ba19926aab21f7a2e3c77ffc7f7ea}
+
+\begin{CompactList}\small\item\em the UPnP device handle of the root device \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+UPnP Service interface
+
+This is a service interface implemented by a UPnP service like CDS oder CMS
+
+It comes with some tool functions which are commonly useful for processing an event or action. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUpnpService_bbffca233e6aa193eda223cb7bfc2917}{
+\index{cUpnpService@{cUpnpService}!execute@{execute}}
+\index{execute@{execute}!cUpnpService@{cUpnpService}}
+\subsubsection[{execute}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cUpnpService::execute (Upnp\_\-Action\_\-Request $\ast$ {\em Request})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcUpnpService_bbffca233e6aa193eda223cb7bfc2917}
+
+
+Executes an action
+
+This executes an action initialized by a control point. The result is stored in the first parameter.
+
+\begin{Desc}
+\item[Returns:]An integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if subscription was okay\item or any other non null value in case of an error\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Input and output parameters of an action \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Input and output parameters of an action \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcConnectionManager_12fa6b0a9e20c3af663e3ca2b3c97dfb}{cConnectionManager}, and \hyperlink{classcContentDirectory_a0225df761512819b9c46f45b2a0f0d0}{cContentDirectory}.\hypertarget{classcUpnpService_846cd44a1c014395278c3af339122656}{
+\index{cUpnpService@{cUpnpService}!parseIntegerValue@{parseIntegerValue}}
+\index{parseIntegerValue@{parseIntegerValue}!cUpnpService@{cUpnpService}}
+\subsubsection[{parseIntegerValue}]{\setlength{\rightskip}{0pt plus 5cm}int cUpnpService::parseIntegerValue (IN IXML\_\-Document $\ast$ {\em Document}, \/  IN const char $\ast$ {\em Item}, \/  OUT int $\ast$ {\em Value})\hspace{0.3cm}{\tt  \mbox{[}protected\mbox{]}}}}
+\label{classcUpnpService_846cd44a1c014395278c3af339122656}
+
+
+Parses an integer value
+
+This tool function parses an integer value from a given {\em IXML\/} document. It is searching for the very first occurance of the demanded item.
+
+\begin{Desc}
+\item[Returns:]Returns\begin{itemize}
+\item {\bf {\tt 0},} if parsing was successful\item {\bf {\tt $<$0},} if an error occured\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Document}]the document, which is parsed \item[{\em Item}]the demanded item \item[{\em Value}]the value of the item \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Document}]the document, which is parsed \item[{\em Item}]the demanded item \item[{\em Value}]the value of the item \end{description}
+\end{Desc}
+\hypertarget{classcUpnpService_925b7a9628230ce69b803afb8fee212f}{
+\index{cUpnpService@{cUpnpService}!parseStringValue@{parseStringValue}}
+\index{parseStringValue@{parseStringValue}!cUpnpService@{cUpnpService}}
+\subsubsection[{parseStringValue}]{\setlength{\rightskip}{0pt plus 5cm}int cUpnpService::parseStringValue (IN IXML\_\-Document $\ast$ {\em Document}, \/  IN const char $\ast$ {\em Item}, \/  OUT char $\ast$$\ast$ {\em Value})\hspace{0.3cm}{\tt  \mbox{[}protected\mbox{]}}}}
+\label{classcUpnpService_925b7a9628230ce69b803afb8fee212f}
+
+
+Parses a string value
+
+This tool function parses a string value from a given {\em IXML\/} document. It is searching for the very first occurance of the demanded item.
+
+\begin{Desc}
+\item[Returns:]Returns\begin{itemize}
+\item {\bf {\tt 0},} if parsing was successful\item {\bf {\tt $<$0},} if an error occured\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Document}]the document, which is parsed \item[{\em Item}]the demanded item \item[{\em Value}]the value of the item \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Document}]the document, which is parsed \item[{\em Item}]the demanded item \item[{\em Value}]the value of the item \end{description}
+\end{Desc}
+\hypertarget{classcUpnpService_f0976057350505eca781aafcaf6b1d14}{
+\index{cUpnpService@{cUpnpService}!setError@{setError}}
+\index{setError@{setError}!cUpnpService@{cUpnpService}}
+\subsubsection[{setError}]{\setlength{\rightskip}{0pt plus 5cm}void cUpnpService::setError (Upnp\_\-Action\_\-Request $\ast$ {\em Request}, \/  int {\em Error})\hspace{0.3cm}{\tt  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classcUpnpService_f0976057350505eca781aafcaf6b1d14}
+
+
+Sets an error on an action request
+
+This function puts a error message into the action request structure according to its error code
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]the action request, to set the error for \item[{\em Error}]the error code of which the message should be obtained \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]the action request, to set the error for \item[{\em Error}]the error code of which the message should be obtained \end{description}
+\end{Desc}
+
+
+Reimplemented in \hyperlink{classcConnectionManager_02014a637c6cb04cbfe10b3cb4ce6d1d}{cConnectionManager}, and \hyperlink{classcContentDirectory_a3b0df304987a0f2b17733c651d5b5c6}{cContentDirectory}.\hypertarget{classcUpnpService_e6d3522d580e5975f5a38d5bea88e29d}{
+\index{cUpnpService@{cUpnpService}!subscribe@{subscribe}}
+\index{subscribe@{subscribe}!cUpnpService@{cUpnpService}}
+\subsubsection[{subscribe}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cUpnpService::subscribe (Upnp\_\-Subscription\_\-Request $\ast$ {\em Request})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcUpnpService_e6d3522d580e5975f5a38d5bea88e29d}
+
+
+Subscribes to an event
+
+This is a callback function to register a new subscriber for an event.
+
+\begin{Desc}
+\item[Returns:]An integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if subscription was okay\item or any other non null value in case of an error\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Information about the subscription \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Information about the subscription \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcConnectionManager_7990eba09a100e5e4ee5b01b87bcc16e}{cConnectionManager}, and \hyperlink{classcContentDirectory_17acd376a722e6e7de9ec0d4cabb707b}{cContentDirectory}.
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+upnpcomponents/upnpservice.h\item 
+upnpcomponents/upnpservice.cpp\end{CompactItemize}

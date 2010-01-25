@@ -1,0 +1,47 @@
+\hypertarget{classcPathParser}{
+\section{cPathParser Class Reference}
+\label{classcPathParser}\index{cPathParser@{cPathParser}}
+}
+{\tt \#include $<$search.h$>$}
+
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static bool \hyperlink{classcPathParser_83229f6ecd4254d7ed145573eae7967a}{parse} (const char $\ast$Path, int $\ast$Section, int $\ast$Method, propertyMap $\ast$Properties)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Web path parser
+
+Parses paths which came from the webserver. It splits the path into a section, a certain method and its properties.
+
+This can be used to easily determine which file was requested by a client 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcPathParser_83229f6ecd4254d7ed145573eae7967a}{
+\index{cPathParser@{cPathParser}!parse@{parse}}
+\index{parse@{parse}!cPathParser@{cPathParser}}
+\subsubsection[{parse}]{\setlength{\rightskip}{0pt plus 5cm}bool cPathParser::parse (const char $\ast$ {\em Path}, \/  int $\ast$ {\em Section}, \/  int $\ast$ {\em Method}, \/  propertyMap $\ast$ {\em Properties})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcPathParser_83229f6ecd4254d7ed145573eae7967a}
+
+
+Parses the path
+
+This will parse the path and stores the result in the pointers given.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the parsing was successful\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Path}]the path which is parsed \item[{\em Section}]the number of the registered section \item[{\em Method}]the number of the registered method \item[{\em Properties}]the properties found in the path \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+misc/search.h\item 
+misc/search.cpp\end{CompactItemize}

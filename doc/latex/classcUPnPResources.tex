@@ -1,0 +1,173 @@
+\hypertarget{classcUPnPResources}{
+\section{cUPnPResources Class Reference}
+\label{classcUPnPResources}\index{cUPnPResources@{cUPnPResources}}
+}
+{\tt \#include $<$resources.h$>$}
+
+Collaboration diagram for cUPnPResources:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUPnPResources__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{classcUPnPResources_5da9137336fa284040a823f53267b837}{getResourcesOfObject} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object)
+\item 
+int \hyperlink{classcUPnPResources_eaffc72ee9faeb046a41b965ce61507f}{loadResources} ()
+\item 
+\hyperlink{classcUPnPResource}{cUPnPResource} $\ast$ \hyperlink{classcUPnPResources_cfec64e65fa14c1efb653c9c4fbbc609}{getResource} (unsigned int ResourceID)
+\item 
+int \hyperlink{classcUPnPResources_974dd63afd52b87732800b7cf578a387}{createFromChannel} (\hyperlink{classcUPnPClassVideoBroadcast}{cUPnPClassVideoBroadcast} $\ast$Object, cChannel $\ast$Channel)
+\item 
+int \hyperlink{classcUPnPResources_47b243391bc9e1867bc16d4307f2af8a}{createFromRecording} (\hyperlink{classcUPnPClassVideoItem}{cUPnPClassVideoItem} $\ast$Object, cRecording $\ast$Recording)
+\item 
+int \hyperlink{classcUPnPResources_b2bac789a9caf023940dfc02a079c249}{createFromFile} (\hyperlink{classcUPnPClassItem}{cUPnPClassItem} $\ast$Object, cString File)
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static \hyperlink{classcUPnPResources}{cUPnPResources} $\ast$ \hyperlink{classcUPnPResources_c3136b664928d2214e76e0e65a4ace6a}{getInstance} ()
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The resource manager
+
+This manages the resources in an internal cache. It may create a new resource from a channel, a recording or a custom file. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPResources_974dd63afd52b87732800b7cf578a387}{
+\index{cUPnPResources@{cUPnPResources}!createFromChannel@{createFromChannel}}
+\index{createFromChannel@{createFromChannel}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{createFromChannel}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPResources::createFromChannel ({\bf cUPnPClassVideoBroadcast} $\ast$ {\em Object}, \/  cChannel $\ast$ {\em Channel})}}
+\label{classcUPnPResources_974dd63afd52b87732800b7cf578a387}
+
+
+Create resource from channel
+
+This creates a new resource from the given channel. It determines what kind of video stream it is and further details if available. It stores the resource in the database after creating it.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the videoBroadcast item which holds the resource \item[{\em Channel}]the VDR TV channel \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if loading was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPResources_b2bac789a9caf023940dfc02a079c249}{
+\index{cUPnPResources@{cUPnPResources}!createFromFile@{createFromFile}}
+\index{createFromFile@{createFromFile}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{createFromFile}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPResources::createFromFile ({\bf cUPnPClassItem} $\ast$ {\em Object}, \/  cString {\em File})}}
+\label{classcUPnPResources_b2bac789a9caf023940dfc02a079c249}
+
+
+Create resource from file
+
+This creates a new resource from the given file. It determines all available information about the resource by analizing the content. It stores the resource in the database after creating it.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the item which holds the resource \item[{\em File}]the file name \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if loading was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPResources_47b243391bc9e1867bc16d4307f2af8a}{
+\index{cUPnPResources@{cUPnPResources}!createFromRecording@{createFromRecording}}
+\index{createFromRecording@{createFromRecording}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{createFromRecording}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPResources::createFromRecording ({\bf cUPnPClassVideoItem} $\ast$ {\em Object}, \/  cRecording $\ast$ {\em Recording})}}
+\label{classcUPnPResources_47b243391bc9e1867bc16d4307f2af8a}
+
+
+Create resource from recording
+
+This creates a new resource from the given recording. It determines what kind of video stream it is and further details if available. It stores the resource in the database after creating it.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the videoItem item which holds the resource \item[{\em Recording}]the VDR TV recording \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if loading was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPResources_c3136b664928d2214e76e0e65a4ace6a}{
+\index{cUPnPResources@{cUPnPResources}!getInstance@{getInstance}}
+\index{getInstance@{getInstance}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{getInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPResources} $\ast$ cUPnPResources::getInstance ()\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPResources_c3136b664928d2214e76e0e65a4ace6a}
+
+
+Get the instance of the resource manager
+
+This returns the instance of the resource manager.
+
+\begin{Desc}
+\item[Returns:]the instance of the manager \end{Desc}
+\hypertarget{classcUPnPResources_cfec64e65fa14c1efb653c9c4fbbc609}{
+\index{cUPnPResources@{cUPnPResources}!getResource@{getResource}}
+\index{getResource@{getResource}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{getResource}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPResource} $\ast$ cUPnPResources::getResource (unsigned int {\em ResourceID})}}
+\label{classcUPnPResources_cfec64e65fa14c1efb653c9c4fbbc609}
+
+
+Get a resource by ID
+
+This returns a resource by its resource ID
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ResourceID}]the resource ID of the demanded resource \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]the requested resource \end{Desc}
+ \hypertarget{classcUPnPResources_5da9137336fa284040a823f53267b837}{
+\index{cUPnPResources@{cUPnPResources}!getResourcesOfObject@{getResourcesOfObject}}
+\index{getResourcesOfObject@{getResourcesOfObject}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{getResourcesOfObject}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPResources::getResourcesOfObject ({\bf cUPnPClassObject} $\ast$ {\em Object})}}
+\label{classcUPnPResources_5da9137336fa284040a823f53267b837}
+
+
+Fill object with its resources
+
+This will load all the resources from the database, which are associated to the given object
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object, which shall be filled \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if loading was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPResources_eaffc72ee9faeb046a41b965ce61507f}{
+\index{cUPnPResources@{cUPnPResources}!loadResources@{loadResources}}
+\index{loadResources@{loadResources}!cUPnPResources@{cUPnPResources}}
+\subsubsection[{loadResources}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPResources::loadResources ()}}
+\label{classcUPnPResources_eaffc72ee9faeb046a41b965ce61507f}
+
+
+Loads all resources from database
+
+This loads all resources from the database into the internal cache.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if loading was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/resources.h\item 
+database/resources.cpp\end{CompactItemize}

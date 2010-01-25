@@ -1,0 +1,161 @@
+\hypertarget{classcUPnPVideoItemMediator}{
+\section{cUPnPVideoItemMediator Class Reference}
+\label{classcUPnPVideoItemMediator}\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+}
+{\tt \#include $<$object.h$>$}
+
+Inheritance diagram for cUPnPVideoItemMediator:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUPnPVideoItemMediator__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cUPnPVideoItemMediator:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=400pt]{classcUPnPVideoItemMediator__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{classcUPnPVideoItemMediator_1f56334e155773b6c3d86f481f4ad96b}{cUPnPVideoItemMediator} (\hyperlink{classcMediaDatabase}{cMediaDatabase} $\ast$MediaDatabase)
+\item 
+virtual \hyperlink{classcUPnPClassVideoItem}{cUPnPClassVideoItem} $\ast$ \hyperlink{classcUPnPVideoItemMediator_27e001142c3651c36dfd3b7c450414c0}{createObject} (const char $\ast$Title, bool Restricted)
+\item 
+virtual \hyperlink{classcUPnPClassVideoItem}{cUPnPClassVideoItem} $\ast$ \hyperlink{classcUPnPVideoItemMediator_dd8927340a69d247965ef9250adefb21}{getObject} (\hyperlink{structcUPnPObjectID}{cUPnPObjectID} ID)
+\end{CompactItemize}
+\subsection*{Protected Member Functions}
+\begin{CompactItemize}
+\item 
+virtual int \hyperlink{classcUPnPVideoItemMediator_984e10738bca46ce38307d5f60e26bd3}{objectToDatabase} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object)
+\item 
+virtual int \hyperlink{classcUPnPVideoItemMediator_3f7ec1937b2b95e3ec5462470971d350}{databaseToObject} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object, \hyperlink{structcUPnPObjectID}{cUPnPObjectID} ID)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+VideoItem Mediator
+
+This is the interface between the objects and the database. It is possible to create new objects, stores objects in the database as well as removing them from it. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcUPnPVideoItemMediator_1f56334e155773b6c3d86f481f4ad96b}{
+\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}!cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}!cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+\subsubsection[{cUPnPVideoItemMediator}]{\setlength{\rightskip}{0pt plus 5cm}cUPnPVideoItemMediator::cUPnPVideoItemMediator ({\bf cMediaDatabase} $\ast$ {\em MediaDatabase})}}
+\label{classcUPnPVideoItemMediator_1f56334e155773b6c3d86f481f4ad96b}
+
+
+Constructor of videoitem mediator
+
+This creates a new videoitem mediator with which it is possible to create new instances of VideoItem objects.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em MediaDatabase}]the media database \end{description}
+\end{Desc}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPVideoItemMediator_27e001142c3651c36dfd3b7c450414c0}{
+\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}!createObject@{createObject}}
+\index{createObject@{createObject}!cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+\subsubsection[{createObject}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPClassVideoItem} $\ast$ cUPnPVideoItemMediator::createObject (const char $\ast$ {\em Title}, \/  bool {\em Restricted})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPVideoItemMediator_27e001142c3651c36dfd3b7c450414c0}
+
+
+Creates an object
+
+This creates a new UPnP object with the specific title and the restriction.
+
+\begin{Desc}
+\item[Returns:]the newly created object \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Title}]the title of that object \item[{\em Restricted}]the restriction of the object \end{description}
+\end{Desc}
+  
+
+Reimplemented from \hyperlink{classcUPnPItemMediator_e2fd4cf5e6435f1eeadd11f9a99cd2db}{cUPnPItemMediator}.
+
+Reimplemented in \hyperlink{classcUPnPVideoBroadcastMediator_14fefa90807d40d91a80712729af2beb}{cUPnPVideoBroadcastMediator}, and \hyperlink{classcUPnPMovieMediator_29d40a311b7283cc4fba36860ac8c935}{cUPnPMovieMediator}.\hypertarget{classcUPnPVideoItemMediator_3f7ec1937b2b95e3ec5462470971d350}{
+\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}!databaseToObject@{databaseToObject}}
+\index{databaseToObject@{databaseToObject}!cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+\subsubsection[{databaseToObject}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPVideoItemMediator::databaseToObject ({\bf cUPnPClassObject} $\ast$ {\em Object}, \/  {\bf cUPnPObjectID} {\em ID})\hspace{0.3cm}{\tt  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classcUPnPVideoItemMediator_3f7ec1937b2b95e3ec5462470971d350}
+
+
+Loads an object from database
+
+This loads an object from the database
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt $<$0},} in case of an error\item {\bf {\tt 0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object to be loaded \item[{\em ID}]the object ID of that object \end{description}
+\end{Desc}
+ 
+
+Reimplemented from \hyperlink{classcUPnPItemMediator_1f3645ebe0a33a81d0b3f22060dc4761}{cUPnPItemMediator}.
+
+Reimplemented in \hyperlink{classcUPnPVideoBroadcastMediator_33237e5d850c107d37be37c1646b17d7}{cUPnPVideoBroadcastMediator}, and \hyperlink{classcUPnPMovieMediator_542135e9c1051b57a8f6f5ecc0c1ede3}{cUPnPMovieMediator}.\hypertarget{classcUPnPVideoItemMediator_dd8927340a69d247965ef9250adefb21}{
+\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}!getObject@{getObject}}
+\index{getObject@{getObject}!cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+\subsubsection[{getObject}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPClassVideoItem} $\ast$ cUPnPVideoItemMediator::getObject ({\bf cUPnPObjectID} {\em ID})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPVideoItemMediator_dd8927340a69d247965ef9250adefb21}
+
+
+Get an object
+
+Retrieves a UPnP object from the database and stores its information in the object. The object is obtained via its object ID.
+
+\begin{Desc}
+\item[Returns:]the object, found in the database \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ID}]the object ID \end{description}
+\end{Desc}
+  
+
+Reimplemented from \hyperlink{classcUPnPItemMediator_81411b2a472ade71d73a9c8ddc2a7990}{cUPnPItemMediator}.
+
+Reimplemented in \hyperlink{classcUPnPVideoBroadcastMediator_c13bf0f008f49b0ab499542391998a24}{cUPnPVideoBroadcastMediator}, and \hyperlink{classcUPnPMovieMediator_d85b240eb54efd9ab46c440b51c71e83}{cUPnPMovieMediator}.\hypertarget{classcUPnPVideoItemMediator_984e10738bca46ce38307d5f60e26bd3}{
+\index{cUPnPVideoItemMediator@{cUPnPVideoItemMediator}!objectToDatabase@{objectToDatabase}}
+\index{objectToDatabase@{objectToDatabase}!cUPnPVideoItemMediator@{cUPnPVideoItemMediator}}
+\subsubsection[{objectToDatabase}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPVideoItemMediator::objectToDatabase ({\bf cUPnPClassObject} $\ast$ {\em Object})\hspace{0.3cm}{\tt  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classcUPnPVideoItemMediator_984e10738bca46ce38307d5f60e26bd3}
+
+
+Store the object in the database
+
+This stores the information of an object in the database
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt $<$0},} in case of an error\item {\bf {\tt 0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object to be saved \end{description}
+\end{Desc}
+ 
+
+Reimplemented from \hyperlink{classcUPnPItemMediator_6d954b1cfdc4a7d55981c6ebff9d6d04}{cUPnPItemMediator}.
+
+Reimplemented in \hyperlink{classcUPnPVideoBroadcastMediator_822f9c93928a7dbe9491c8cccbf53f95}{cUPnPVideoBroadcastMediator}, and \hyperlink{classcUPnPMovieMediator_61ab6dcaf2417898428ddf1f635788b7}{cUPnPMovieMediator}.
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/object.h\item 
+database/object.cpp\end{CompactItemize}

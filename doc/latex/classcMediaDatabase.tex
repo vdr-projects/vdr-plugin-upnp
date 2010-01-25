@@ -1,0 +1,205 @@
+\hypertarget{classcMediaDatabase}{
+\section{cMediaDatabase Class Reference}
+\label{classcMediaDatabase}\index{cMediaDatabase@{cMediaDatabase}}
+}
+{\tt \#include $<$metadata.h$>$}
+
+Collaboration diagram for cMediaDatabase:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=400pt]{classcMediaDatabase__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+unsigned int \hyperlink{classcMediaDatabase_96232caa30b80d4e3ca667c317101fd0}{getSystemUpdateID} ()
+\item 
+const char $\ast$ \hyperlink{classcMediaDatabase_dadd330e273e0f354d51b76cee436198}{getContainerUpdateIDs} ()
+\item 
+\hyperlink{classcMediaDatabase_ace0720fbddbdd7f2e4ca5ad16d5acd2}{cMediaDatabase} ()
+\item 
+int \hyperlink{classcMediaDatabase_1aec38e63143c7eb26012f1c74fe373d}{addFastFind} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object, const char $\ast$FastFind)
+\item 
+\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$ \hyperlink{classcMediaDatabase_b0fac893d82c29276d68b94569cfef1d}{getObjectByFastFind} (const char $\ast$FastFind)
+\item 
+\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$ \hyperlink{classcMediaDatabase_b8da7da9612c64de0ddf88db3c316d5a}{getObjectByID} (\hyperlink{structcUPnPObjectID}{cUPnPObjectID} ID)
+\item 
+int \hyperlink{classcMediaDatabase_25ff666113dbe72598e4ef4e23af5d8f}{browse} (OUT \hyperlink{structcUPnPResultSet}{cUPnPResultSet} $\ast$$\ast$Results, IN const char $\ast$ID, IN bool BrowseMetadata, IN const char $\ast$Filter=\char`\"{}$\ast$\char`\"{}, IN unsigned int Offset=0, IN unsigned int Count=0, IN const char $\ast$SortCriteria=\char`\"{}\char`\"{})
+\item 
+int \hyperlink{classcMediaDatabase_36bdc240d3fa11d685440d365d9ab8c9}{search} (OUT \hyperlink{structcUPnPResultSet}{cUPnPResultSet} $\ast$$\ast$Results, IN const char $\ast$ID, IN const char $\ast$Search, IN const char $\ast$Filter=\char`\"{}$\ast$\char`\"{}, IN unsigned int Offset=0, IN unsigned int Count=0, IN const char $\ast$SortCriteria=\char`\"{}\char`\"{})
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcMediaDatabase_02ebb94fd2cdff4bfb2da3267446d62b}{
+class \hyperlink{classcMediaDatabase_02ebb94fd2cdff4bfb2da3267446d62b}{cUPnPServer}}
+\label{classcMediaDatabase_02ebb94fd2cdff4bfb2da3267446d62b}
+
+\item 
+\hypertarget{classcMediaDatabase_aefab39434a832c545ac75a79fa81d23}{
+class \hyperlink{classcMediaDatabase_aefab39434a832c545ac75a79fa81d23}{cUPnPObjectMediator}}
+\label{classcMediaDatabase_aefab39434a832c545ac75a79fa81d23}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The media database
+
+This class is the global object manager. It holds every object in a local cache. Only this class is allowed to create new objects.
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcUPnPClassObject}{cUPnPClassObject} \end{Desc}
+
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcMediaDatabase_ace0720fbddbdd7f2e4ca5ad16d5acd2}{
+\index{cMediaDatabase@{cMediaDatabase}!cMediaDatabase@{cMediaDatabase}}
+\index{cMediaDatabase@{cMediaDatabase}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{cMediaDatabase}]{\setlength{\rightskip}{0pt plus 5cm}cMediaDatabase::cMediaDatabase ()}}
+\label{classcMediaDatabase_ace0720fbddbdd7f2e4ca5ad16d5acd2}
+
+
+Constructor
+
+This creates an instance of the media database. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcMediaDatabase_1aec38e63143c7eb26012f1c74fe373d}{
+\index{cMediaDatabase@{cMediaDatabase}!addFastFind@{addFastFind}}
+\index{addFastFind@{addFastFind}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{addFastFind}]{\setlength{\rightskip}{0pt plus 5cm}int cMediaDatabase::addFastFind ({\bf cUPnPClassObject} $\ast$ {\em Object}, \/  const char $\ast$ {\em FastFind})}}
+\label{classcMediaDatabase_1aec38e63143c7eb26012f1c74fe373d}
+
+
+Add a Fastfind
+
+This creates a {\em Fastfind\/} entry. It is a string which can be used to relocate a objectID. Usually this is a file name or another ID with which the related object can be found.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt -1},} if the creation was successful\item {\bf {\tt 0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object, which should be registered \item[{\em FastFind}]the string with which the object shall be relocated \end{description}
+\end{Desc}
+\hypertarget{classcMediaDatabase_25ff666113dbe72598e4ef4e23af5d8f}{
+\index{cMediaDatabase@{cMediaDatabase}!browse@{browse}}
+\index{browse@{browse}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{browse}]{\setlength{\rightskip}{0pt plus 5cm}int cMediaDatabase::browse (OUT {\bf cUPnPResultSet} $\ast$$\ast$ {\em Results}, \/  IN const char $\ast$ {\em ID}, \/  IN bool {\em BrowseMetadata}, \/  IN const char $\ast$ {\em Filter} = {\tt \char`\"{}$\ast$\char`\"{}}, \/  IN unsigned int {\em Offset} = {\tt 0}, \/  IN unsigned int {\em Count} = {\tt 0}, \/  IN const char $\ast$ {\em SortCriteria} = {\tt \char`\"{}\char`\"{}})}}
+\label{classcMediaDatabase_25ff666113dbe72598e4ef4e23af5d8f}
+
+
+Performs a browse on the database
+
+This performs a browse request on the database and returns a structure containing the matching count and DIDL-Lite fragement which is sent to the control point.
+
+\begin{Desc}
+\item[Returns:]returns an integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-CDS\_\-E\_\-INVALID\_\-SORT\_\-CRITERIA},} when the sort criteria is malformed\item {\bf {\tt UPNP\_\-CDS\_\-E\_\-CANT\_\-PROCESS\_\-REQUEST},} when there is an internal error while processing the request\item {\bf {\tt UPNP\_\-CDS\_\-E\_\-NO\_\-SUCH\_\-OBJECT},} when the requested ObjectID does not exist\item {\bf {\tt UPNP\_\-SOAP\_\-E\_\-ACTION\_\-FAILED},} when the action failed due any reasons\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if the request was successful \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Results}]the result of the request \item[{\em ID}]the objectID of the request \item[{\em BrowseMetadata}]{\bf true} to browse metadata, {\bf false} otherwise \item[{\em Filter}]the filter applied to the returned metadata \item[{\em Offset}]the starting offset \item[{\em Count}]maximum count returned \item[{\em SortCriteria}]sorts the results before returning them \end{description}
+\end{Desc}
+\hypertarget{classcMediaDatabase_dadd330e273e0f354d51b76cee436198}{
+\index{cMediaDatabase@{cMediaDatabase}!getContainerUpdateIDs@{getContainerUpdateIDs}}
+\index{getContainerUpdateIDs@{getContainerUpdateIDs}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{getContainerUpdateIDs}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ cMediaDatabase::getContainerUpdateIDs ()}}
+\label{classcMediaDatabase_dadd330e273e0f354d51b76cee436198}
+
+
+Returns a CSV list with ContainerUpdateIDs
+
+This list contains an unordered list of ordered pairs of ContainerID and its ContainerUpdateID. It contains only recent changes which are not yet beeing evented. This means that evented updates will be removed from list.
+
+\begin{Desc}
+\item[Returns:]CSV list of ContainerUpdateIDs \end{Desc}
+\hypertarget{classcMediaDatabase_b0fac893d82c29276d68b94569cfef1d}{
+\index{cMediaDatabase@{cMediaDatabase}!getObjectByFastFind@{getObjectByFastFind}}
+\index{getObjectByFastFind@{getObjectByFastFind}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{getObjectByFastFind}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPClassObject} $\ast$ cMediaDatabase::getObjectByFastFind (const char $\ast$ {\em FastFind})}}
+\label{classcMediaDatabase_b0fac893d82c29276d68b94569cfef1d}
+
+
+Finds a object by Fastfind
+
+This returns the object via the {\em Fastfind\/} string. The object must be previosly registered via {\tt \hyperlink{classcMediaDatabase_1aec38e63143c7eb26012f1c74fe373d}{cMediaDatabase::addFastFind()}}.
+
+It tries to find the object in the internal object cache. If this fails, the object will be loaded from the database.
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcMediaDatabase_1aec38e63143c7eb26012f1c74fe373d}{cMediaDatabase::addFastFind} \end{Desc}
+\begin{Desc}
+\item[Returns:]The object associated with FastFind \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em FastFind}]the string with which the object shall be relocated \end{description}
+\end{Desc}
+\hypertarget{classcMediaDatabase_b8da7da9612c64de0ddf88db3c316d5a}{
+\index{cMediaDatabase@{cMediaDatabase}!getObjectByID@{getObjectByID}}
+\index{getObjectByID@{getObjectByID}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{getObjectByID}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPClassObject} $\ast$ cMediaDatabase::getObjectByID ({\bf cUPnPObjectID} {\em ID})}}
+\label{classcMediaDatabase_b8da7da9612c64de0ddf88db3c316d5a}
+
+
+Finds a object by its ObjectID
+
+This returns the object via its {\em ObjectID\/}.
+
+It tries to find the object in the internal object cache. If this fails, the object will be loaded from the database.
+
+\begin{Desc}
+\item[Returns:]The object associated with FastFind \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ID}]The ObjectID of the requested object \end{description}
+\end{Desc}
+\hypertarget{classcMediaDatabase_96232caa30b80d4e3ca667c317101fd0}{
+\index{cMediaDatabase@{cMediaDatabase}!getSystemUpdateID@{getSystemUpdateID}}
+\index{getSystemUpdateID@{getSystemUpdateID}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{getSystemUpdateID}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cMediaDatabase::getSystemUpdateID ()}}
+\label{classcMediaDatabase_96232caa30b80d4e3ca667c317101fd0}
+
+
+Returns the SystemUpdateID
+
+This returns the {\em SystemUpdateID\/}. This changes whenever anything changed within the content directory. This value will be sent through the UPnP network every 2 seconds.
+
+\begin{Desc}
+\item[Returns:]the SystemUpdateID \end{Desc}
+\hypertarget{classcMediaDatabase_36bdc240d3fa11d685440d365d9ab8c9}{
+\index{cMediaDatabase@{cMediaDatabase}!search@{search}}
+\index{search@{search}!cMediaDatabase@{cMediaDatabase}}
+\subsubsection[{search}]{\setlength{\rightskip}{0pt plus 5cm}int cMediaDatabase::search (OUT {\bf cUPnPResultSet} $\ast$$\ast$ {\em Results}, \/  IN const char $\ast$ {\em ID}, \/  IN const char $\ast$ {\em Search}, \/  IN const char $\ast$ {\em Filter} = {\tt \char`\"{}$\ast$\char`\"{}}, \/  IN unsigned int {\em Offset} = {\tt 0}, \/  IN unsigned int {\em Count} = {\tt 0}, \/  IN const char $\ast$ {\em SortCriteria} = {\tt \char`\"{}\char`\"{}})}}
+\label{classcMediaDatabase_36bdc240d3fa11d685440d365d9ab8c9}
+
+
+Performs a search on the database
+
+This performs a search request on the database and returns a structure containing the matching count and DIDL-Lite fragement which is sent to the control point.
+
+\begin{Desc}
+\item[Note:]The submitted ID must be a ContainerID. Searches are performed only in this container.\end{Desc}
+\begin{Desc}
+\item[Returns:]returns an integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-CDS\_\-E\_\-INVALID\_\-SORT\_\-CRITERIA},} when the sort criteria is malformed\item {\bf {\tt UPNP\_\-CDS\_\-E\_\-CANT\_\-PROCESS\_\-REQUEST},} when there is an internal error while processing the request\item {\bf {\tt UPNP\_\-CDS\_\-E\_\-NO\_\-SUCH\_\-OBJECT},} when the requested ObjectID does not exist\item {\bf {\tt UPNP\_\-SOAP\_\-E\_\-ACTION\_\-FAILED},} when the action failed due any reasons\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if the request was successful \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Results}]the result of the request \item[{\em ID}]the ContainerID \item[{\em Search}]the search string \item[{\em Filter}]the filter applied to the returned metadata \item[{\em Offset}]the starting offset \item[{\em Count}]maximum count returned \item[{\em SortCriteria}]sorts the results before returning them \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/metadata.h\item 
+database/metadata.cpp\end{CompactItemize}

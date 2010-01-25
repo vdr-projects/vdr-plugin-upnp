@@ -1,0 +1,229 @@
+\hypertarget{classcLiveReceiver}{
+\section{cLiveReceiver Class Reference}
+\label{classcLiveReceiver}\index{cLiveReceiver@{cLiveReceiver}}
+}
+{\tt \#include $<$livereceiver.h$>$}
+
+Inheritance diagram for cLiveReceiver:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcLiveReceiver__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cLiveReceiver:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcLiveReceiver__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+virtual void \hyperlink{classcLiveReceiver_b8e751f641be1da4a925106e3dd062e9}{open} (UpnpOpenFileMode mode)
+\item 
+virtual int \hyperlink{classcLiveReceiver_4a19e1fd4e1d043fb091bfb01a9cbf08}{read} (char $\ast$buf, size\_\-t buflen)
+\item 
+virtual int \hyperlink{classcLiveReceiver_eb56988441b589b6e34ea01825dfb183}{write} (char $\ast$buf, size\_\-t buflen)
+\item 
+virtual int \hyperlink{classcLiveReceiver_efb4156ef247773873dee42053e94edf}{seek} (off\_\-t offset, int whence)
+\item 
+virtual void \hyperlink{classcLiveReceiver_5b8beb2bc6809aacbdb087e31e836a27}{close} ()
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static \hyperlink{classcLiveReceiver}{cLiveReceiver} $\ast$ \hyperlink{classcLiveReceiver_1e28c50bb73404597b2363422e038c12}{newInstance} (cChannel $\ast$Channel, int Priority)
+\end{CompactItemize}
+\subsection*{Protected Member Functions}
+\begin{CompactItemize}
+\item 
+virtual void \hyperlink{classcLiveReceiver_c8bc191994b0acd3fa2d23b26f996f8a}{Receive} (uchar $\ast$Data, int Length)
+\item 
+virtual void \hyperlink{classcLiveReceiver_631c7392c3226b07ba654875580fb26c}{Activate} (bool On)
+\item 
+virtual void \hyperlink{classcLiveReceiver_5c1f30f48fdc612c19ff4b9b4c176b07}{Action} (void)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+A receiver for live TV
+
+This is a receiver object which is attached to a VDR tv card device. It is receiving transport stream packages and generates a single MPEG2 transport stream which can be distributed through the network. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcLiveReceiver_5c1f30f48fdc612c19ff4b9b4c176b07}{
+\index{cLiveReceiver@{cLiveReceiver}!Action@{Action}}
+\index{Action@{Action}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{Action}]{\setlength{\rightskip}{0pt plus 5cm}void cLiveReceiver::Action (void)\hspace{0.3cm}{\tt  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classcLiveReceiver_5c1f30f48fdc612c19ff4b9b4c176b07}
+
+
+The receiver thread action
+
+This actually is the receiver thread, which runs consequitivelly and buffers any received video data from the interal incoming buffer to the internal outgoing buffer.
+
+While doing so, it tries to syncronize with the stream and creates new MPEG2-TS PATs and PMTs for a single MPEG2-TS stream \hypertarget{classcLiveReceiver_631c7392c3226b07ba654875580fb26c}{
+\index{cLiveReceiver@{cLiveReceiver}!Activate@{Activate}}
+\index{Activate@{Activate}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{Activate}]{\setlength{\rightskip}{0pt plus 5cm}void cLiveReceiver::Activate (bool {\em On})\hspace{0.3cm}{\tt  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classcLiveReceiver_631c7392c3226b07ba654875580fb26c}
+
+
+Activates the receiver
+
+This activates the receiver which initializes internal data structures to be prepared for receiving data from the VDR
+
+If the parameter is {\bf {\tt true},} the receiver will be activated. If it is {\bf {\tt false},} the receiver will be deactivated and stops its threads. \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em On}]Activates the receiver thread \end{description}
+\end{Desc}
+\hypertarget{classcLiveReceiver_5b8beb2bc6809aacbdb087e31e836a27}{
+\index{cLiveReceiver@{cLiveReceiver}!close@{close}}
+\index{close@{close}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{close}]{\setlength{\rightskip}{0pt plus 5cm}void cLiveReceiver::close ()\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcLiveReceiver_5b8beb2bc6809aacbdb087e31e836a27}
+
+
+Closes the open file
+
+This will close open file handles and frees the memory obtained by it.  
+
+Implements \hyperlink{classcFileHandle_d7eaed7d254a64c85a48c3968238b93d}{cFileHandle}.\hypertarget{classcLiveReceiver_1e28c50bb73404597b2363422e038c12}{
+\index{cLiveReceiver@{cLiveReceiver}!newInstance@{newInstance}}
+\index{newInstance@{newInstance}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{newInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cLiveReceiver} $\ast$ cLiveReceiver::newInstance (cChannel $\ast$ {\em Channel}, \/  int {\em Priority})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcLiveReceiver_1e28c50bb73404597b2363422e038c12}
+
+
+Creates a new receiver instance
+
+This will create a new instance of a live receiver for the specified channel at the specified priority level.
+
+A negativ priority means that the receiver may being detached from a device.
+
+The receiver must be free'd with delete after it is not used anylonger.
+
+\begin{Desc}
+\item[Returns:]returns a new liveReceiver instance \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Channel}]the channel which shall be tuned \item[{\em Priority}]the priority level \end{description}
+\end{Desc}
+\hypertarget{classcLiveReceiver_b8e751f641be1da4a925106e3dd062e9}{
+\index{cLiveReceiver@{cLiveReceiver}!open@{open}}
+\index{open@{open}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{open}]{\setlength{\rightskip}{0pt plus 5cm}void cLiveReceiver::open (UpnpOpenFileMode {\em mode})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcLiveReceiver_b8e751f641be1da4a925106e3dd062e9}
+
+
+Opens the file
+
+Opens the file at the given mode. These can be:\begin{itemize}
+\item {\bf UPNP\_\-READ}, to read from the file\item {\bf UPNP\_\-WRITE}, to write to the file\end{itemize}
+
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mode}]The file mode, i.e. one of the following\begin{itemize}
+\item {\bf UPNP\_\-READ} \item {\bf UPNP\_\-WRITE} \end{itemize}
+\end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcFileHandle_cdf4f4d07382de675b498d85544ea1b6}{cFileHandle}.\hypertarget{classcLiveReceiver_4a19e1fd4e1d043fb091bfb01a9cbf08}{
+\index{cLiveReceiver@{cLiveReceiver}!read@{read}}
+\index{read@{read}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}int cLiveReceiver::read (char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcLiveReceiver_4a19e1fd4e1d043fb091bfb01a9cbf08}
+
+
+Reads from the file
+
+Reads from the file a certain amount of bytes and stores them in a buffer
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcFileHandle_458f25a4c7f62d528cffc84e66d38e7d}{cFileHandle}.\hypertarget{classcLiveReceiver_c8bc191994b0acd3fa2d23b26f996f8a}{
+\index{cLiveReceiver@{cLiveReceiver}!Receive@{Receive}}
+\index{Receive@{Receive}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{Receive}]{\setlength{\rightskip}{0pt plus 5cm}void cLiveReceiver::Receive (uchar $\ast$ {\em Data}, \/  int {\em Length})\hspace{0.3cm}{\tt  \mbox{[}protected, virtual\mbox{]}}}}
+\label{classcLiveReceiver_c8bc191994b0acd3fa2d23b26f996f8a}
+
+
+Receives data from VDR
+
+This is the interface for receiving packet data from the VDR. It buffers the incoming transport stream packets in a linear ringbuffer and returns immediatelly \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Data}]The data received from VDR \item[{\em Length}]The length of the data packet, usually 188 bytes \end{description}
+\end{Desc}
+\hypertarget{classcLiveReceiver_efb4156ef247773873dee42053e94edf}{
+\index{cLiveReceiver@{cLiveReceiver}!seek@{seek}}
+\index{seek@{seek}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{seek}]{\setlength{\rightskip}{0pt plus 5cm}int cLiveReceiver::seek (off\_\-t {\em offset}, \/  int {\em whence})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcLiveReceiver_efb4156ef247773873dee42053e94edf}
+
+
+Seeks in the file
+
+Seeks in the file where the offset is the relativ position depending on the second parameter. This means, in case of
+
+\begin{itemize}
+\item {\bf SEEK\_\-SET}, the offset is relative to the beginning of the file\item {\bf SEEK\_\-CUR}, it is relative to the current position or\item {\bf SEEK\_\-END}, relative to the end of the file.\end{itemize}
+
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em offset}]The byte offset in the file \item[{\em whence}]one of the following\begin{itemize}
+\item {\bf SEEK\_\-SET},\item {\bf SEEK\_\-CUR},\item {\bf SEEK\_\-END} \end{itemize}
+\end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcFileHandle_d2dde523301abe5e79e6109a93ba705b}{cFileHandle}.\hypertarget{classcLiveReceiver_eb56988441b589b6e34ea01825dfb183}{
+\index{cLiveReceiver@{cLiveReceiver}!write@{write}}
+\index{write@{write}!cLiveReceiver@{cLiveReceiver}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}int cLiveReceiver::write (char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcLiveReceiver_eb56988441b589b6e34ea01825dfb183}
+
+
+Writes to the file
+
+Writes to the file a certain amount of bytes which are stored in a buffer
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcFileHandle_e1495303f52f6f2d7ac37a030f78a937}{cFileHandle}.
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+receiver/livereceiver.h\item 
+receiver/livereceiver.cpp\end{CompactItemize}

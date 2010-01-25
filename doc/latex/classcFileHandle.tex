@@ -1,0 +1,168 @@
+\hypertarget{classcFileHandle}{
+\section{cFileHandle Class Reference}
+\label{classcFileHandle}\index{cFileHandle@{cFileHandle}}
+}
+{\tt \#include $<$filehandle.h$>$}
+
+Inheritance diagram for cFileHandle:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcFileHandle__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+virtual void \hyperlink{classcFileHandle_cdf4f4d07382de675b498d85544ea1b6}{open} (UpnpOpenFileMode mode)=0
+\item 
+virtual int \hyperlink{classcFileHandle_458f25a4c7f62d528cffc84e66d38e7d}{read} (char $\ast$buf, size\_\-t buflen)=0
+\item 
+virtual int \hyperlink{classcFileHandle_e1495303f52f6f2d7ac37a030f78a937}{write} (char $\ast$buf, size\_\-t buflen)=0
+\item 
+virtual int \hyperlink{classcFileHandle_d2dde523301abe5e79e6109a93ba705b}{seek} (off\_\-t offset, int whence)=0
+\item 
+virtual void \hyperlink{classcFileHandle_d7eaed7d254a64c85a48c3968238b93d}{close} ()=0
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Interface for File Handles
+
+This class is a pure virtual class to act as an interface for file handles used by the webserver. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcFileHandle_d7eaed7d254a64c85a48c3968238b93d}{
+\index{cFileHandle@{cFileHandle}!close@{close}}
+\index{close@{close}!cFileHandle@{cFileHandle}}
+\subsubsection[{close}]{\setlength{\rightskip}{0pt plus 5cm}virtual void cFileHandle::close ()\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcFileHandle_d7eaed7d254a64c85a48c3968238b93d}
+
+
+Closes the open file
+
+This will close open file handles and frees the memory obtained by it. 
+
+Implemented in \hyperlink{classcLiveReceiver_5b8beb2bc6809aacbdb087e31e836a27}{cLiveReceiver}, and \hyperlink{classcRecordingPlayer_5e81aeecd16f89e432690a9b05d8dd6a}{cRecordingPlayer}.\hypertarget{classcFileHandle_cdf4f4d07382de675b498d85544ea1b6}{
+\index{cFileHandle@{cFileHandle}!open@{open}}
+\index{open@{open}!cFileHandle@{cFileHandle}}
+\subsubsection[{open}]{\setlength{\rightskip}{0pt plus 5cm}virtual void cFileHandle::open (UpnpOpenFileMode {\em mode})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcFileHandle_cdf4f4d07382de675b498d85544ea1b6}
+
+
+Opens the file
+
+Opens the file at the given mode. These can be:\begin{itemize}
+\item {\bf UPNP\_\-READ}, to read from the file\item {\bf UPNP\_\-WRITE}, to write to the file\end{itemize}
+
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mode}]The file mode, i.e. one of the following\begin{itemize}
+\item {\bf UPNP\_\-READ} \item {\bf UPNP\_\-WRITE} \end{itemize}
+\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em mode}]The file mode, i.e. one of the following\begin{itemize}
+\item {\bf UPNP\_\-READ} \item {\bf UPNP\_\-WRITE} \end{itemize}
+\end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcLiveReceiver_b8e751f641be1da4a925106e3dd062e9}{cLiveReceiver}, and \hyperlink{classcRecordingPlayer_e7ad4362d821f38db5143c0aeff15d97}{cRecordingPlayer}.\hypertarget{classcFileHandle_458f25a4c7f62d528cffc84e66d38e7d}{
+\index{cFileHandle@{cFileHandle}!read@{read}}
+\index{read@{read}!cFileHandle@{cFileHandle}}
+\subsubsection[{read}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cFileHandle::read (char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcFileHandle_458f25a4c7f62d528cffc84e66d38e7d}
+
+
+Reads from the file
+
+Reads from the file a certain amount of bytes and stores them in a buffer
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcLiveReceiver_4a19e1fd4e1d043fb091bfb01a9cbf08}{cLiveReceiver}, and \hyperlink{classcRecordingPlayer_e0fda8b0be8e47133698f1763e649b3d}{cRecordingPlayer}.\hypertarget{classcFileHandle_d2dde523301abe5e79e6109a93ba705b}{
+\index{cFileHandle@{cFileHandle}!seek@{seek}}
+\index{seek@{seek}!cFileHandle@{cFileHandle}}
+\subsubsection[{seek}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cFileHandle::seek (off\_\-t {\em offset}, \/  int {\em whence})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcFileHandle_d2dde523301abe5e79e6109a93ba705b}
+
+
+Seeks in the file
+
+Seeks in the file where the offset is the relativ position depending on the second parameter. This means, in case of
+
+\begin{itemize}
+\item {\bf SEEK\_\-SET}, the offset is relative to the beginning of the file\item {\bf SEEK\_\-CUR}, it is relative to the current position or\item {\bf SEEK\_\-END}, relative to the end of the file.\end{itemize}
+
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em offset}]The byte offset in the file \item[{\em whence}]one of the following\begin{itemize}
+\item {\bf SEEK\_\-SET},\item {\bf SEEK\_\-CUR},\item {\bf SEEK\_\-END} \end{itemize}
+\end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em offset}]The byte offset in the file \item[{\em whence}]one of the following\begin{itemize}
+\item {\bf SEEK\_\-SET},\item {\bf SEEK\_\-CUR},\item {\bf SEEK\_\-END} \end{itemize}
+\end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcLiveReceiver_efb4156ef247773873dee42053e94edf}{cLiveReceiver}, and \hyperlink{classcRecordingPlayer_43f7ba867374d6be9e78c68c872bf608}{cRecordingPlayer}.\hypertarget{classcFileHandle_e1495303f52f6f2d7ac37a030f78a937}{
+\index{cFileHandle@{cFileHandle}!write@{write}}
+\index{write@{write}!cFileHandle@{cFileHandle}}
+\subsubsection[{write}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cFileHandle::write (char $\ast$ {\em buf}, \/  size\_\-t {\em buflen})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcFileHandle_e1495303f52f6f2d7ac37a030f78a937}
+
+
+Writes to the file
+
+Writes to the file a certain amount of bytes which are stored in a buffer
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf $<$0}, in case of an error\item {\bf 0}, when reading was successful\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em buf}]The char buffer \item[{\em buflen}]The size of the buffer \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcLiveReceiver_eb56988441b589b6e34ea01825dfb183}{cLiveReceiver}, and \hyperlink{classcRecordingPlayer_7dd0cb78ae8032eb677f01d71187d6e0}{cRecordingPlayer}.
+
+The documentation for this class was generated from the following file:\begin{CompactItemize}
+\item 
+receiver/filehandle.h\end{CompactItemize}

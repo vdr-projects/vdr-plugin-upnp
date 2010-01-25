@@ -1,0 +1,64 @@
+\hypertarget{classcRows}{
+\section{cRows Class Reference}
+\label{classcRows}\index{cRows@{cRows}}
+}
+{\tt \#include $<$database.h$>$}
+
+Collaboration diagram for cRows:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=133pt]{classcRows__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+bool \hyperlink{classcRows_03a454862807c81280fd7b87b35ba19e}{fetchRow} (\hyperlink{classcRow}{cRow} $\ast$$\ast$Row)
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcRows_224b94ad297724d01a0ad06388446137}{
+class \hyperlink{classcRows_224b94ad297724d01a0ad06388446137}{cSQLiteDatabase}}
+\label{classcRows_224b94ad297724d01a0ad06388446137}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Result rows of a SQL SELECT request
+
+Contains the rows of a SQL SELECT request
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcRow}{cRow} \end{Desc}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classcRows_03a454862807c81280fd7b87b35ba19e}{
+\index{cRows@{cRows}!fetchRow@{fetchRow}}
+\index{fetchRow@{fetchRow}!cRows@{cRows}}
+\subsubsection[{fetchRow}]{\setlength{\rightskip}{0pt plus 5cm}bool cRows::fetchRow ({\bf cRow} $\ast$$\ast$ {\em Row})}}
+\label{classcRows_03a454862807c81280fd7b87b35ba19e}
+
+
+Fetches a row from the result
+
+This fetches the next row in the resultset by storing the contents of that row in the first parameter.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if more rows to come\item {\bf {\tt false},} if the row is its last in this resultset. \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Row}]The Pointer of the row \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/database.h\item 
+database/database.cpp\end{CompactItemize}

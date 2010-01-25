@@ -1,0 +1,318 @@
+\hypertarget{classcUPnPServer}{
+\section{cUPnPServer Class Reference}
+\label{classcUPnPServer}\index{cUPnPServer@{cUPnPServer}}
+}
+{\tt \#include $<$server.h$>$}
+
+Collaboration diagram for cUPnPServer:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=400pt]{classcUPnPServer__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{classcUPnPServer_e0277b2231f10e66a5c6ce9acb42fcd0}{cUPnPServer} ()
+\item 
+virtual \hyperlink{classcUPnPServer_8eb136050f3f6c2edb7acbf5d690723d}{$\sim$cUPnPServer} ()
+\item 
+void \hyperlink{classcUPnPServer_4935ab1fbcc03279193e0f9fa675fb8b}{enable} (bool enabled)
+\item 
+bool \hyperlink{classcUPnPServer_811d90c5aadc75bc48670757def1c21e}{start} (void)
+\item 
+bool \hyperlink{classcUPnPServer_9dd50cfea9042d49ef58b99b44c0c5af}{restart} (void)
+\item 
+void \hyperlink{classcUPnPServer_c5ecc7ef5d42db1fa136ff00b24d1289}{stop} (void)
+\item 
+bool \hyperlink{classcUPnPServer_783f27c1997257539ccb8ff7ade815be}{autoDetectSettings} (void)
+\item 
+sockaddr\_\-in $\ast$ \hyperlink{classcUPnPServer_f938922eff48ca1035e88677e095c0c4}{getServerAddress} (void)
+\item 
+const char $\ast$ \hyperlink{classcUPnPServer_e28dd555ac861850c9a2bbd22d9a7d3a}{getInterface} (void) const 
+\item 
+bool \hyperlink{classcUPnPServer_77494ce55a93601110bd4ffce8559b23}{setServerPort} (unsigned short port)
+\item 
+bool \hyperlink{classcUPnPServer_81cf9d85c09093094febe6966a568702}{setInterface} (const char $\ast$Interface)
+\item 
+bool \hyperlink{classcUPnPServer_ebebc8d232cf4ad04e5f72f5ab763db6}{setAddress} (const char $\ast$Address)
+\item 
+bool \hyperlink{classcUPnPServer_7c91df7310a99786a0a126497299d030}{setAutoDetection} (bool enable)
+\item 
+bool \hyperlink{classcUPnPServer_fbaaebd4496e98106c2d9be4c2512a66}{isEnabled} (void) const 
+\item 
+bool \hyperlink{classcUPnPServer_af5358b41e19ba2917371c2d118d0145}{isRunning} (void) const 
+\item 
+bool \hyperlink{classcUPnPServer_389ffe474f61ec18b6f99dd02a9c31e4}{isAutoDetectionEnabled} ()
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPServer_d07aa2117373999585d4e5530ef02918}{
+class \hyperlink{classcUPnPServer_d07aa2117373999585d4e5530ef02918}{cPluginUpnp}}
+\label{classcUPnPServer_d07aa2117373999585d4e5530ef02918}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The UPnP Server
+
+This is the core of the UPnP server. This handles all the components which are needed for a UPnP media server. Incoming messages are passed through it and it determines what to do. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcUPnPServer_e0277b2231f10e66a5c6ce9acb42fcd0}{
+\index{cUPnPServer@{cUPnPServer}!cUPnPServer@{cUPnPServer}}
+\index{cUPnPServer@{cUPnPServer}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{cUPnPServer}]{\setlength{\rightskip}{0pt plus 5cm}cUPnPServer::cUPnPServer ()}}
+\label{classcUPnPServer_e0277b2231f10e66a5c6ce9acb42fcd0}
+
+
+Constructor
+
+This will create a new server and initializes the main functionalities The server has to be started manually by invoking \hyperlink{classcUPnPServer_811d90c5aadc75bc48670757def1c21e}{cUPnPServer::start()}. \hypertarget{classcUPnPServer_8eb136050f3f6c2edb7acbf5d690723d}{
+\index{cUPnPServer@{cUPnPServer}!$\sim$cUPnPServer@{$\sim$cUPnPServer}}
+\index{$\sim$cUPnPServer@{$\sim$cUPnPServer}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{$\sim$cUPnPServer}]{\setlength{\rightskip}{0pt plus 5cm}cUPnPServer::$\sim$cUPnPServer ()\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPServer_8eb136050f3f6c2edb7acbf5d690723d}
+
+
+Destructor
+
+This will destroy the server object. Open ports and connections will be closed. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPServer_783f27c1997257539ccb8ff7ade815be}{
+\index{cUPnPServer@{cUPnPServer}!autoDetectSettings@{autoDetectSettings}}
+\index{autoDetectSettings@{autoDetectSettings}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{autoDetectSettings}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::autoDetectSettings (void)}}
+\label{classcUPnPServer_783f27c1997257539ccb8ff7ade815be}
+
+
+Automatically detect settings
+
+This will automatically detect the network settings if the autodetection is turned on.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if autoDetection was successful\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_4935ab1fbcc03279193e0f9fa675fb8b}{
+\index{cUPnPServer@{cUPnPServer}!enable@{enable}}
+\index{enable@{enable}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{enable}]{\setlength{\rightskip}{0pt plus 5cm}void cUPnPServer::enable (bool {\em enabled})}}
+\label{classcUPnPServer_4935ab1fbcc03279193e0f9fa675fb8b}
+
+
+Enable the server
+
+This switch indicates if the server is startable or not
+
+If it is set to false, any invocation of \hyperlink{classcUPnPServer_811d90c5aadc75bc48670757def1c21e}{start()} will do nothing.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em enabled}]if {\bf {\tt true},} the server will be enabled. If {\bf {\tt false} it} is disabled. \end{description}
+\end{Desc}
+\hypertarget{classcUPnPServer_e28dd555ac861850c9a2bbd22d9a7d3a}{
+\index{cUPnPServer@{cUPnPServer}!getInterface@{getInterface}}
+\index{getInterface@{getInterface}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{getInterface}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPServer::getInterface (void) const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPServer_e28dd555ac861850c9a2bbd22d9a7d3a}
+
+
+Get the interface the server listens to
+
+\begin{Desc}
+\item[Returns:]the network interface \end{Desc}
+\hypertarget{classcUPnPServer_f938922eff48ca1035e88677e095c0c4}{
+\index{cUPnPServer@{cUPnPServer}!getServerAddress@{getServerAddress}}
+\index{getServerAddress@{getServerAddress}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{getServerAddress}]{\setlength{\rightskip}{0pt plus 5cm}sockaddr\_\-in $\ast$ cUPnPServer::getServerAddress (void)}}
+\label{classcUPnPServer_f938922eff48ca1035e88677e095c0c4}
+
+
+Get the server address
+
+Returns a server address structure including IP address and port
+
+\begin{Desc}
+\item[Returns:]The server socket address \end{Desc}
+\hypertarget{classcUPnPServer_389ffe474f61ec18b6f99dd02a9c31e4}{
+\index{cUPnPServer@{cUPnPServer}!isAutoDetectionEnabled@{isAutoDetectionEnabled}}
+\index{isAutoDetectionEnabled@{isAutoDetectionEnabled}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{isAutoDetectionEnabled}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::isAutoDetectionEnabled ()\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPServer_389ffe474f61ec18b6f99dd02a9c31e4}
+
+
+Is auto detection enabled or not
+
+Returns true or false if auto detection is enabled or not
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if autodetection is enabled\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_fbaaebd4496e98106c2d9be4c2512a66}{
+\index{cUPnPServer@{cUPnPServer}!isEnabled@{isEnabled}}
+\index{isEnabled@{isEnabled}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{isEnabled}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::isEnabled (void) const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPServer_fbaaebd4496e98106c2d9be4c2512a66}
+
+
+Checks if the server is enabled
+
+This indicates if the server is currently enabled.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the server is enabled\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_af5358b41e19ba2917371c2d118d0145}{
+\index{cUPnPServer@{cUPnPServer}!isRunning@{isRunning}}
+\index{isRunning@{isRunning}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{isRunning}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::isRunning (void) const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPServer_af5358b41e19ba2917371c2d118d0145}
+
+
+Checks if the server is running
+
+If the server is enabled, this indicates if it is running.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true} if} the server is running\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_9dd50cfea9042d49ef58b99b44c0c5af}{
+\index{cUPnPServer@{cUPnPServer}!restart@{restart}}
+\index{restart@{restart}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{restart}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::restart (void)}}
+\label{classcUPnPServer_9dd50cfea9042d49ef58b99b44c0c5af}
+
+
+Restart the server
+
+When the server is not operating properly it can be restarted. It will stop the server functionalities, clear everything and start it again.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} when the server restarted successfully\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_ebebc8d232cf4ad04e5f72f5ab763db6}{
+\index{cUPnPServer@{cUPnPServer}!setAddress@{setAddress}}
+\index{setAddress@{setAddress}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{setAddress}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::setAddress (const char $\ast$ {\em Address})}}
+\label{classcUPnPServer_ebebc8d232cf4ad04e5f72f5ab763db6}
+
+
+Set the server address
+
+Specifies the servers IP address. The server needs to restart when the IP is changed. However, it's not possible to detect changes through the system.
+
+This method should only be used in cases of fixed IP addresses for example when no DHCP server is available.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Address}]The address of the server \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the new server address is set\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_7c91df7310a99786a0a126497299d030}{
+\index{cUPnPServer@{cUPnPServer}!setAutoDetection@{setAutoDetection}}
+\index{setAutoDetection@{setAutoDetection}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{setAutoDetection}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::setAutoDetection (bool {\em enable})}}
+\label{classcUPnPServer_7c91df7310a99786a0a126497299d030}
+
+
+Enables oder Disables auto detection mode
+
+If this is set to true, the setup will get it's information via auto detection
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em enable}]{\bf {\tt true} enables} and {\bf {\tt false} disables} the auto detection \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the new server address is set\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_81cf9d85c09093094febe6966a568702}{
+\index{cUPnPServer@{cUPnPServer}!setInterface@{setInterface}}
+\index{setInterface@{setInterface}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{setInterface}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::setInterface (const char $\ast$ {\em Interface})}}
+\label{classcUPnPServer_81cf9d85c09093094febe6966a568702}
+
+
+The Interface to listen on
+
+Sets the listener interface, for instance 'eth1' or 'wlan0'
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Interface}]The interface of the server \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the new server address is set\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_77494ce55a93601110bd4ffce8559b23}{
+\index{cUPnPServer@{cUPnPServer}!setServerPort@{setServerPort}}
+\index{setServerPort@{setServerPort}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{setServerPort}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::setServerPort (unsigned short {\em port})}}
+\label{classcUPnPServer_77494ce55a93601110bd4ffce8559b23}
+
+
+Set the server port
+
+The port must be in the scope of user definied ports (49152 - 65535). If the port is 0, it is autoassigned. You can retrieve the actual port by calling \hyperlink{classcUPnPServer_f938922eff48ca1035e88677e095c0c4}{getServerAddress()}, which will give you a structure with the port in it.
+
+The server must be restarted if the IP or port changes.
+
+Returns 1 when the port is valid, 0 otherwise
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em port}]The port of the server \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the new server port is set\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_811d90c5aadc75bc48670757def1c21e}{
+\index{cUPnPServer@{cUPnPServer}!start@{start}}
+\index{start@{start}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{start}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPServer::start (void)}}
+\label{classcUPnPServer_811d90c5aadc75bc48670757def1c21e}
+
+
+Start the UPnP server
+
+This will start the UPnP server activities as a background task.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} when the server started successfully\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPServer_c5ecc7ef5d42db1fa136ff00b24d1289}{
+\index{cUPnPServer@{cUPnPServer}!stop@{stop}}
+\index{stop@{stop}!cUPnPServer@{cUPnPServer}}
+\subsubsection[{stop}]{\setlength{\rightskip}{0pt plus 5cm}void cUPnPServer::stop (void)}}
+\label{classcUPnPServer_c5ecc7ef5d42db1fa136ff00b24d1289}
+
+
+Stop the server
+
+This will stop the server. This means that open connections to any clients and open ports will be closed. 
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+server/server.h\item 
+server/server.cpp\end{CompactItemize}

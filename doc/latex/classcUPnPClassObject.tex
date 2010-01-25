@@ -1,0 +1,703 @@
+\hypertarget{classcUPnPClassObject}{
+\section{cUPnPClassObject Class Reference}
+\label{classcUPnPClassObject}\index{cUPnPClassObject@{cUPnPClassObject}}
+}
+{\tt \#include $<$object.h$>$}
+
+Inheritance diagram for cUPnPClassObject:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=400pt]{classcUPnPClassObject__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cUPnPClassObject:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUPnPClassObject__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+time\_\-t \hyperlink{classcUPnPClassObject_18c91d90256db85d1356db17b27f69c3}{modified} () const 
+\item 
+virtual int \hyperlink{classcUPnPClassObject_7297d228db4033bf8968eaee502131dd}{Compare} (const cListObject \&ListObject) const 
+\item 
+virtual cStringList $\ast$ \hyperlink{classcUPnPClassObject_4a4d2cd2e59d364050bb64a3d9dced6e}{getPropertyList} ()
+\item 
+virtual bool \hyperlink{classcUPnPClassObject_539cf36abc96b95bc8437601fed8a0f6}{getProperty} (const char $\ast$Property, char $\ast$$\ast$Value) const 
+\item 
+virtual bool \hyperlink{classcUPnPClassObject_6f2a803a0d0e148133edce23ed6c0e7c}{setProperty} (const char $\ast$Property, const char $\ast$Value)
+\item 
+virtual \hyperlink{classcUPnPClassContainer}{cUPnPClassContainer} $\ast$ \hyperlink{classcUPnPClassObject_ce6f39a8484ae48ea9801b11046cd2a6}{getContainer} ()
+\item 
+virtual IXML\_\-Node $\ast$ \hyperlink{classcUPnPClassObject_9090f5982129bc5aa15c6e19db627445}{createDIDLFragment} (IXML\_\-Document $\ast$Document, cStringList $\ast$Filter)=0
+\item 
+bool \hyperlink{classcUPnPClassObject_44f963ff6d731daca5b163ddbb1cf50f}{isContainer} ()
+\item 
+void \hyperlink{classcUPnPClassObject_6bf77953db1fd098a0ec5bc8795e6c6b}{setSortCriteria} (const char $\ast$Property, bool Descending=false)
+\item 
+void \hyperlink{classcUPnPClassObject_19295252a40ad5fd1a4870a473ac90ea}{clearSortCriteria} ()
+\item 
+int \hyperlink{classcUPnPClassObject_717c3efc5b21fc0c92ef19f1925b24c5}{setTitle} (const char $\ast$Title)
+\item 
+int \hyperlink{classcUPnPClassObject_b59e3528eda8c223f5336bd8a7d47527}{setCreator} (const char $\ast$Creator)
+\item 
+int \hyperlink{classcUPnPClassObject_40819ea39a75fc93e8c8a2ffde43732d}{setRestricted} (bool Restricted)
+\item 
+int \hyperlink{classcUPnPClassObject_4731b6c591544342da067f5abef5b661}{setWriteStatus} (int Status)
+\item 
+int \hyperlink{classcUPnPClassObject_18856f1b0320713a754a87f66b62396e}{setResources} (cList$<$ \hyperlink{classcUPnPResource}{cUPnPResource} $>$ $\ast$Resources)
+\item 
+int \hyperlink{classcUPnPClassObject_3132df806f003bde133e6724125366f2}{addResource} (\hyperlink{classcUPnPResource}{cUPnPResource} $\ast$Resource)
+\item 
+int \hyperlink{classcUPnPClassObject_5df5b5c205aaaeea44a1e5d03b7cba23}{removeResource} (\hyperlink{classcUPnPResource}{cUPnPResource} $\ast$Resource)
+\item 
+\hyperlink{structcUPnPObjectID}{cUPnPObjectID} \hyperlink{classcUPnPClassObject_8ae04f4f645c764c0179be1cbf99941a}{getID} () const 
+\item 
+\hyperlink{structcUPnPObjectID}{cUPnPObjectID} \hyperlink{classcUPnPClassObject_9eb008855499fc1afcd807cb019d7abe}{getParentID} () const 
+\item 
+\hyperlink{classcUPnPClassContainer}{cUPnPClassContainer} $\ast$ \hyperlink{classcUPnPClassObject_4787df89382fc962598fe4008a3eefd9}{getParent} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPClassObject_12312c25d2a926f4d4fe5c4e0eb46f6a}{getTitle} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPClassObject_39c9bb75681ce4517c4eff6a6bdffad7}{getClass} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPClassObject_2069a6b6653c5dcbbaa582fbc9ea3075}{getCreator} () const 
+\item 
+bool \hyperlink{classcUPnPClassObject_a5498dca2bf917a16f2a8d78f34b6516}{isRestricted} () const 
+\item 
+int \hyperlink{classcUPnPClassObject_c3ac47d3b60823e7efd31f5b58b9d331}{getWriteStatus} () const 
+\item 
+\hyperlink{classcUPnPResource}{cUPnPResource} $\ast$ \hyperlink{classcUPnPClassObject_7bce9528b984a9f943d9a1892bb592ad}{getResource} (unsigned int ResourceID) const 
+\item 
+cList$<$ \hyperlink{classcUPnPResource}{cUPnPResource} $>$ $\ast$ \hyperlink{classcUPnPClassObject_24136f55324f724bfe7129eb424f4597}{getResources} () const 
+\end{CompactItemize}
+\subsection*{Protected Member Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{classcUPnPClassObject_1e00f20de14c17cfebd4f6670d5e548d}{setID} (\hyperlink{structcUPnPObjectID}{cUPnPObjectID} ID)
+\item 
+int \hyperlink{classcUPnPClassObject_d092a68523a7e3a8bd8d1b6f79888eff}{setParent} (\hyperlink{classcUPnPClassContainer}{cUPnPClassContainer} $\ast$Parent)
+\item 
+int \hyperlink{classcUPnPClassObject_980233a73fe6b3286313f992909602ae}{setClass} (const char $\ast$Class)
+\item 
+void \hyperlink{classcUPnPClassObject_f5c5ca8dd663fe6c59ee2d29dba870e5}{setModified} (void)
+\end{CompactItemize}
+\subsection*{Protected Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPClassObject_3196f065470aac0fd027ff81225f18e1}{
+time\_\-t \hyperlink{classcUPnPClassObject_3196f065470aac0fd027ff81225f18e1}{mLastModified}}
+\label{classcUPnPClassObject_3196f065470aac0fd027ff81225f18e1}
+
+\begin{CompactList}\small\item\em The last modification of this property. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_96ccf6ef7924ae0d440a87cc88221e08}{
+\hyperlink{structcUPnPObjectID}{cUPnPObjectID} \hyperlink{classcUPnPClassObject_96ccf6ef7924ae0d440a87cc88221e08}{mID}}
+\label{classcUPnPClassObject_96ccf6ef7924ae0d440a87cc88221e08}
+
+\begin{CompactList}\small\item\em The object ID. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_bccecf0a80934f907c3ede2dfe5fc27d}{
+\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$ \hyperlink{classcUPnPClassObject_bccecf0a80934f907c3ede2dfe5fc27d}{mParent}}
+\label{classcUPnPClassObject_bccecf0a80934f907c3ede2dfe5fc27d}
+
+\begin{CompactList}\small\item\em The parent object. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_60875cd885a2ac83b5c8eba2f4b98c20}{
+cString \hyperlink{classcUPnPClassObject_60875cd885a2ac83b5c8eba2f4b98c20}{mClass}}
+\label{classcUPnPClassObject_60875cd885a2ac83b5c8eba2f4b98c20}
+
+\begin{CompactList}\small\item\em Class (Who am I?). \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_b31f0c0cb2d9761c90713a1744634ec6}{
+cString \hyperlink{classcUPnPClassObject_b31f0c0cb2d9761c90713a1744634ec6}{mTitle}}
+\label{classcUPnPClassObject_b31f0c0cb2d9761c90713a1744634ec6}
+
+\begin{CompactList}\small\item\em Object title. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_a5e80e4679babeaaee989b0591046137}{
+cString \hyperlink{classcUPnPClassObject_a5e80e4679babeaaee989b0591046137}{mCreator}}
+\label{classcUPnPClassObject_a5e80e4679babeaaee989b0591046137}
+
+\begin{CompactList}\small\item\em Creator of this object. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_d3709ce6e3c60a3cea616e437408d9b5}{
+bool \hyperlink{classcUPnPClassObject_d3709ce6e3c60a3cea616e437408d9b5}{mRestricted}}
+\label{classcUPnPClassObject_d3709ce6e3c60a3cea616e437408d9b5}
+
+\begin{CompactList}\small\item\em Ability of changing metadata? \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_63ae3b00533846717e40fdf4729d50c9}{
+int \hyperlink{classcUPnPClassObject_63ae3b00533846717e40fdf4729d50c9}{mWriteStatus}}
+\label{classcUPnPClassObject_63ae3b00533846717e40fdf4729d50c9}
+
+\begin{CompactList}\small\item\em Ability of writing resources? \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_3da123add3d4de3c6d9a6fe76c666253}{
+cList$<$ \hyperlink{classcUPnPResource}{cUPnPResource} $>$ $\ast$ \hyperlink{classcUPnPClassObject_3da123add3d4de3c6d9a6fe76c666253}{mResources}}
+\label{classcUPnPClassObject_3da123add3d4de3c6d9a6fe76c666253}
+
+\begin{CompactList}\small\item\em The resources of this object. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_36028ece195b24fa9ff01c2713a8a291}{
+cHash$<$ \hyperlink{classcUPnPResource}{cUPnPResource} $>$ $\ast$ \hyperlink{classcUPnPClassObject_36028ece195b24fa9ff01c2713a8a291}{mResourcesID}}
+\label{classcUPnPClassObject_36028ece195b24fa9ff01c2713a8a291}
+
+\begin{CompactList}\small\item\em The resources of this object as hashmap. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_21b48ab17d1d7379943aa9d4c026046a}{
+IXML\_\-Document $\ast$ \hyperlink{classcUPnPClassObject_21b48ab17d1d7379943aa9d4c026046a}{mDIDLFragment}}
+\label{classcUPnPClassObject_21b48ab17d1d7379943aa9d4c026046a}
+
+\begin{CompactList}\small\item\em The DIDL fragment of the object. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_f7156d07778825170844d35fda5959eb}{
+cString \hyperlink{classcUPnPClassObject_f7156d07778825170844d35fda5959eb}{mSortCriteria}}
+\label{classcUPnPClassObject_f7156d07778825170844d35fda5959eb}
+
+\begin{CompactList}\small\item\em The sort criteria to sort with. \item\end{CompactList}\item 
+\hypertarget{classcUPnPClassObject_0bcc859a9bb114ebf93c474137bf157c}{
+bool \hyperlink{classcUPnPClassObject_0bcc859a9bb114ebf93c474137bf157c}{mSortDescending}}
+\label{classcUPnPClassObject_0bcc859a9bb114ebf93c474137bf157c}
+
+\begin{CompactList}\small\item\em The direction of the sort. \item\end{CompactList}\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPClassObject_3d0d0aedce8b1c661ea360b9a6d616f6}{
+class \hyperlink{classcUPnPClassObject_3d0d0aedce8b1c661ea360b9a6d616f6}{cMediaDatabase}}
+\label{classcUPnPClassObject_3d0d0aedce8b1c661ea360b9a6d616f6}
+
+\item 
+\hypertarget{classcUPnPClassObject_aefab39434a832c545ac75a79fa81d23}{
+class \hyperlink{classcUPnPClassObject_aefab39434a832c545ac75a79fa81d23}{cUPnPObjectMediator}}
+\label{classcUPnPClassObject_aefab39434a832c545ac75a79fa81d23}
+
+\item 
+\hypertarget{classcUPnPClassObject_cb2ebde5758d6dc066be77d5a94d9f27}{
+class \hyperlink{classcUPnPClassObject_cb2ebde5758d6dc066be77d5a94d9f27}{cUPnPClassContainer}}
+\label{classcUPnPClassObject_cb2ebde5758d6dc066be77d5a94d9f27}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The UPnP class Object
+
+This is a UPnP class Object representation with all its properties. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPClassObject_3132df806f003bde133e6724125366f2}{
+\index{cUPnPClassObject@{cUPnPClassObject}!addResource@{addResource}}
+\index{addResource@{addResource}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{addResource}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::addResource ({\bf cUPnPResource} $\ast$ {\em Resource})}}
+\label{classcUPnPClassObject_3132df806f003bde133e6724125366f2}
+
+
+Add resource to list
+
+This adds the specified resource to the resource list of the object
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Resource}]the resource to be added \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_19295252a40ad5fd1a4870a473ac90ea}{
+\index{cUPnPClassObject@{cUPnPClassObject}!clearSortCriteria@{clearSortCriteria}}
+\index{clearSortCriteria@{clearSortCriteria}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{clearSortCriteria}]{\setlength{\rightskip}{0pt plus 5cm}void cUPnPClassObject::clearSortCriteria ()}}
+\label{classcUPnPClassObject_19295252a40ad5fd1a4870a473ac90ea}
+
+
+Clears the sort criteria
+
+Clears the property of the sort criteria and sets the descending flag to false. \hypertarget{classcUPnPClassObject_7297d228db4033bf8968eaee502131dd}{
+\index{cUPnPClassObject@{cUPnPClassObject}!Compare@{Compare}}
+\index{Compare@{Compare}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{Compare}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::Compare (const cListObject \& {\em ListObject}) const\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassObject_7297d228db4033bf8968eaee502131dd}
+
+
+Compares a object
+
+This compares a given object with this object It uses the SortCriteria to compare them.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt $>$0},} if the object comes after this one\item {\bf {\tt 0},} if the objects have the same property\item {\bf {\tt $<$0},} if the object comes before this one \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ListObject}]the object to compare with \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_9090f5982129bc5aa15c6e19db627445}{
+\index{cUPnPClassObject@{cUPnPClassObject}!createDIDLFragment@{createDIDLFragment}}
+\index{createDIDLFragment@{createDIDLFragment}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{createDIDLFragment}]{\setlength{\rightskip}{0pt plus 5cm}virtual IXML\_\-Node$\ast$ cUPnPClassObject::createDIDLFragment (IXML\_\-Document $\ast$ {\em Document}, \/  cStringList $\ast$ {\em Filter})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcUPnPClassObject_9090f5982129bc5aa15c6e19db627445}
+
+
+Create the DIDL fragment
+
+This creates the DIDL-Lite fragment of the object. The DIDL is written to the specified {\em IXML\/} document. The details of the output can be controlled via the filter stringlist
+
+\begin{Desc}
+\item[Returns:]the DIDL fragment of the object \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Document}]the IXML document where to write the contents \item[{\em Filter}]the string list with the filter criteria \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcUPnPClassItem_5385975d79cd8e8b78429ecfe11b30a7}{cUPnPClassItem}, and \hyperlink{classcUPnPClassContainer_fec5b0bae4ed2d194bfc9973f14a3926}{cUPnPClassContainer}.\hypertarget{classcUPnPClassObject_39c9bb75681ce4517c4eff6a6bdffad7}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getClass@{getClass}}
+\index{getClass@{getClass}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getClass}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPClassObject::getClass () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_39c9bb75681ce4517c4eff6a6bdffad7}
+
+
+Get the object class
+
+This returns the object class of the object. The classes are defined by the UPnP Working Committee. However, custom classes which are derived from a standardized class are also possible.
+
+\begin{Desc}
+\item[Returns:]the class of the object \end{Desc}
+\hypertarget{classcUPnPClassObject_ce6f39a8484ae48ea9801b11046cd2a6}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getContainer@{getContainer}}
+\index{getContainer@{getContainer}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getContainer}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf cUPnPClassContainer}$\ast$ cUPnPClassObject::getContainer ()\hspace{0.3cm}{\tt  \mbox{[}inline, virtual\mbox{]}}}}
+\label{classcUPnPClassObject_ce6f39a8484ae48ea9801b11046cd2a6}
+
+
+Converts to container
+
+This will convert the object into a container if it is one. If not, it returns {\bf {\tt NULL}.} 
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt NULL},} if it is not a container\item a container representation of this object \end{itemize}
+\end{Desc}
+
+
+Reimplemented in \hyperlink{classcUPnPClassContainer_32eb7f1d0b3821f0d9573fe59befdf10}{cUPnPClassContainer}.\hypertarget{classcUPnPClassObject_2069a6b6653c5dcbbaa582fbc9ea3075}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getCreator@{getCreator}}
+\index{getCreator@{getCreator}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getCreator}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPClassObject::getCreator () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_2069a6b6653c5dcbbaa582fbc9ea3075}
+
+
+Get the creator
+
+This returns the creator of the object. Usually, this is the primary content creator or the owner of the object
+
+\begin{Desc}
+\item[Returns:]the creator of the object \end{Desc}
+\hypertarget{classcUPnPClassObject_8ae04f4f645c764c0179be1cbf99941a}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getID@{getID}}
+\index{getID@{getID}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getID}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPObjectID} cUPnPClassObject::getID () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_8ae04f4f645c764c0179be1cbf99941a}
+
+
+Get the object ID
+
+This returns the object ID of the object.
+
+\begin{Desc}
+\item[Returns:]the object ID \end{Desc}
+\hypertarget{classcUPnPClassObject_4787df89382fc962598fe4008a3eefd9}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getParent@{getParent}}
+\index{getParent@{getParent}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getParent}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPClassContainer}$\ast$ cUPnPClassObject::getParent () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_4787df89382fc962598fe4008a3eefd9}
+
+
+Get the parent object
+
+This returns the parent container object, associated with this object. It is {\bf {\tt NULL},} if the object is the root object.
+
+\begin{Desc}
+\item[Returns:]the parent object \end{Desc}
+\hypertarget{classcUPnPClassObject_9eb008855499fc1afcd807cb019d7abe}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getParentID@{getParentID}}
+\index{getParentID@{getParentID}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getParentID}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPObjectID} cUPnPClassObject::getParentID () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_9eb008855499fc1afcd807cb019d7abe}
+
+
+Get the parent ID
+
+This returns the ID of the parent container object, associated with this object. It is {\bf {\tt -1},} if the object is the root object.
+
+\begin{Desc}
+\item[Returns:]the parent ID \end{Desc}
+\hypertarget{classcUPnPClassObject_539cf36abc96b95bc8437601fed8a0f6}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getProperty@{getProperty}}
+\index{getProperty@{getProperty}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getProperty}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPClassObject::getProperty (const char $\ast$ {\em Property}, \/  char $\ast$$\ast$ {\em Value}) const\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassObject_539cf36abc96b95bc8437601fed8a0f6}
+
+
+Gets a property
+
+Returns the value of a specified property. The value is converted into a string.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the property exists\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Property}]the property which should be returned \item[{\em Value}]the value of that property \end{description}
+\end{Desc}
+
+
+Reimplemented in \hyperlink{classcUPnPClassItem_31f7010baa65cc25b95a864f05eb4e62}{cUPnPClassItem}, \hyperlink{classcUPnPClassContainer_f70297d2275e083f05024524d21118d7}{cUPnPClassContainer}, \hyperlink{classcUPnPClassVideoItem_94ab2ffcbe14abb63c680e6748e70ef1}{cUPnPClassVideoItem}, \hyperlink{classcUPnPClassMovie_b4c1d5a973856469b93d2033b65d7ba2}{cUPnPClassMovie}, and \hyperlink{classcUPnPClassVideoBroadcast_e1d13a13de094337cea6be214c4da0f0}{cUPnPClassVideoBroadcast}.\hypertarget{classcUPnPClassObject_4a4d2cd2e59d364050bb64a3d9dced6e}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getPropertyList@{getPropertyList}}
+\index{getPropertyList@{getPropertyList}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getPropertyList}]{\setlength{\rightskip}{0pt plus 5cm}cStringList $\ast$ cUPnPClassObject::getPropertyList ()\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassObject_4a4d2cd2e59d364050bb64a3d9dced6e}
+
+
+Get the properties of the object
+
+This returns a property list with all the properties which can be obtained or set with {\tt getProperty} or {\tt setProperty}.
+
+\begin{Desc}
+\item[Returns:]a stringlist with the properties \end{Desc}
+
+
+Reimplemented in \hyperlink{classcUPnPClassItem_add0c9d378036e270e6f99d8d1409e3b}{cUPnPClassItem}, \hyperlink{classcUPnPClassContainer_d952c993314a9352d13f644bb95fbdc2}{cUPnPClassContainer}, \hyperlink{classcUPnPClassVideoItem_9dc397419b45535a3e6a676667b619a4}{cUPnPClassVideoItem}, \hyperlink{classcUPnPClassMovie_b62e6dac175090b82c47f955e29c146c}{cUPnPClassMovie}, and \hyperlink{classcUPnPClassVideoBroadcast_192f6a04c87fe8d56f99c71337cf0f68}{cUPnPClassVideoBroadcast}.\hypertarget{classcUPnPClassObject_7bce9528b984a9f943d9a1892bb592ad}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getResource@{getResource}}
+\index{getResource@{getResource}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getResource}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPResource}$\ast$ cUPnPClassObject::getResource (unsigned int {\em ResourceID}) const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_7bce9528b984a9f943d9a1892bb592ad}
+
+
+Get a resource by its ID
+
+Returns the resource with the specified resource ID.
+
+\begin{Desc}
+\item[Returns:]the resource by ID \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ResourceID}]the resource ID of the demanded resource \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_24136f55324f724bfe7129eb424f4597}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getResources@{getResources}}
+\index{getResources@{getResources}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getResources}]{\setlength{\rightskip}{0pt plus 5cm}cList$<${\bf cUPnPResource}$>$$\ast$ cUPnPClassObject::getResources () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_24136f55324f724bfe7129eb424f4597}
+
+
+Get the resources
+
+This returns a list with resources associated with this object.
+
+\begin{Desc}
+\item[Returns:]the resources of this object \end{Desc}
+\hypertarget{classcUPnPClassObject_12312c25d2a926f4d4fe5c4e0eb46f6a}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getTitle@{getTitle}}
+\index{getTitle@{getTitle}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getTitle}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPClassObject::getTitle () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_12312c25d2a926f4d4fe5c4e0eb46f6a}
+
+
+Get the title
+
+This returns the title of the object. This may be the title of an item or the folder name in case of a container.
+
+\begin{Desc}
+\item[Returns:]the title of the object \end{Desc}
+\hypertarget{classcUPnPClassObject_c3ac47d3b60823e7efd31f5b58b9d331}{
+\index{cUPnPClassObject@{cUPnPClassObject}!getWriteStatus@{getWriteStatus}}
+\index{getWriteStatus@{getWriteStatus}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{getWriteStatus}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::getWriteStatus () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_c3ac47d3b60823e7efd31f5b58b9d331}
+
+
+Get write status
+
+This returns the write status of the object. It gives information, if the resource is modifiable.
+
+\begin{Desc}
+\item[Returns:]the write status \end{Desc}
+\hypertarget{classcUPnPClassObject_44f963ff6d731daca5b163ddbb1cf50f}{
+\index{cUPnPClassObject@{cUPnPClassObject}!isContainer@{isContainer}}
+\index{isContainer@{isContainer}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{isContainer}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPClassObject::isContainer ()\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_44f963ff6d731daca5b163ddbb1cf50f}
+
+
+Is this a container?
+
+Returns if this object is a container or not
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if it is a container\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_a5498dca2bf917a16f2a8d78f34b6516}{
+\index{cUPnPClassObject@{cUPnPClassObject}!isRestricted@{isRestricted}}
+\index{isRestricted@{isRestricted}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{isRestricted}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPClassObject::isRestricted () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_a5498dca2bf917a16f2a8d78f34b6516}
+
+
+Is the resource restricted?
+
+Returns {\bf {\tt true},} if the object is restricted or {\bf {\tt false},} otherwise. When the object is restricted, then modifications to the metadata of the object are disallowed.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the object is restricted\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_18c91d90256db85d1356db17b27f69c3}{
+\index{cUPnPClassObject@{cUPnPClassObject}!modified@{modified}}
+\index{modified@{modified}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{modified}]{\setlength{\rightskip}{0pt plus 5cm}time\_\-t cUPnPClassObject::modified () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPClassObject_18c91d90256db85d1356db17b27f69c3}
+
+
+Last modified
+
+Returns when the object was modified the last time.
+
+\begin{Desc}
+\item[Returns:]last modification timestamp \end{Desc}
+\hypertarget{classcUPnPClassObject_5df5b5c205aaaeea44a1e5d03b7cba23}{
+\index{cUPnPClassObject@{cUPnPClassObject}!removeResource@{removeResource}}
+\index{removeResource@{removeResource}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{removeResource}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::removeResource ({\bf cUPnPResource} $\ast$ {\em Resource})}}
+\label{classcUPnPClassObject_5df5b5c205aaaeea44a1e5d03b7cba23}
+
+
+Remove resource from list
+
+This removes the specified resource from the resource list of the object
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Resource}]the resource to be removed \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_980233a73fe6b3286313f992909602ae}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setClass@{setClass}}
+\index{setClass@{setClass}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setClass}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setClass (const char $\ast$ {\em Class})\hspace{0.3cm}{\tt  \mbox{[}protected\mbox{]}}}}
+\label{classcUPnPClassObject_980233a73fe6b3286313f992909602ae}
+
+
+Set the object class
+
+This is only allowed by mediators and the media database. Manually editing the object class may result in unpredictable behavior.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Class}]the class of this object \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_b59e3528eda8c223f5336bd8a7d47527}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setCreator@{setCreator}}
+\index{setCreator@{setCreator}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setCreator}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setCreator (const char $\ast$ {\em Creator})}}
+\label{classcUPnPClassObject_b59e3528eda8c223f5336bd8a7d47527}
+
+
+Set the creator
+
+The creator of an object is primarily the creator or owner of the object
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Creator}]the creator of the object \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_1e00f20de14c17cfebd4f6670d5e548d}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setID@{setID}}
+\index{setID@{setID}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setID}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setID ({\bf cUPnPObjectID} {\em ID})\hspace{0.3cm}{\tt  \mbox{[}protected\mbox{]}}}}
+\label{classcUPnPClassObject_1e00f20de14c17cfebd4f6670d5e548d}
+
+
+Set the Object ID
+
+This is only allowed by mediators and the media database. Manually editing the object ID may result in unpredictable behavior.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ID}]the ObjectID of this object \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_f5c5ca8dd663fe6c59ee2d29dba870e5}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setModified@{setModified}}
+\index{setModified@{setModified}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setModified}]{\setlength{\rightskip}{0pt plus 5cm}void cUPnPClassObject::setModified (void)\hspace{0.3cm}{\tt  \mbox{[}inline, protected\mbox{]}}}}
+\label{classcUPnPClassObject_f5c5ca8dd663fe6c59ee2d29dba870e5}
+
+
+Set the modification time
+
+This sets the last modification time to the current timestamp. This is used to indicate when the object was updated the last time. \hypertarget{classcUPnPClassObject_d092a68523a7e3a8bd8d1b6f79888eff}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setParent@{setParent}}
+\index{setParent@{setParent}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setParent}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setParent ({\bf cUPnPClassContainer} $\ast$ {\em Parent})\hspace{0.3cm}{\tt  \mbox{[}protected\mbox{]}}}}
+\label{classcUPnPClassObject_d092a68523a7e3a8bd8d1b6f79888eff}
+
+
+Set the Parent Object
+
+This is only allowed by mediators and the media database. Manually editing the parent may result in unpredictable behavior.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Parent}]the parent of this object \end{description}
+\end{Desc}
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_6f2a803a0d0e148133edce23ed6c0e7c}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setProperty@{setProperty}}
+\index{setProperty@{setProperty}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setProperty}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPClassObject::setProperty (const char $\ast$ {\em Property}, \/  const char $\ast$ {\em Value})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcUPnPClassObject_6f2a803a0d0e148133edce23ed6c0e7c}
+
+
+Sets a property
+
+Sets the value of a specified property. The value is converted from string into the propper data type
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if the property exists\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Property}]the property which should be set \item[{\em Value}]the value of that property \end{description}
+\end{Desc}
+
+
+Reimplemented in \hyperlink{classcUPnPClassItem_ab17057659c17792a5b67f4297ade642}{cUPnPClassItem}, \hyperlink{classcUPnPClassContainer_488761ebb4f074ded0d5374f862a1b54}{cUPnPClassContainer}, \hyperlink{classcUPnPClassVideoItem_3cbda6d87f5a9ff0475a75e76ba19924}{cUPnPClassVideoItem}, \hyperlink{classcUPnPClassMovie_d7f990edda85f2caabe822d2ceeb2b0d}{cUPnPClassMovie}, and \hyperlink{classcUPnPClassVideoBroadcast_ce7a341834e448479d3c8f4f0254ce43}{cUPnPClassVideoBroadcast}.\hypertarget{classcUPnPClassObject_18856f1b0320713a754a87f66b62396e}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setResources@{setResources}}
+\index{setResources@{setResources}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setResources}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setResources (cList$<$ {\bf cUPnPResource} $>$ $\ast$ {\em Resources})}}
+\label{classcUPnPClassObject_18856f1b0320713a754a87f66b62396e}
+
+
+Set the resources
+
+This sets the list of resources of an object. The list usally contain a single resource. However, multiple resources a also very common.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Resources}]the resource list of this object \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_40819ea39a75fc93e8c8a2ffde43732d}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setRestricted@{setRestricted}}
+\index{setRestricted@{setRestricted}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setRestricted}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setRestricted (bool {\em Restricted})}}
+\label{classcUPnPClassObject_40819ea39a75fc93e8c8a2ffde43732d}
+
+
+Set the restriction
+
+This sets the restriction flag. If the object is restricted, no modifications to its metadata by the user are allowed.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Restricted}]{\bf {\tt true},} to disallow modification, {\bf {\tt false} to} allow it \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_6bf77953db1fd098a0ec5bc8795e6c6b}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setSortCriteria@{setSortCriteria}}
+\index{setSortCriteria@{setSortCriteria}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setSortCriteria}]{\setlength{\rightskip}{0pt plus 5cm}void cUPnPClassObject::setSortCriteria (const char $\ast$ {\em Property}, \/  bool {\em Descending} = {\tt false})}}
+\label{classcUPnPClassObject_6bf77953db1fd098a0ec5bc8795e6c6b}
+
+
+Set the sort criteria
+
+This sets a certain criteria which the object can be compared with.
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Property}]the property to sort after \item[{\em Descending}]sort the objects in descending order \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_717c3efc5b21fc0c92ef19f1925b24c5}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setTitle@{setTitle}}
+\index{setTitle@{setTitle}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setTitle}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setTitle (const char $\ast$ {\em Title})}}
+\label{classcUPnPClassObject_717c3efc5b21fc0c92ef19f1925b24c5}
+
+
+Set the title
+
+This sets the title of the object. It is a required metadata information. It must not be {\bf {\tt NULL} or} an empty string.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Title}]the title of the object \end{description}
+\end{Desc}
+\hypertarget{classcUPnPClassObject_4731b6c591544342da067f5abef5b661}{
+\index{cUPnPClassObject@{cUPnPClassObject}!setWriteStatus@{setWriteStatus}}
+\index{setWriteStatus@{setWriteStatus}!cUPnPClassObject@{cUPnPClassObject}}
+\subsubsection[{setWriteStatus}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPClassObject::setWriteStatus (int {\em Status})}}
+\label{classcUPnPClassObject_4731b6c591544342da067f5abef5b661}
+
+
+Set the write status
+
+This sets the write status of a resource. With this indicator, you can set the modifiabilty of resources by a control point.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt 0},} if setting was successful\item {\bf {\tt $<$0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Status}]the write status \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/object.h\item 
+database/object.cpp\end{CompactItemize}

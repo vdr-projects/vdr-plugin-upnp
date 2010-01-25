@@ -1,0 +1,145 @@
+\hypertarget{classcMediatorInterface}{
+\section{cMediatorInterface Class Reference}
+\label{classcMediatorInterface}\index{cMediatorInterface@{cMediatorInterface}}
+}
+{\tt \#include $<$object.h$>$}
+
+Inheritance diagram for cMediatorInterface:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=400pt]{classcMediatorInterface__inherit__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+virtual \hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$ \hyperlink{classcMediatorInterface_68a8350f7ea5ccd2496580035228b1fc}{createObject} (const char $\ast$Title, bool Restricted)=0
+\item 
+virtual \hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$ \hyperlink{classcMediatorInterface_716ad95bf6ac5a10e9409ced7a63a9d8}{getObject} (\hyperlink{structcUPnPObjectID}{cUPnPObjectID} ID)=0
+\item 
+virtual int \hyperlink{classcMediatorInterface_a2f40e697f499c64cfd007aa70e3da7e}{saveObject} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object)=0
+\item 
+virtual int \hyperlink{classcMediatorInterface_ffbddb7fe72554b9cde9d02648cf8f0e}{deleteObject} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object)=0
+\item 
+virtual int \hyperlink{classcMediatorInterface_cd087c690154d43ac5ef92c5a42f2349}{clearObject} (\hyperlink{classcUPnPClassObject}{cUPnPClassObject} $\ast$Object)=0
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+Mediator interface
+
+This is an interface for mediators used to communicate with the database. A mediator is applied to get, create, save or delete an UPnP object. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcMediatorInterface_cd087c690154d43ac5ef92c5a42f2349}{
+\index{cMediatorInterface@{cMediatorInterface}!clearObject@{clearObject}}
+\index{clearObject@{clearObject}!cMediatorInterface@{cMediatorInterface}}
+\subsubsection[{clearObject}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cMediatorInterface::clearObject ({\bf cUPnPClassObject} $\ast$ {\em Object})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcMediatorInterface_cd087c690154d43ac5ef92c5a42f2349}
+
+
+Clears the object
+
+This clears the object, i.e. all its children will be removed and deleted from the database
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt $<$0},} in case of an error\item {\bf {\tt 0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object to be cleared \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcUPnPObjectMediator_9ab720e86c6d6cb397799ac5070f70aa}{cUPnPObjectMediator}.\hypertarget{classcMediatorInterface_68a8350f7ea5ccd2496580035228b1fc}{
+\index{cMediatorInterface@{cMediatorInterface}!createObject@{createObject}}
+\index{createObject@{createObject}!cMediatorInterface@{cMediatorInterface}}
+\subsubsection[{createObject}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf cUPnPClassObject}$\ast$ cMediatorInterface::createObject (const char $\ast$ {\em Title}, \/  bool {\em Restricted})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcMediatorInterface_68a8350f7ea5ccd2496580035228b1fc}
+
+
+Creates an object
+
+This creates a new UPnP object with the specific title and the restriction.
+
+\begin{Desc}
+\item[Returns:]the newly created object \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Title}]the title of that object \item[{\em Restricted}]the restriction of the object \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcUPnPObjectMediator_bfbca3f1cbadacee2b21306364750f26}{cUPnPObjectMediator}, \hyperlink{classcUPnPItemMediator_e2fd4cf5e6435f1eeadd11f9a99cd2db}{cUPnPItemMediator}, \hyperlink{classcUPnPVideoItemMediator_27e001142c3651c36dfd3b7c450414c0}{cUPnPVideoItemMediator}, \hyperlink{classcUPnPVideoBroadcastMediator_14fefa90807d40d91a80712729af2beb}{cUPnPVideoBroadcastMediator}, \hyperlink{classcUPnPMovieMediator_29d40a311b7283cc4fba36860ac8c935}{cUPnPMovieMediator}, and \hyperlink{classcUPnPContainerMediator_751177c725da94b1b91f6cda4645844d}{cUPnPContainerMediator}.\hypertarget{classcMediatorInterface_ffbddb7fe72554b9cde9d02648cf8f0e}{
+\index{cMediatorInterface@{cMediatorInterface}!deleteObject@{deleteObject}}
+\index{deleteObject@{deleteObject}!cMediatorInterface@{cMediatorInterface}}
+\subsubsection[{deleteObject}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cMediatorInterface::deleteObject ({\bf cUPnPClassObject} $\ast$ {\em Object})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcMediatorInterface_ffbddb7fe72554b9cde9d02648cf8f0e}
+
+
+Deletes the object
+
+This deletes the object in the database by removing all its children and then deleting the contents from the database
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt $<$0},} in case of an error\item {\bf {\tt 0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object to be deleted \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcUPnPObjectMediator_0d2f9d72a678002456cbdeccb2c6e5fe}{cUPnPObjectMediator}.\hypertarget{classcMediatorInterface_716ad95bf6ac5a10e9409ced7a63a9d8}{
+\index{cMediatorInterface@{cMediatorInterface}!getObject@{getObject}}
+\index{getObject@{getObject}!cMediatorInterface@{cMediatorInterface}}
+\subsubsection[{getObject}]{\setlength{\rightskip}{0pt plus 5cm}virtual {\bf cUPnPClassObject}$\ast$ cMediatorInterface::getObject ({\bf cUPnPObjectID} {\em ID})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcMediatorInterface_716ad95bf6ac5a10e9409ced7a63a9d8}
+
+
+Get an object
+
+Retrieves a UPnP object from the database and stores its information in the object. The object is obtained via its object ID.
+
+\begin{Desc}
+\item[Returns:]the object, found in the database \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em ID}]the object ID \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcUPnPObjectMediator_5b4fff612476fb51690919f9c59899a5}{cUPnPObjectMediator}, \hyperlink{classcUPnPItemMediator_81411b2a472ade71d73a9c8ddc2a7990}{cUPnPItemMediator}, \hyperlink{classcUPnPVideoItemMediator_dd8927340a69d247965ef9250adefb21}{cUPnPVideoItemMediator}, \hyperlink{classcUPnPVideoBroadcastMediator_c13bf0f008f49b0ab499542391998a24}{cUPnPVideoBroadcastMediator}, \hyperlink{classcUPnPMovieMediator_d85b240eb54efd9ab46c440b51c71e83}{cUPnPMovieMediator}, and \hyperlink{classcUPnPContainerMediator_78b71f96fb4289dc78f897d6282078d6}{cUPnPContainerMediator}.\hypertarget{classcMediatorInterface_a2f40e697f499c64cfd007aa70e3da7e}{
+\index{cMediatorInterface@{cMediatorInterface}!saveObject@{saveObject}}
+\index{saveObject@{saveObject}!cMediatorInterface@{cMediatorInterface}}
+\subsubsection[{saveObject}]{\setlength{\rightskip}{0pt plus 5cm}virtual int cMediatorInterface::saveObject ({\bf cUPnPClassObject} $\ast$ {\em Object})\hspace{0.3cm}{\tt  \mbox{[}pure virtual\mbox{]}}}}
+\label{classcMediatorInterface_a2f40e697f499c64cfd007aa70e3da7e}
+
+
+Saves the object
+
+This saves the object in the database by updating the values in the database with those in the object.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt $<$0},} in case of an error\item {\bf {\tt 0},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Object}]the object to be saved \end{description}
+\end{Desc}
+
+
+Implemented in \hyperlink{classcUPnPObjectMediator_c200f88239b8940d9d38cbe04c3e961e}{cUPnPObjectMediator}.
+
+The documentation for this class was generated from the following file:\begin{CompactItemize}
+\item 
+database/object.h\end{CompactItemize}

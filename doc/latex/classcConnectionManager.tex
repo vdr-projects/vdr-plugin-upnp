@@ -1,0 +1,124 @@
+\hypertarget{classcConnectionManager}{
+\section{cConnectionManager Class Reference}
+\label{classcConnectionManager}\index{cConnectionManager@{cConnectionManager}}
+}
+{\tt \#include $<$connectionmanager.h$>$}
+
+Inheritance diagram for cConnectionManager:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcConnectionManager__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cConnectionManager:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcConnectionManager__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{classcConnectionManager_2d6d4af3110c40c399a3e4e203283ff1}{cConnectionManager} (UpnpDevice\_\-Handle DeviceHandle)
+\item 
+virtual int \hyperlink{classcConnectionManager_7990eba09a100e5e4ee5b01b87bcc16e}{subscribe} (Upnp\_\-Subscription\_\-Request $\ast$Request)
+\item 
+virtual int \hyperlink{classcConnectionManager_12fa6b0a9e20c3af663e3ca2b3c97dfb}{execute} (Upnp\_\-Action\_\-Request $\ast$Request)
+\item 
+virtual void \hyperlink{classcConnectionManager_02014a637c6cb04cbfe10b3cb4ce6d1d}{setError} (Upnp\_\-Action\_\-Request $\ast$Request, int Error)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The connection manager service
+
+This is the connection manager service which handles all incoming connection, creates and destroys connections to clients. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcConnectionManager_2d6d4af3110c40c399a3e4e203283ff1}{
+\index{cConnectionManager@{cConnectionManager}!cConnectionManager@{cConnectionManager}}
+\index{cConnectionManager@{cConnectionManager}!cConnectionManager@{cConnectionManager}}
+\subsubsection[{cConnectionManager}]{\setlength{\rightskip}{0pt plus 5cm}cConnectionManager::cConnectionManager (UpnpDevice\_\-Handle {\em DeviceHandle})}}
+\label{classcConnectionManager_2d6d4af3110c40c399a3e4e203283ff1}
+
+
+Constructor of a Connection manager
+
+This creates an instance of a {\em Connection Manager Service\/} and provides interfaces for executing actions and subscribing on events. \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em DeviceHandle}]the UPnP device handle of this root device \end{description}
+\end{Desc}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classcConnectionManager_12fa6b0a9e20c3af663e3ca2b3c97dfb}{
+\index{cConnectionManager@{cConnectionManager}!execute@{execute}}
+\index{execute@{execute}!cConnectionManager@{cConnectionManager}}
+\subsubsection[{execute}]{\setlength{\rightskip}{0pt plus 5cm}int cConnectionManager::execute (Upnp\_\-Action\_\-Request $\ast$ {\em Request})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcConnectionManager_12fa6b0a9e20c3af663e3ca2b3c97dfb}
+
+
+Executes an action
+
+This executes an action initialized by a control point. The result is stored in the first parameter.
+
+\begin{Desc}
+\item[Returns:]An integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if subscription was okay\item or any other non null value in case of an error\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Input and output parameters of an action \end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcUpnpService_bbffca233e6aa193eda223cb7bfc2917}{cUpnpService}.\hypertarget{classcConnectionManager_02014a637c6cb04cbfe10b3cb4ce6d1d}{
+\index{cConnectionManager@{cConnectionManager}!setError@{setError}}
+\index{setError@{setError}!cConnectionManager@{cConnectionManager}}
+\subsubsection[{setError}]{\setlength{\rightskip}{0pt plus 5cm}void cConnectionManager::setError (Upnp\_\-Action\_\-Request $\ast$ {\em Request}, \/  int {\em Error})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcConnectionManager_02014a637c6cb04cbfe10b3cb4ce6d1d}
+
+
+Sets an error on an action request
+
+This function puts a error message into the action request structure according to its error code
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]the action request, to set the error for \item[{\em Error}]the error code of which the message should be obtained \end{description}
+\end{Desc}
+ 
+
+Reimplemented from \hyperlink{classcUpnpService_f0976057350505eca781aafcaf6b1d14}{cUpnpService}.\hypertarget{classcConnectionManager_7990eba09a100e5e4ee5b01b87bcc16e}{
+\index{cConnectionManager@{cConnectionManager}!subscribe@{subscribe}}
+\index{subscribe@{subscribe}!cConnectionManager@{cConnectionManager}}
+\subsubsection[{subscribe}]{\setlength{\rightskip}{0pt plus 5cm}int cConnectionManager::subscribe (Upnp\_\-Subscription\_\-Request $\ast$ {\em Request})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcConnectionManager_7990eba09a100e5e4ee5b01b87bcc16e}
+
+
+Subscribes to an event
+
+This is a callback function to register a new subscriber for an event.
+
+\begin{Desc}
+\item[Returns:]An integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if subscription was okay\item or any other non null value in case of an error\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Information about the subscription \end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcUpnpService_e6d3522d580e5975f5a38d5bea88e29d}{cUpnpService}.
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+upnpcomponents/connectionmanager.h\item 
+upnpcomponents/connectionmanager.cpp\end{CompactItemize}

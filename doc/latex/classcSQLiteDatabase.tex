@@ -1,0 +1,224 @@
+\hypertarget{classcSQLiteDatabase}{
+\section{cSQLiteDatabase Class Reference}
+\label{classcSQLiteDatabase}\index{cSQLiteDatabase@{cSQLiteDatabase}}
+}
+{\tt \#include $<$database.h$>$}
+
+Collaboration diagram for cSQLiteDatabase:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcSQLiteDatabase__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+int \hyperlink{classcSQLiteDatabase_2119fbbf7a02c9c627038ddc14c9eb48}{getResultCount} () const 
+\item 
+long \hyperlink{classcSQLiteDatabase_408e5de345a74f2540ee1cea3c97cd51}{getLastInsertRowID} () const 
+\item 
+\hyperlink{classcRows}{cRows} $\ast$ \hyperlink{classcSQLiteDatabase_4cd24d9d63173c54b63aadc7ada86e7e}{getResultRows} () const 
+\item 
+int \hyperlink{classcSQLiteDatabase_33ac864ee86fe3f08f66f1c14fcfc331}{execStatement} (const char $\ast$Statement,...)
+\item 
+void \hyperlink{classcSQLiteDatabase_5c481c06d73cff4f1192409bfc23a15a}{startTransaction} ()
+\item 
+void \hyperlink{classcSQLiteDatabase_f11b7090ae824f7f3fc094dc7112323a}{commitTransaction} ()
+\item 
+void \hyperlink{classcSQLiteDatabase_e20eff598832e1da41a8e915ee807548}{rollbackTransaction} ()
+\item 
+void \hyperlink{classcSQLiteDatabase_b1749baadeb733ea3efdbbd9ffe83253}{setAutoCommit} (bool Commit=true)
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static const char $\ast$ \hyperlink{classcSQLiteDatabase_cdc42326657aea81fd26da6500642381}{sprintf} (const char $\ast$Format,...)
+\item 
+static \hyperlink{classcSQLiteDatabase}{cSQLiteDatabase} $\ast$ \hyperlink{classcSQLiteDatabase_a39756509bd68fd8e335cc9cc40c6f26}{getInstance} ()
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcSQLiteDatabase_e652fe93205a32a144bf764782bea797}{
+class \textbf{cStatement}}
+\label{classcSQLiteDatabase_e652fe93205a32a144bf764782bea797}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+SQLite Database
+
+This is a wrapper class for a SQLite3 database connection It supports simple execution functions.
+
+On requests with returns any results a instance of {\tt cRows$\ast$} will be created. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcSQLiteDatabase_f11b7090ae824f7f3fc094dc7112323a}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!commitTransaction@{commitTransaction}}
+\index{commitTransaction@{commitTransaction}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{commitTransaction}]{\setlength{\rightskip}{0pt plus 5cm}void cSQLiteDatabase::commitTransaction ()}}
+\label{classcSQLiteDatabase_f11b7090ae824f7f3fc094dc7112323a}
+
+
+Commits a transaction
+
+This function commits the transaction and writes all changes to the database
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcSQLiteDatabase_5c481c06d73cff4f1192409bfc23a15a}{cSQLiteDatabase::startTransaction} \end{Desc}
+\hypertarget{classcSQLiteDatabase_33ac864ee86fe3f08f66f1c14fcfc331}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!execStatement@{execStatement}}
+\index{execStatement@{execStatement}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{execStatement}]{\setlength{\rightskip}{0pt plus 5cm}int cSQLiteDatabase::execStatement (const char $\ast$ {\em Statement}, \/   {\em ...})}}
+\label{classcSQLiteDatabase_33ac864ee86fe3f08f66f1c14fcfc331}
+
+
+Executes a SQL statement
+
+This will execute the statement in the first parameter. If it is followed by any optional parameters it will be formated using the same function as in {\tt \hyperlink{classcSQLiteDatabase_cdc42326657aea81fd26da6500642381}{cSQLiteDatabase::sprintf()}}.
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcSQLiteDatabase_cdc42326657aea81fd26da6500642381}{cSQLiteDatabase::sprintf()}.\end{Desc}
+\begin{Desc}
+\item[Returns:]returns an integer representing\begin{itemize}
+\item {\bf {\tt -1},} in case of an error\item {\bf {\tt 0},} when the statement was executed successfuly \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Statement}]Statement to be executed \end{description}
+\end{Desc}
+\hypertarget{classcSQLiteDatabase_a39756509bd68fd8e335cc9cc40c6f26}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!getInstance@{getInstance}}
+\index{getInstance@{getInstance}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{getInstance}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cSQLiteDatabase} $\ast$ cSQLiteDatabase::getInstance ()\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcSQLiteDatabase_a39756509bd68fd8e335cc9cc40c6f26}
+
+
+Returns the instance of the database
+
+Returns the instance of the SQLite database. This will create a single instance of none is existing on the very first call. A subsequent call will return the same instance.
+
+\begin{Desc}
+\item[Returns:]the database instance \end{Desc}
+\hypertarget{classcSQLiteDatabase_408e5de345a74f2540ee1cea3c97cd51}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!getLastInsertRowID@{getLastInsertRowID}}
+\index{getLastInsertRowID@{getLastInsertRowID}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{getLastInsertRowID}]{\setlength{\rightskip}{0pt plus 5cm}long cSQLiteDatabase::getLastInsertRowID () const}}
+\label{classcSQLiteDatabase_408e5de345a74f2540ee1cea3c97cd51}
+
+
+The last {\tt INSERT} RowID
+
+Returns the primary key of the last inserted row. This will only work if there are no successive calls to the database.
+
+\begin{Desc}
+\item[Returns:]the last insert RowID \end{Desc}
+\hypertarget{classcSQLiteDatabase_2119fbbf7a02c9c627038ddc14c9eb48}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!getResultCount@{getResultCount}}
+\index{getResultCount@{getResultCount}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{getResultCount}]{\setlength{\rightskip}{0pt plus 5cm}int cSQLiteDatabase::getResultCount () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcSQLiteDatabase_2119fbbf7a02c9c627038ddc14c9eb48}
+
+
+Row count of the last result
+
+Returns the row count of the last \{{\tt SQL} SELECT\} request.
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcRows}{cRows} \end{Desc}
+\begin{Desc}
+\item[Returns:]the result row count \end{Desc}
+\hypertarget{classcSQLiteDatabase_4cd24d9d63173c54b63aadc7ada86e7e}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!getResultRows@{getResultRows}}
+\index{getResultRows@{getResultRows}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{getResultRows}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cRows}$\ast$ cSQLiteDatabase::getResultRows () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcSQLiteDatabase_4cd24d9d63173c54b63aadc7ada86e7e}
+
+
+Result set of the last request
+
+Returns the result rows of the SQL SELECT request. This might be NULL, if the last statement was not a SELECT.
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcRows}{cRows} \end{Desc}
+\begin{Desc}
+\item[Returns:]the result rows of the last {\tt SELECT} statement. \end{Desc}
+\hypertarget{classcSQLiteDatabase_e20eff598832e1da41a8e915ee807548}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!rollbackTransaction@{rollbackTransaction}}
+\index{rollbackTransaction@{rollbackTransaction}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{rollbackTransaction}]{\setlength{\rightskip}{0pt plus 5cm}void cSQLiteDatabase::rollbackTransaction ()}}
+\label{classcSQLiteDatabase_e20eff598832e1da41a8e915ee807548}
+
+
+Performs a rollback on a transaction
+
+This function performs a rollback. No changes will be made to the database
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcSQLiteDatabase_e20eff598832e1da41a8e915ee807548}{cSQLiteDatabase::rollbackTransaction} \end{Desc}
+\hypertarget{classcSQLiteDatabase_b1749baadeb733ea3efdbbd9ffe83253}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!setAutoCommit@{setAutoCommit}}
+\index{setAutoCommit@{setAutoCommit}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{setAutoCommit}]{\setlength{\rightskip}{0pt plus 5cm}void cSQLiteDatabase::setAutoCommit (bool {\em Commit} = {\tt true})\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcSQLiteDatabase_b1749baadeb733ea3efdbbd9ffe83253}
+
+
+Set the commit behavior
+
+This function sets the auto commit behavior on new transactions with \begin{Desc}
+\item[See also:]\hyperlink{classcSQLiteDatabase_5c481c06d73cff4f1192409bfc23a15a}{cSQLiteDatabase::startTransaction}.\end{Desc}
+\begin{itemize}
+\item {\bf {\tt true},} commits the last transaction before starting a new one\item {\bf {\tt false},} performs a rollback on the old transaction \end{itemize}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Commit}]Switches the behavior of auto commit \end{description}
+\end{Desc}
+\hypertarget{classcSQLiteDatabase_cdc42326657aea81fd26da6500642381}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!sprintf@{sprintf}}
+\index{sprintf@{sprintf}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{sprintf}]{\setlength{\rightskip}{0pt plus 5cm}const char $\ast$ cSQLiteDatabase::sprintf (const char $\ast$ {\em Format}, \/   {\em ...})\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcSQLiteDatabase_cdc42326657aea81fd26da6500642381}
+
+
+Prints a SQLite escaped text
+
+Returns a formated text with special characters to escape SQLite special characters like \char`\"{}'\char`\"{}. Additionally to the well known characters of {\em printf\/} the following are allowed:
+
+\begin{itemize}
+\item {\bf {\tt q},} like s, escapes single quotes in strings\item {\bf {\tt Q},} like q, surrounds the escaped string with additional single quotes\item {\bf {\tt z},} frees the string after reading and coping it\end{itemize}
+
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcSQLiteDatabase_cdc42326657aea81fd26da6500642381}{sprintf()} \end{Desc}
+\begin{Desc}
+\item[Returns:]the formated string \end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Format}]The format string \end{description}
+\end{Desc}
+\hypertarget{classcSQLiteDatabase_5c481c06d73cff4f1192409bfc23a15a}{
+\index{cSQLiteDatabase@{cSQLiteDatabase}!startTransaction@{startTransaction}}
+\index{startTransaction@{startTransaction}!cSQLiteDatabase@{cSQLiteDatabase}}
+\subsubsection[{startTransaction}]{\setlength{\rightskip}{0pt plus 5cm}void cSQLiteDatabase::startTransaction ()}}
+\label{classcSQLiteDatabase_5c481c06d73cff4f1192409bfc23a15a}
+
+
+Starts a transaction
+
+This starts a new transaction and commits or rolls back a previous.
+
+\begin{Desc}
+\item[See also:]\hyperlink{classcSQLiteDatabase_b1749baadeb733ea3efdbbd9ffe83253}{cSQLiteDatabase::setAutoCommit} 
+
+\hyperlink{classcSQLiteDatabase_f11b7090ae824f7f3fc094dc7112323a}{cSQLiteDatabase::commitTransaction} \end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/database.h\item 
+database/database.cpp\end{CompactItemize}

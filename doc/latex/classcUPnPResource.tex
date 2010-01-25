@@ -1,0 +1,288 @@
+\hypertarget{classcUPnPResource}{
+\section{cUPnPResource Class Reference}
+\label{classcUPnPResource}\index{cUPnPResource@{cUPnPResource}}
+}
+{\tt \#include $<$object.h$>$}
+
+Collaboration diagram for cUPnPResource:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[height=400pt]{classcUPnPResource__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+unsigned int \hyperlink{classcUPnPResource_47ad15c119fbcfdda1bc5f60d0a3efc9}{getID} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPResource_b648a88993b0e5a4421514f45a5b266f}{getResource} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPResource_5da7e39c5fc76f5607c232319daa135c}{getDuration} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPResource_27d5140dc72a8e034ce197913d6aa1d5}{getResolution} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPResource_0ff5e61a2d07873ae2ebdab7d87b3d9f}{getProtocolInfo} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPResource_6aeaaf476c5d6548b15bb381c032b815}{getContentType} () const 
+\item 
+const char $\ast$ \hyperlink{classcUPnPResource_04ab0d214e39ddfa18339926cef9fd64}{getImportURI} () const 
+\item 
+int \hyperlink{classcUPnPResource_6b6855ba6d4bd06805750ede92449c8d}{getResourceType} () const 
+\item 
+unsigned long \hyperlink{classcUPnPResource_361f6991a29dddf575a2b0b63ce5a66a}{getSize} () const 
+\item 
+off64\_\-t \hyperlink{classcUPnPResource_5cabb363c4fd0785d3f073011df835e9}{getFileSize} () const 
+\item 
+time\_\-t \hyperlink{classcUPnPResource_c95a8fe0bdba2c371a46e4e267dab1aa}{getLastModification} () const 
+\item 
+unsigned int \hyperlink{classcUPnPResource_3f2f3d5c447fee28d3dff5cf739e4c98}{getBitrate} () const 
+\item 
+unsigned int \hyperlink{classcUPnPResource_5ea6003b282c48f575bc54f5c9658ca9}{getSampleFrequency} () const 
+\item 
+unsigned int \hyperlink{classcUPnPResource_3efd82888fd648dd08b5d43520638d17}{getBitsPerSample} () const 
+\item 
+unsigned int \hyperlink{classcUPnPResource_ff18e089f421d710580292f0b91b40f8}{getNrAudioChannels} () const 
+\item 
+unsigned int \hyperlink{classcUPnPResource_276eddcc28bad31d6178cf109373074a}{getColorDepth} () const 
+\end{CompactItemize}
+\subsection*{Friends}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPResource_61e899959de76787a31b2caf642893f5}{
+class \hyperlink{classcUPnPResource_61e899959de76787a31b2caf642893f5}{cUPnPResourceMediator}}
+\label{classcUPnPResource_61e899959de76787a31b2caf642893f5}
+
+\item 
+\hypertarget{classcUPnPResource_bd3fceb5edae16f35b23748913128356}{
+class \hyperlink{classcUPnPResource_bd3fceb5edae16f35b23748913128356}{cUPnPResources}}
+\label{classcUPnPResource_bd3fceb5edae16f35b23748913128356}
+
+\item 
+\hypertarget{classcUPnPResource_41bb7e713331591ea53b89d0019b101a}{
+class \hyperlink{classcUPnPResource_41bb7e713331591ea53b89d0019b101a}{cAudioVideoDetector}}
+\label{classcUPnPResource_41bb7e713331591ea53b89d0019b101a}
+
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+UPnP Resource
+
+This contains all details about a resource 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPResource_3f2f3d5c447fee28d3dff5cf739e4c98}{
+\index{cUPnPResource@{cUPnPResource}!getBitrate@{getBitrate}}
+\index{getBitrate@{getBitrate}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getBitrate}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cUPnPResource::getBitrate () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_3f2f3d5c447fee28d3dff5cf739e4c98}
+
+
+Get the bitrate
+
+This returns the bitrate of the resource in bits per second.
+
+\begin{Desc}
+\item[Returns:]the bitrate of the resource \end{Desc}
+\hypertarget{classcUPnPResource_3efd82888fd648dd08b5d43520638d17}{
+\index{cUPnPResource@{cUPnPResource}!getBitsPerSample@{getBitsPerSample}}
+\index{getBitsPerSample@{getBitsPerSample}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getBitsPerSample}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cUPnPResource::getBitsPerSample () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_3efd82888fd648dd08b5d43520638d17}
+
+
+Get the bits per sample
+
+Returns the number of bits per sample.
+
+\begin{Desc}
+\item[Returns:]the bits per sample of the resource \end{Desc}
+\hypertarget{classcUPnPResource_276eddcc28bad31d6178cf109373074a}{
+\index{cUPnPResource@{cUPnPResource}!getColorDepth@{getColorDepth}}
+\index{getColorDepth@{getColorDepth}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getColorDepth}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cUPnPResource::getColorDepth () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_276eddcc28bad31d6178cf109373074a}
+
+
+Get the color depth
+
+Returns the color depth of the resource in pits per pixel
+
+\begin{Desc}
+\item[Returns:]the color depth of the resource \end{Desc}
+\hypertarget{classcUPnPResource_6aeaaf476c5d6548b15bb381c032b815}{
+\index{cUPnPResource@{cUPnPResource}!getContentType@{getContentType}}
+\index{getContentType@{getContentType}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getContentType}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPResource::getContentType () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_6aeaaf476c5d6548b15bb381c032b815}
+
+
+Get the content type
+
+Returns the mime type of the content of the resource
+
+\begin{Desc}
+\item[Returns:]the content type of the resource \end{Desc}
+\hypertarget{classcUPnPResource_5da7e39c5fc76f5607c232319daa135c}{
+\index{cUPnPResource@{cUPnPResource}!getDuration@{getDuration}}
+\index{getDuration@{getDuration}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getDuration}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPResource::getDuration () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_5da7e39c5fc76f5607c232319daa135c}
+
+
+Get the duration
+
+Returns a date time string with the duration of the resource
+
+\begin{Desc}
+\item[Returns:]the duration of the resource \end{Desc}
+\hypertarget{classcUPnPResource_5cabb363c4fd0785d3f073011df835e9}{
+\index{cUPnPResource@{cUPnPResource}!getFileSize@{getFileSize}}
+\index{getFileSize@{getFileSize}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getFileSize}]{\setlength{\rightskip}{0pt plus 5cm}off64\_\-t cUPnPResource::getFileSize () const}}
+\label{classcUPnPResource_5cabb363c4fd0785d3f073011df835e9}
+
+
+Get the file size
+
+Returns the file size in bytes of the resource or 0 if its unknown or a stream
+
+\begin{Desc}
+\item[Returns:]the file size \end{Desc}
+\hypertarget{classcUPnPResource_47ad15c119fbcfdda1bc5f60d0a3efc9}{
+\index{cUPnPResource@{cUPnPResource}!getID@{getID}}
+\index{getID@{getID}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getID}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cUPnPResource::getID () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_47ad15c119fbcfdda1bc5f60d0a3efc9}
+
+
+Get resource ID
+
+Gets the resource ID
+
+\begin{Desc}
+\item[Returns:]the resource ID \end{Desc}
+\hypertarget{classcUPnPResource_04ab0d214e39ddfa18339926cef9fd64}{
+\index{cUPnPResource@{cUPnPResource}!getImportURI@{getImportURI}}
+\index{getImportURI@{getImportURI}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getImportURI}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPResource::getImportURI () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_04ab0d214e39ddfa18339926cef9fd64}
+
+
+Get the import URI
+
+This returns the import URI where the resource was located before importing it
+
+\begin{Desc}
+\item[Returns:]the import URI \end{Desc}
+\hypertarget{classcUPnPResource_c95a8fe0bdba2c371a46e4e267dab1aa}{
+\index{cUPnPResource@{cUPnPResource}!getLastModification@{getLastModification}}
+\index{getLastModification@{getLastModification}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getLastModification}]{\setlength{\rightskip}{0pt plus 5cm}time\_\-t cUPnPResource::getLastModification () const}}
+\label{classcUPnPResource_c95a8fe0bdba2c371a46e4e267dab1aa}
+
+
+Get the last modification
+
+This returns the timestamp of the last modification to the file. If it is a stream, then its the current time.
+
+\begin{Desc}
+\item[Returns:]the timestamp with the last modification of the resource \end{Desc}
+\hypertarget{classcUPnPResource_ff18e089f421d710580292f0b91b40f8}{
+\index{cUPnPResource@{cUPnPResource}!getNrAudioChannels@{getNrAudioChannels}}
+\index{getNrAudioChannels@{getNrAudioChannels}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getNrAudioChannels}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cUPnPResource::getNrAudioChannels () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_ff18e089f421d710580292f0b91b40f8}
+
+
+Get number of audio channels
+
+Returns the number of audio channels of the audio stream in a video
+
+\begin{Desc}
+\item[Returns:]the number of audio channels \end{Desc}
+\hypertarget{classcUPnPResource_0ff5e61a2d07873ae2ebdab7d87b3d9f}{
+\index{cUPnPResource@{cUPnPResource}!getProtocolInfo@{getProtocolInfo}}
+\index{getProtocolInfo@{getProtocolInfo}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getProtocolInfo}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPResource::getProtocolInfo () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_0ff5e61a2d07873ae2ebdab7d87b3d9f}
+
+
+Get the protocol info
+
+This returns the protocol info field of a resource
+
+\begin{Desc}
+\item[Returns:]the protocol info string \end{Desc}
+\hypertarget{classcUPnPResource_27d5140dc72a8e034ce197913d6aa1d5}{
+\index{cUPnPResource@{cUPnPResource}!getResolution@{getResolution}}
+\index{getResolution@{getResolution}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getResolution}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPResource::getResolution () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_27d5140dc72a8e034ce197913d6aa1d5}
+
+
+Get the resolution
+
+Returns the resolution string with the pattern width x height in pixels
+
+\begin{Desc}
+\item[Returns:]the resolution of the resource \end{Desc}
+\hypertarget{classcUPnPResource_b648a88993b0e5a4421514f45a5b266f}{
+\index{cUPnPResource@{cUPnPResource}!getResource@{getResource}}
+\index{getResource@{getResource}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getResource}]{\setlength{\rightskip}{0pt plus 5cm}const char$\ast$ cUPnPResource::getResource () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_b648a88993b0e5a4421514f45a5b266f}
+
+
+Get the resources
+
+Returns the resource. This is in most cases the file name or resource locator where to find the resource
+
+\begin{Desc}
+\item[Returns:]the resource string \end{Desc}
+\hypertarget{classcUPnPResource_6b6855ba6d4bd06805750ede92449c8d}{
+\index{cUPnPResource@{cUPnPResource}!getResourceType@{getResourceType}}
+\index{getResourceType@{getResourceType}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getResourceType}]{\setlength{\rightskip}{0pt plus 5cm}int cUPnPResource::getResourceType () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_6b6855ba6d4bd06805750ede92449c8d}
+
+
+Get the resource type
+
+This returns the resource type of the resource.
+
+\begin{Desc}
+\item[Returns:]the resource type \end{Desc}
+\hypertarget{classcUPnPResource_5ea6003b282c48f575bc54f5c9658ca9}{
+\index{cUPnPResource@{cUPnPResource}!getSampleFrequency@{getSampleFrequency}}
+\index{getSampleFrequency@{getSampleFrequency}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getSampleFrequency}]{\setlength{\rightskip}{0pt plus 5cm}unsigned int cUPnPResource::getSampleFrequency () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_5ea6003b282c48f575bc54f5c9658ca9}
+
+
+Get the sample frequency
+
+Returns the sample frequency in samples per second.
+
+\begin{Desc}
+\item[Returns:]the sample frequency of the resource \end{Desc}
+\hypertarget{classcUPnPResource_361f6991a29dddf575a2b0b63ce5a66a}{
+\index{cUPnPResource@{cUPnPResource}!getSize@{getSize}}
+\index{getSize@{getSize}!cUPnPResource@{cUPnPResource}}
+\subsubsection[{getSize}]{\setlength{\rightskip}{0pt plus 5cm}unsigned long cUPnPResource::getSize () const\hspace{0.3cm}{\tt  \mbox{[}inline\mbox{]}}}}
+\label{classcUPnPResource_361f6991a29dddf575a2b0b63ce5a66a}
+
+
+Get the size
+
+Returns the resource size or -1 if its unknown
+
+\begin{Desc}
+\item[Returns:]the resource size or -1 if unknown \end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+database/object.h\item 
+database/object.cpp\end{CompactItemize}

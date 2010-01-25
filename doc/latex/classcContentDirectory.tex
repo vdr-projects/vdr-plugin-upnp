@@ -1,0 +1,124 @@
+\hypertarget{classcContentDirectory}{
+\section{cContentDirectory Class Reference}
+\label{classcContentDirectory}\index{cContentDirectory@{cContentDirectory}}
+}
+{\tt \#include $<$contentdirectory.h$>$}
+
+Inheritance diagram for cContentDirectory:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=166pt]{classcContentDirectory__inherit__graph}
+\end{center}
+\end{figure}
+Collaboration diagram for cContentDirectory:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=400pt]{classcContentDirectory__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+\hyperlink{classcContentDirectory_aca0fe0cffa30b1040719720ff4b82a2}{cContentDirectory} (UpnpDevice\_\-Handle DeviceHandle, \hyperlink{classcMediaDatabase}{cMediaDatabase} $\ast$MediaDatabase)
+\item 
+virtual int \hyperlink{classcContentDirectory_17acd376a722e6e7de9ec0d4cabb707b}{subscribe} (Upnp\_\-Subscription\_\-Request $\ast$Request)
+\item 
+virtual int \hyperlink{classcContentDirectory_a0225df761512819b9c46f45b2a0f0d0}{execute} (Upnp\_\-Action\_\-Request $\ast$Request)
+\item 
+virtual void \hyperlink{classcContentDirectory_a3b0df304987a0f2b17733c651d5b5c6}{setError} (Upnp\_\-Action\_\-Request $\ast$Request, int Error)
+\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The content directory service
+
+This is the content directory service which handles all incoming requests for contents managed by the media server. 
+
+\subsection{Constructor \& Destructor Documentation}
+\hypertarget{classcContentDirectory_aca0fe0cffa30b1040719720ff4b82a2}{
+\index{cContentDirectory@{cContentDirectory}!cContentDirectory@{cContentDirectory}}
+\index{cContentDirectory@{cContentDirectory}!cContentDirectory@{cContentDirectory}}
+\subsubsection[{cContentDirectory}]{\setlength{\rightskip}{0pt plus 5cm}cContentDirectory::cContentDirectory (UpnpDevice\_\-Handle {\em DeviceHandle}, \/  {\bf cMediaDatabase} $\ast$ {\em MediaDatabase})}}
+\label{classcContentDirectory_aca0fe0cffa30b1040719720ff4b82a2}
+
+
+Constructor of a Content Directory
+
+This creates an instance of a {\em Content Directory Service\/} and provides interfaces for executing actions and subscribing on events. \begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em DeviceHandle}]The UPnP device handle of the root device \item[{\em MediaDatabase}]the media database where requests are processed \end{description}
+\end{Desc}
+
+
+\subsection{Member Function Documentation}
+\hypertarget{classcContentDirectory_a0225df761512819b9c46f45b2a0f0d0}{
+\index{cContentDirectory@{cContentDirectory}!execute@{execute}}
+\index{execute@{execute}!cContentDirectory@{cContentDirectory}}
+\subsubsection[{execute}]{\setlength{\rightskip}{0pt plus 5cm}int cContentDirectory::execute (Upnp\_\-Action\_\-Request $\ast$ {\em Request})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcContentDirectory_a0225df761512819b9c46f45b2a0f0d0}
+
+
+Executes an action
+
+This executes an action initialized by a control point. The result is stored in the first parameter.
+
+\begin{Desc}
+\item[Returns:]An integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if subscription was okay\item or any other non null value in case of an error\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Input and output parameters of an action \end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcUpnpService_bbffca233e6aa193eda223cb7bfc2917}{cUpnpService}.\hypertarget{classcContentDirectory_a3b0df304987a0f2b17733c651d5b5c6}{
+\index{cContentDirectory@{cContentDirectory}!setError@{setError}}
+\index{setError@{setError}!cContentDirectory@{cContentDirectory}}
+\subsubsection[{setError}]{\setlength{\rightskip}{0pt plus 5cm}void cContentDirectory::setError (Upnp\_\-Action\_\-Request $\ast$ {\em Request}, \/  int {\em Error})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcContentDirectory_a3b0df304987a0f2b17733c651d5b5c6}
+
+
+Sets an error on an action request
+
+This function puts a error message into the action request structure according to its error code
+
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]the action request, to set the error for \item[{\em Error}]the error code of which the message should be obtained \end{description}
+\end{Desc}
+ 
+
+Reimplemented from \hyperlink{classcUpnpService_f0976057350505eca781aafcaf6b1d14}{cUpnpService}.\hypertarget{classcContentDirectory_17acd376a722e6e7de9ec0d4cabb707b}{
+\index{cContentDirectory@{cContentDirectory}!subscribe@{subscribe}}
+\index{subscribe@{subscribe}!cContentDirectory@{cContentDirectory}}
+\subsubsection[{subscribe}]{\setlength{\rightskip}{0pt plus 5cm}int cContentDirectory::subscribe (Upnp\_\-Subscription\_\-Request $\ast$ {\em Request})\hspace{0.3cm}{\tt  \mbox{[}virtual\mbox{]}}}}
+\label{classcContentDirectory_17acd376a722e6e7de9ec0d4cabb707b}
+
+
+Subscribes to an event
+
+This is a callback function to register a new subscriber for an event.
+
+\begin{Desc}
+\item[Returns:]An integer representing one of the following:\begin{itemize}
+\item {\bf {\tt UPNP\_\-E\_\-SUCCESS},} if subscription was okay\item or any other non null value in case of an error\end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Request}]Information about the subscription \end{description}
+\end{Desc}
+ 
+
+Implements \hyperlink{classcUpnpService_e6d3522d580e5975f5a38d5bea88e29d}{cUpnpService}.
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+upnpcomponents/contentdirectory.h\item 
+upnpcomponents/contentdirectory.cpp\end{CompactItemize}

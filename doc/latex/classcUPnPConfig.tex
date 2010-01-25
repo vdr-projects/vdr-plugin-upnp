@@ -1,0 +1,120 @@
+\hypertarget{classcUPnPConfig}{
+\section{cUPnPConfig Class Reference}
+\label{classcUPnPConfig}\index{cUPnPConfig@{cUPnPConfig}}
+}
+{\tt \#include $<$config.h$>$}
+
+Collaboration diagram for cUPnPConfig:\nopagebreak
+\begin{figure}[H]
+\begin{center}
+\leavevmode
+\includegraphics[width=204pt]{classcUPnPConfig__coll__graph}
+\end{center}
+\end{figure}
+\subsection*{Public Member Functions}
+\begin{CompactItemize}
+\item 
+bool \hyperlink{classcUPnPConfig_3ac0d1253dba86cb4630bc1e29a9fe10}{parseSetup} (const char $\ast$Name, const char $\ast$Value)
+\item 
+bool \hyperlink{classcUPnPConfig_19689798911a39c47958e819c33d4b09}{processArgs} (int argc, char $\ast$argv\mbox{[}$\,$\mbox{]})
+\end{CompactItemize}
+\subsection*{Static Public Member Functions}
+\begin{CompactItemize}
+\item 
+static \hyperlink{classcUPnPConfig}{cUPnPConfig} $\ast$ \hyperlink{classcUPnPConfig_3949dcc8a418edb8a0ece2dce62f515c}{get} ()
+\end{CompactItemize}
+\subsection*{Public Attributes}
+\begin{CompactItemize}
+\item 
+\hypertarget{classcUPnPConfig_dd0afbf876c2625acc52cfd8fd8b6a7c}{
+char $\ast$ \hyperlink{classcUPnPConfig_dd0afbf876c2625acc52cfd8fd8b6a7c}{mInterface}}
+\label{classcUPnPConfig_dd0afbf876c2625acc52cfd8fd8b6a7c}
+
+\begin{CompactList}\small\item\em the network interface, which the server is bound to \item\end{CompactList}\item 
+\hypertarget{classcUPnPConfig_0d7d7eb8d1ae9fffab39b39d1c9f10dd}{
+char $\ast$ \hyperlink{classcUPnPConfig_0d7d7eb8d1ae9fffab39b39d1c9f10dd}{mAddress}}
+\label{classcUPnPConfig_0d7d7eb8d1ae9fffab39b39d1c9f10dd}
+
+\begin{CompactList}\small\item\em the IP address which is used by the server \item\end{CompactList}\item 
+\hypertarget{classcUPnPConfig_93224ed337b1f74525a68c5159532cb3}{
+int \hyperlink{classcUPnPConfig_93224ed337b1f74525a68c5159532cb3}{mPort}}
+\label{classcUPnPConfig_93224ed337b1f74525a68c5159532cb3}
+
+\begin{CompactList}\small\item\em the port which the server is listening on \item\end{CompactList}\item 
+\hypertarget{classcUPnPConfig_6861c1183545e44a7d33e17440f4cd8c}{
+int \hyperlink{classcUPnPConfig_6861c1183545e44a7d33e17440f4cd8c}{mEnable}}
+\label{classcUPnPConfig_6861c1183545e44a7d33e17440f4cd8c}
+
+\begin{CompactList}\small\item\em indicates, if the server is enabled or not \item\end{CompactList}\item 
+\hypertarget{classcUPnPConfig_da3ca113e9f1946fd1c09ebdcdcde0af}{
+int \hyperlink{classcUPnPConfig_da3ca113e9f1946fd1c09ebdcdcde0af}{mAutoSetup}}
+\label{classcUPnPConfig_da3ca113e9f1946fd1c09ebdcdcde0af}
+
+\begin{CompactList}\small\item\em indicates, if the settings are automatically detected \item\end{CompactList}\end{CompactItemize}
+
+
+\subsection{Detailed Description}
+The configuration settings
+
+This holds the configurations for the server. It holds information about the network settings as well as some status flags. 
+
+\subsection{Member Function Documentation}
+\hypertarget{classcUPnPConfig_3949dcc8a418edb8a0ece2dce62f515c}{
+\index{cUPnPConfig@{cUPnPConfig}!get@{get}}
+\index{get@{get}!cUPnPConfig@{cUPnPConfig}}
+\subsubsection[{get}]{\setlength{\rightskip}{0pt plus 5cm}{\bf cUPnPConfig} $\ast$ cUPnPConfig::get ()\hspace{0.3cm}{\tt  \mbox{[}static\mbox{]}}}}
+\label{classcUPnPConfig_3949dcc8a418edb8a0ece2dce62f515c}
+
+
+Get the configuration
+
+This returns the instance of the current configuration settings.
+
+\begin{Desc}
+\item[Returns:]the configuration object \end{Desc}
+\hypertarget{classcUPnPConfig_3ac0d1253dba86cb4630bc1e29a9fe10}{
+\index{cUPnPConfig@{cUPnPConfig}!parseSetup@{parseSetup}}
+\index{parseSetup@{parseSetup}!cUPnPConfig@{cUPnPConfig}}
+\subsubsection[{parseSetup}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPConfig::parseSetup (const char $\ast$ {\em Name}, \/  const char $\ast$ {\em Value})}}
+\label{classcUPnPConfig_3ac0d1253dba86cb4630bc1e29a9fe10}
+
+
+Parse setup variable
+
+This parses the setup variable with the according value. The value is a string representation and must be converted into the according data type.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if parsing was successful\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em Name}]the name of the variable \item[{\em Value}]the according value of the variable \end{description}
+\end{Desc}
+\hypertarget{classcUPnPConfig_19689798911a39c47958e819c33d4b09}{
+\index{cUPnPConfig@{cUPnPConfig}!processArgs@{processArgs}}
+\index{processArgs@{processArgs}!cUPnPConfig@{cUPnPConfig}}
+\subsubsection[{processArgs}]{\setlength{\rightskip}{0pt plus 5cm}bool cUPnPConfig::processArgs (int {\em argc}, \/  char $\ast$ {\em argv}\mbox{[}$\,$\mbox{]})}}
+\label{classcUPnPConfig_19689798911a39c47958e819c33d4b09}
+
+
+Processes the commandline arguments
+
+This processes the commandline arguments which the user specified at the start of the plugin.
+
+\begin{Desc}
+\item[Returns:]returns\begin{itemize}
+\item {\bf {\tt true},} if processing was successful\item {\bf {\tt false},} otherwise \end{itemize}
+\end{Desc}
+\begin{Desc}
+\item[Parameters:]
+\begin{description}
+\item[{\em argc}]the number of arguments in the list \item[{\em argv}]the arguments as a char array \end{description}
+\end{Desc}
+
+
+The documentation for this class was generated from the following files:\begin{CompactItemize}
+\item 
+misc/config.h\item 
+misc/config.cpp\end{CompactItemize}
