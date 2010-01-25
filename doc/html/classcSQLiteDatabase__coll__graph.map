@@ -1,2 +1,0 @@
-<area shape="rect" href="$classcRows.html" title="{cRows\n|&#45; mLastRow\l|+ ~cRows()\l+ fetchRow()\l&#45; cRows()\l}" alt="" coords="124,261,220,373">
-<area shape="rect" href="$classcRow.html" title="{cRow\n|&#45; currentCol\l&#45; ColCount\l&#45; Columns\l&#45; Values\l|+ ~cRow()\l+ Count()\l+ fetchColumn()\l+ fetchColumn()\l&#45; cRow()\l}" alt="" coords="25,5,140,197">
