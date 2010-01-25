@@ -184,7 +184,7 @@ int cUPnPResources::createFromChannel(cUPnPClassVideoBroadcast* Object, cChannel
 
     cAudioVideoDetector* Detector = new cAudioVideoDetector(Channel);
 
-    if(!Detector->detectProperties()){
+    if(Detector->detectProperties()){
         ERROR("Cannot detect channel properties");
         delete Detector;
         return -1;
