@@ -334,30 +334,22 @@ IXML_Node* cUPnPClassItem::createDIDLFragment(IXML_Document* Document, cStringLi
     MESSAGE(VERBOSE_DIDL, "ParentID: %s", *this->getParentID());
     MESSAGE(VERBOSE_DIDL, "Restricted: %s", this->isRestricted()?"1":"0");
     MESSAGE(VERBOSE_DIDL, "Class: %s", this->getClass());
+    MESSAGE(VERBOSE_DIDL, "Filter: %d", Filter?Filter->Size():-1);
 
     IXML_Node* Didl = ixmlNode_getFirstChild((IXML_Node*) this->mDIDLFragment);
 
     IXML_Element* eItem = ixmlDocument_createElement(this->mDIDLFragment, "item");
-    ixmlElement_setAttribute(eItem, att(UPNP_PROP_OBJECTID), *this->getID());
-    ixmlElement_setAttribute(eItem, att(UPNP_PROP_PARENTID), *this->getParentID());
-    ixmlElement_setAttribute(eItem, att(UPNP_PROP_RESTRICTED), this->isRestricted()?"1":"0");
-
     ixmlNode_appendChild(Didl, (IXML_Node*) eItem);
 
-    IXML_Element* eTitle = ixmlDocument_createElement(this->mDIDLFragment, UPNP_PROP_TITLE);
-    IXML_Node* Title = ixmlDocument_createTextNode(this->mDIDLFragment, this->getTitle());
-
-    IXML_Element* eClass = ixmlDocument_createElement(this->mDIDLFragment, UPNP_PROP_CLASS);
-    IXML_Node* Class = ixmlDocument_createTextNode(this->mDIDLFragment, this->getClass());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_OBJECTID, *this->getID());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_PARENTID, *this->getParentID());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_RESTRICTED, this->isRestricted()?"1":"0");
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_TITLE, this->getTitle());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_CLASS, this->getClass());
     
-    ixmlNode_appendChild((IXML_Node*) eTitle, Title);
-    ixmlNode_appendChild((IXML_Node*) eClass, Class);
-    ixmlNode_appendChild((IXML_Node*) eItem, (IXML_Node*) eTitle);
-    ixmlNode_appendChild((IXML_Node*) eItem, (IXML_Node*) eClass);
-
-//    if(Filter==NULL || Filter->Find(UPNP_PROP_CREATOR)) ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_CREATOR, this->getCreator());
-//    if(Filter==NULL || Filter->Find(UPNP_PROP_WRITESTATUS)) ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_WRITESTATUS, itoa(this->getWriteStatus()));
-//    if(Filter==NULL || Filter->Find(UPNP_PROP_REFERENCEID)) ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_REFERENCEID, *this->getReferenceID());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_CREATOR, this->getCreator());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_WRITESTATUS, itoa(this->getWriteStatus()));
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_REFERENCEID, ((int)(this->getReferenceID())<0)?"":*this->getReferenceID());
 
     for(cUPnPResource* Resource = this->getResources()->First(); Resource; Resource = this->getResources()->Next(Resource)){
         MESSAGE(VERBOSE_DIDL, "Resource: %s", Resource->getResource());
@@ -367,18 +359,17 @@ IXML_Node* cUPnPClassItem::createDIDLFragment(IXML_Document* Document, cStringLi
         cString ResourceURL = cString::sprintf("%s%s/get?resId=%d", *URLBase, UPNP_DIR_SHARES, Resource->getID());
 
         MESSAGE(VERBOSE_DIDL, "Resource-URI: %s", *ResourceURL);
+        
+        IXML_Element* eRes = ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_RESOURCE, *ResourceURL);
+        if(eRes){
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eRes, UPNP_PROP_BITRATE, itoa(Resource->getBitrate()));
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eRes, UPNP_PROP_BITSPERSAMPLE, itoa(Resource->getBitsPerSample()));
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eRes, UPNP_PROP_COLORDEPTH, itoa(Resource->getColorDepth()));
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eRes, UPNP_PROP_DURATION, Resource->getDuration());
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eRes, UPNP_PROP_PROTOCOLINFO, Resource->getProtocolInfo());
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eRes, UPNP_PROP_SIZE, cString::sprintf("%lld", Resource->getFileSize()));
+        }
 
-        IXML_Element* eRes = ixmlDocument_createElement(this->mDIDLFragment, UPNP_PROP_RESOURCE);
-        IXML_Node*    Res  = ixmlDocument_createTextNode(this->mDIDLFragment, *ResourceURL);
-        ixmlNode_appendChild((IXML_Node*) eRes, Res);
-
-        if(Resource->getBitrate()) ixmlElement_setAttribute(eRes, att(UPNP_PROP_BITRATE), itoa(Resource->getBitrate()));
-        if(Resource->getBitsPerSample()) ixmlElement_setAttribute(eRes, att(UPNP_PROP_BITSPERSAMPLE), itoa(Resource->getBitsPerSample()));
-        if(Resource->getColorDepth()) ixmlElement_setAttribute(eRes, att(UPNP_PROP_COLORDEPTH), itoa(Resource->getColorDepth()));
-        if(Resource->getDuration()) ixmlElement_setAttribute(eRes, att(UPNP_PROP_DURATION), Resource->getDuration());
-        if(Resource->getProtocolInfo()) ixmlElement_setAttribute(eRes, att(UPNP_PROP_PROTOCOLINFO), Resource->getProtocolInfo());
-
-        ixmlNode_appendChild((IXML_Node*) eItem, (IXML_Node*) eRes);
     }
 
     return (IXML_Node*)eItem;
@@ -411,25 +402,38 @@ IXML_Node* cUPnPClassContainer::createDIDLFragment(IXML_Document* Document, cStr
     MESSAGE(VERBOSE_DIDL, "ParentID: %s", *this->getParentID());
     MESSAGE(VERBOSE_DIDL, "Restricted: %s", this->isRestricted()?"1":"0");
     MESSAGE(VERBOSE_DIDL, "Class: %s", this->getClass());
+    MESSAGE(VERBOSE_DIDL, "Filter: %d", Filter?Filter->Size():-1);
 
     IXML_Node* Didl = ixmlNode_getFirstChild((IXML_Node*) this->mDIDLFragment);
     IXML_Element* eItem = ixmlDocument_createElement(this->mDIDLFragment, "container");
-    ixmlElement_setAttribute(eItem, att(UPNP_PROP_OBJECTID), *this->getID());
-    ixmlElement_setAttribute(eItem, att(UPNP_PROP_PARENTID), *this->getParentID());
-    ixmlElement_setAttribute(eItem, att(UPNP_PROP_RESTRICTED), this->isRestricted()?"1":"0");
     ixmlNode_appendChild(Didl, (IXML_Node*) eItem);
 
-    IXML_Element* eTitle = ixmlDocument_createElement(this->mDIDLFragment, UPNP_PROP_TITLE);
-    IXML_Node* Title = ixmlDocument_createTextNode(this->mDIDLFragment, this->getTitle());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_OBJECTID, *this->getID());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_PARENTID, *this->getParentID());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_RESTRICTED, this->isRestricted()?"1":"0");
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_TITLE, this->getTitle());
+    ixmlAddProperty(this->mDIDLFragment, eItem, UPNP_PROP_CLASS, this->getClass());
+    
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_DLNA_CONTAINERTYPE, this->getContainerType());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_CHILDCOUNT, itoa(this->getChildCount()));
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_SEARCHABLE, this->isSearchable()?"1":"0");
+    
+    const tClassVector* CreateClasses = this->getCreateClasses();
+    for(unsigned int i = 0; i < CreateClasses->size(); i++){
+        cClass CreateClass = CreateClasses->at(i);
+        IXML_Element* eCreateClasses = ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_CREATECLASS, CreateClass.ID);
+        if(eCreateClasses)
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_CCLASSDERIVED, CreateClass.includeDerived?"1":"0");
+    }
 
-    IXML_Element* eClass = ixmlDocument_createElement(this->mDIDLFragment, UPNP_PROP_CLASS);
-    IXML_Node* Class = ixmlDocument_createTextNode(this->mDIDLFragment, this->getClass());
-
-    ixmlNode_appendChild((IXML_Node*) eTitle, Title);
-    ixmlNode_appendChild((IXML_Node*) eClass, Class);
-    ixmlNode_appendChild((IXML_Node*) eItem, (IXML_Node*) eTitle);
-    ixmlNode_appendChild((IXML_Node*) eItem, (IXML_Node*) eClass);
-
+    const tClassVector* SearchClasses = this->getSearchClasses();
+    for(unsigned int i = 0; i < SearchClasses->size(); i++){
+        cClass SearchClass = SearchClasses->at(i);
+        IXML_Element* eSearchClasses = ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_SEARCHCLASS, SearchClass.ID);
+        if(eSearchClasses)
+            ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_SCLASSDERIVED, SearchClass.includeDerived?"1":"0");
+    }
+    
     return (IXML_Node*)eItem;
 }
 
@@ -596,9 +600,52 @@ cUPnPClassVideoItem::cUPnPClassVideoItem(){
 cUPnPClassVideoItem::~cUPnPClassVideoItem(){
 }
 
-//cString cUPnPClassVideoItem::createDIDLFragment(cStringList* Filter){
-//    return NULL;
-//}
+IXML_Node* cUPnPClassVideoItem::createDIDLFragment(IXML_Document* Document, cStringList* Filter){
+    IXML_Element* eItem = (IXML_Element*) cUPnPClassItem::createDIDLFragment(Document, Filter);
+    
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_LONGDESCRIPTION, this->getLongDescription());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_DESCRIPTION, this->getDescription());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_LANGUAGE, this->getLanguage());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_RATING, this->getRating());
+
+    char* genre  = strtok(strdup0(this->getGenre()), ",");
+    while(genre){
+        ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_GENRE, genre);
+        genre = strtok(NULL, ",");
+    }
+    
+    char* producer = strtok(strdup0(this->getProducers()), ",");
+    while(producer){
+        ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_PRODUCER, producer);
+        producer = strtok(NULL, ",");
+    }
+    
+    char* actor = strtok(strdup0(this->getActors()), ",");
+    while(actor){
+        ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_ACTOR, actor);
+        actor = strtok(NULL, ",");
+    }
+
+    char* director = strtok(strdup0(this->getDirectors()), ",");
+    while(director){
+        ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_DIRECTOR, director);
+        director = strtok(NULL, ",");
+    }
+
+    char* publisher = strtok(strdup0(this->getPublishers()), ",");
+    while(publisher){
+        ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_PUBLISHER, publisher);
+        publisher = strtok(NULL, ",");
+    }
+
+    char* relation = strtok(strdup0(this->getRelations()), ",");
+    while(relation){
+        ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_RELATION, relation);
+        relation = strtok(NULL, ",");
+    }
+
+    return (IXML_Node*) eItem;
+}
 
 cStringList* cUPnPClassVideoItem::getPropertyList(){
     cStringList* Properties = cUPnPClassItem::getPropertyList();
@@ -754,9 +801,16 @@ cUPnPClassVideoBroadcast::cUPnPClassVideoBroadcast(){
 cUPnPClassVideoBroadcast::~cUPnPClassVideoBroadcast(){
 }
 
-//cString cUPnPClassVideoBroadcast::createDIDLFragment(cStringList* Filter){
-//    return NULL;
-//}
+IXML_Node* cUPnPClassVideoBroadcast::createDIDLFragment(IXML_Document* Document, cStringList* Filter){
+    IXML_Element* eItem = (IXML_Element*) cUPnPClassItem::createDIDLFragment(Document, Filter);
+
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_CHANNELNAME, this->getChannelName());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_CHANNELNR, itoa(this->getChannelNr()));
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_ICON, this->getIcon());
+    ixmlAddFilteredProperty(Filter, this->mDIDLFragment, eItem, UPNP_PROP_REGION, this->getRegion());
+
+    return (IXML_Node*) eItem;
+}
 
 cStringList* cUPnPClassVideoBroadcast::getPropertyList(){
     cStringList* Properties = cUPnPClassVideoItem::getPropertyList();

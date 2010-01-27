@@ -1,6 +1,11 @@
 VDR Plugin 'upnp' Revision History
 ----------------------------------
 
+2009-01-25: Version 0.0.2-alpha1
+
+ - Bug: A minor bug prevented the plugin from detecting the resources
+        correnctly
+
 2009-01-24: Version 0.0.2-alpha0
 
  - New: Added record streaming support for SDTV

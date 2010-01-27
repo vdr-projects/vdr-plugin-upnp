@@ -156,7 +156,7 @@ int cUPnPResources::createFromRecording(cUPnPClassVideoItem* Object, cRecording*
     cUPnPResource* Resource  = this->mMediator->newResource(Object, UPNP_RESOURCE_RECORDING,ResourceFile, Detector->getDLNAProfile()->mime, ProtocolInfo);
     Resource->mBitrate       = Detector->getBitrate();
     Resource->mBitsPerSample = Detector->getBitsPerSample();
-    Resource->mDuration      = duration(Detector->getDuration());
+    Resource->mDuration      = duration(Detector->getDuration(), AVDETECTOR_TIME_BASE);
     Resource->mResolution    = (Detector->getWidth() && Detector->getHeight()) ? *cString::sprintf("%dx%d",Detector->getWidth(), Detector->getHeight()) : NULL;
     Resource->mSampleFrequency = Detector->getSampleFrequency();
     Resource->mSize          = Detector->getFileSize();

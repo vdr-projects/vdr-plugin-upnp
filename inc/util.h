@@ -88,14 +88,17 @@ char* ixmlGetFirstDocumentItem( IN IXML_Document * doc, IN const char *item, int
  * The property must have the pattern "namespace:property@attribute".
  *
  * @return returns
- * - \bc <0, in case of an error
- * - \bc 0, otherwise
+ * - \bc NULL, in case of an error
+ * - \bc the newly created property node or the node at which the attribute was
+ *       appended to
  * @param document the \c IXML document to put the parameter in
  * @param node the specific node where to put the parameter
  * @param upnpproperty the upnp property
  * @param value the value of the upnp property
  */
-int ixmlAddProperty(IN IXML_Document* document, IN IXML_Element* node, const char* upnpproperty, const char* value );
+IXML_Element* ixmlAddProperty(IN IXML_Document* document, IN IXML_Element* node, IN const char* upnpproperty, IN const char* value );
+
+IXML_Element* ixmlAddFilteredProperty(IN cStringList* Filter, IN IXML_Document* document, IN IXML_Element* node, IN const char* upnpproperty, IN const char* value );
 /**
  * creates a part of a string
  * 

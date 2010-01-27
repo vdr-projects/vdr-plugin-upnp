@@ -18,13 +18,15 @@
 #include <iosfwd>
 #include <time.h>
 
-#define DURATION_MAX_STRING_LENGTH      13              // DLNA: 1-5 DIGIT hours :
+#define DURATION_MAX_STRING_LENGTH      16              // DLNA: 1-5 DIGIT hours :
                                                         //         2 DIGIT minutes :
                                                         //         2 DIGIT seconds .
                                                         //         3 DIGIT fraction
 
 char* duration(off64_t duration, unsigned int timeBase){
-    if (timeBase == 0) timeBase = 1;
+    if(!timeBase){
+        timeBase = 1;
+    }
 
     int seconds, minutes, hours, fraction;
 
@@ -37,28 +39,29 @@ char* duration(off64_t duration, unsigned int timeBase){
 
     char* output = new char[DURATION_MAX_STRING_LENGTH];
 
-    if(!snprintf(
-            output,
-            DURATION_MAX_STRING_LENGTH,
-            UPNP_DURATION_FORMAT_STRING,
-            hours, minutes, seconds)
-      ){
-        delete output;
-        return NULL;
-    }
-    else {
-        if(timeBase > 1 && 
-           !snprintf(
+    if(timeBase > 1){
+        if(!snprintf(
                 output,
                 DURATION_MAX_STRING_LENGTH,
-                "%s" UPNP_DURATION_FRAME_FORMAT,
-                output, fraction)
+                UPNP_DURATION_FRAME_FORMAT,
+                hours, minutes, seconds, fraction) < 0
           ){
-            delete output;
+            delete [] output;
             return NULL;
         }
-        else return output;
     }
+    else {
+        if(snprintf(
+                output,
+                DURATION_MAX_STRING_LENGTH,
+                UPNP_DURATION_FORMAT,
+                hours, minutes, seconds) < 0
+          ){
+            delete [] output;
+            return NULL;
+        }
+    }
+    return output;
 }
 
 char* substr(const char* str, unsigned int offset, unsigned int length){
@@ -475,39 +478,58 @@ char* ixmlGetFirstDocumentItem( IN IXML_Document * doc, IN const char *item, int
     return ret;
 }
 
-int ixmlAddProperty(IXML_Document* document, IXML_Element* node, const char* upnpproperty, const char* value){
-    if(!node) return -1;
+IXML_Element* ixmlAddProperty(IXML_Document* document, IXML_Element* node, const char* upnpproperty, const char* value){
+    if(!node) return NULL;
     IXML_Element* PropertyNode = NULL;
+    
+    char tvalue[UPNP_MAX_METADATA_LENGTH];
+    // trim the value to max metadata size
+    if(value){
+        strncpy(tvalue, value, UPNP_MAX_METADATA_LENGTH);
+    }
     
     const char* attribute = att(upnpproperty);
     const char* property = prop(upnpproperty);
     if(attribute){
-        if(strcasecmp(property,"")){
-            ixmlElement_setAttribute(node, attribute, value);
+        if(!strcmp(property,"")){
+            ixmlElement_setAttribute(node, attribute, tvalue);
         }
         else {
             IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property);
             if(NodeList!=NULL){
-                IXML_Node* Node = ixmlNodeList_item(NodeList, 0);
-                PropertyNode = (IXML_Element*) ixmlNode_getFirstChild(Node);
+                PropertyNode = (IXML_Element*) ixmlNodeList_item(NodeList, 0);
                 if(PropertyNode){
-                    ixmlElement_setAttribute(PropertyNode, attribute, value);
+                    if(ixmlElement_setAttribute(PropertyNode, attribute, tvalue)!=IXML_SUCCESS){
+                        return NULL;
+                    }
                 }
                 else {
                     ixmlNodeList_free(NodeList);
-                    return -1;
+                    return NULL;
                 }
             }
             else {
-                return -1;
+                return NULL;
             }
         }
     }
     else {
         PropertyNode = ixmlDocument_createElement(document, property);
-        IXML_Node* PropertyText = ixmlDocument_createTextNode(document, value);
+        IXML_Node* PropertyText = ixmlDocument_createTextNode(document, tvalue);
         ixmlNode_appendChild((IXML_Node*) PropertyNode, PropertyText);
         ixmlNode_appendChild((IXML_Node*) node, (IXML_Node*) PropertyNode);
     }
-    return 0;
+    return PropertyNode;
+}
+
+IXML_Element* ixmlAddFilteredProperty(cStringList* Filter, IXML_Document* document, IXML_Element* node, const char* upnpproperty, const char* value){
+    // leave out empty values.
+    if(!value || !strcmp(value, "") || !strcmp(value, "0")){
+        return NULL;
+    }
+
+    if(!Filter || Filter->Find(upnpproperty))
+        return ixmlAddProperty(document, node, upnpproperty, value);
+    else
+        return NULL;
 }

@@ -752,7 +752,7 @@ public:
      *
      * @return a vector with all search classes
      */
-    const std::vector<cClass>* getSearchClasses() const { return &(this->mSearchClasses); }
+    const tClassVector* getSearchClasses() const { return &(this->mSearchClasses); }
     /**
      * Get the create classes
      *
@@ -763,7 +763,7 @@ public:
      *
      * @return a vector with create classes
      */
-    const std::vector<cClass>* getCreateClasses() const { return &(this->mCreateClasses); }
+    const tClassVector* getCreateClasses() const { return &(this->mCreateClasses); }
     /**
      * Is this container searchable
      *
@@ -832,7 +832,7 @@ protected:
     cUPnPClassVideoItem();
 public:
     virtual ~cUPnPClassVideoItem();
-    //virtual cString createDIDLFragment(cStringList* Filter);
+    virtual IXML_Node* createDIDLFragment(IXML_Document* Document, cStringList* Filter);
     virtual cStringList* getPropertyList();
     virtual bool setProperty(const char* Property, const char* Value);
     virtual bool getProperty(const char* Property, char** Value) const;
@@ -1141,7 +1141,7 @@ protected:
     cUPnPClassVideoBroadcast();
 public:
     virtual ~cUPnPClassVideoBroadcast();
-    //virtual cString createDIDLFragment(cStringList* Filter);
+    virtual IXML_Node* createDIDLFragment(IXML_Document* Document, cStringList* Filter);
     virtual cStringList* getPropertyList();
     virtual bool setProperty(const char* Property, const char* Value);
     virtual bool getProperty(const char* Property, char** Value) const;

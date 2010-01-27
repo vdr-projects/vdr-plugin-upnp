@@ -376,10 +376,13 @@ enum    UPNP_WEB_METHODS {
 #define UPNP_PROP_WRITESTATUS          "upnp:writeStatus"
 #define UPNP_PROP_CLASS                "upnp:class"
 #define UPNP_PROP_CLASSNAME            UPNP_PROP_CLASS "@name"
+#define UPNP_PROP_CREATECLASS          "upnp:createClass"
 #define UPNP_PROP_SEARCHCLASS          "upnp:searchClass"
 #define UPNP_PROP_SCLASSDERIVED        UPNP_PROP_SEARCHCLASS "@includeDerived"
-#define UPNP_PROP_REFERENCEID          UPNP_OBJECT_ITEM "@refID"
 #define UPNP_PROP_SCLASSNAME           UPNP_PROP_SEARCHCLASS "@name"
+#define UPNP_PROP_CCLASSDERIVED        UPNP_PROP_CREATECLASS "@includeDerived"
+#define UPNP_PROP_CCLASSNAME           UPNP_PROP_CREATECLASS "@name"
+#define UPNP_PROP_REFERENCEID          UPNP_OBJECT_ITEM "@refID"
 #define UPNP_PROP_SEARCHABLE           UPNP_OBJECT_CONTAINER "@searchable"
 #define UPNP_PROP_CHILDCOUNT           UPNP_OBJECT_CONTAINER "@childcount"
 #define UPNP_PROP_RESOURCE             "res"
@@ -481,8 +484,9 @@ enum    UPNP_WEB_METHODS {
                                         UPNP_PROP_LONGDESCRIPTION ","\
                                         UPNP_PROP_PUBLISHER
 
-#define UPNP_DURATION_FORMAT_STRING     "%5d:%02d:%02d"
-#define UPNP_DURATION_FRAME_FORMAT      ".%03d"
+#define UPNP_DURATION_FORMAT            "%5d:%02d:%02d"
+#define UPNP_DURATION_FRAME_FORMAT      "%5d:%02d:%02d.%03d"
+#define UPNP_MAX_METADATA_LENGTH        1024
 #define AVDETECTOR_TIME_BASE            1000
 
 /****************************************************
