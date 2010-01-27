@@ -461,11 +461,20 @@ void cMediaDatabase::Action(){
     time_t LastEPGUpdate = 0;
     while(this->Running()){
 
+#ifndef WITHOUT_TV
         if(cSchedules::Modified() >= LastEPGUpdate){
             MESSAGE(VERBOSE_EPG_UPDATES, "Schedule changed. Updating...");
             updateChannelEPG();
             LastEPGUpdate = cSchedules::Modified();
         }
+#endif
+#ifndef WITHOUT_RECORDS
+        int NotUsed;
+        if(Recordings.StateChanged(NotUsed)){
+            MESSAGE(VERBOSE_EPG_UPDATES, "Recordings changed. Updating...");
+            loadRecordings();
+        }
+#endif
 
         cCondWait::SleepMs(60 * 1000); // sleep a minute
     }
@@ -531,7 +540,10 @@ int cMediaDatabase::browse(
                         }
 
                         cUPnPClassObject* Child = Children->First();
-                        if(Count==0) Count = Container->getChildCount();
+                        if(Count==0 || Count > Container->getChildCount())
+                            Count = Container->getChildCount();
+                        
+                        MESSAGE(VERBOSE_DIDL, "Number of children: %d", Count);
                         while(Offset-- && (Child = Children->Next(Child))){}
                         for(; Count && Child ; Child = Children->Next(Child), Count--){
                             MESSAGE(VERBOSE_DIDL, "Appending %s to didl", Child->getTitle());
