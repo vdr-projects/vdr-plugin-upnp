@@ -1,0 +1,88 @@
+<?xml version = "1.0" encoding = "utf-8"?>
+<#
+
+This is the Device Description File
+
+It contains the device and service descriptions of the media server.
+
+#>
+<%pre>
+#include <string>
+#include <stdint.h>
+#include "../include/tools.h"
+#include "../include/server.h"
+#include "../include/service.h"
+#include "../include/webserver.h"
+#include "../include/config.h"
+
+using namespace upnp;
+</%pre>
+<{
+  upnp::cMediaServer* server = cMediaServer::GetInstance();
+  const upnp::cWebserver& webserver = server->GetWebserver();
+  
+  const upnp::cMediaServer::Description& serverDescription = server->GetServerDescription();
+  std::string deviceUUID = server->GetDeviceUUID();
+  std::string urlBase = webserver.GetBaseUrl();
+  std::string presentationUrl = webserver.GetPresentationUrl();
+  std::string staticContentUrl = webserver.GetStaticContentUrl();
+  
+  std::string serviceUrl = webserver.GetServiceUrl();
+  std::string controlUrl = webserver.GetControlUrl();
+  
+  reply.setContentType("application/xml");
+
+}>
+<root xmlns="urn:schemas-upnp-org:device-1-0" xmlns:dlna="urn:schemas-dlna-org:device-1-0"> 
+  <specVersion> 
+    <major>1</major> 
+    <minor>0</minor> 
+  </specVersion> 
+  <URLBase><$ urlBase $></URLBase> 
+  <device> 
+    <deviceType>urn:schemas-upnp-org:device:MediaServer:1</deviceType> 
+    <friendlyName><$ serverDescription.friendlyName $></friendlyName> 
+    <manufacturer><$ serverDescription.manufacturer $></manufacturer> 
+    <manufacturerURL><$ serverDescription.manufacturerURL $></manufacturerURL> 
+    <modelDescription><$ serverDescription.modelDescription $></modelDescription> 
+    <modelName><$ serverDescription.modelName $></modelName> 
+    <modelNumber><$ serverDescription.modelNumber $></modelNumber> 
+    <modelURL><$ serverDescription.modelURL $></modelURL> 
+    <serialNumber><$ serverDescription.serialNumber $></serialNumber> 
+    <UDN><$ deviceUUID $></UDN> 
+    <presentationURL><$ presentationUrl $></presentationURL> 
+    <dlna:X_DLNADOC>DMS-1.50</dlna:X_DLNADOC> 
+    <serviceList>
+<{
+  const cMediaServer::serviceMap& services = server->GetServices();
+  
+  for(cMediaServer::serviceMap::const_iterator it = services.begin(); it != services.end(); ++it){
+  	const cUPnPService::Description& serviceDescription = (*it).second->GetServiceDescription();
+}>
+
+      <service>
+        <serviceType><$ serviceDescription.serviceType $></serviceType>
+        <serviceId><$ serviceDescription.serviceID $></serviceId>
+        <SCPDURL><$ serviceUrl $><$ serviceDescription.SCPDXML $></SCPDURL>
+        <controlURL><$ controlUrl $><$ serviceDescription.controlDescriptor $></controlURL>
+        <eventSubURL><$ controlUrl $><$ serviceDescription.eventSubscriberDescriptor $></eventSubURL>
+      </service>
+%  };
+    </serviceList>
+    <iconList>
+<{
+  const cMediaServer::iconList& icons = server->GetServerIcons();
+  
+  for(cMediaServer::iconList::const_iterator it = icons.begin(); it != icons.end(); ++it){
+}>
+      <icon>
+        <mimetype><$ (*it).profile.mime $></mimetype>
+        <width><$ (*it).profile.width $></width>
+        <height><$ (*it).profile.height $></height>
+        <depth><$ (int)(*it).profile.bitDepth $></depth>
+        <url><$ staticContentUrl $><$ (*it).filename $></url>
+      </icon>
+%  };
+    </iconList>
+  </device> 
+</root>
