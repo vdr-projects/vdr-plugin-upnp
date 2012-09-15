@@ -144,6 +144,8 @@ public:
   string GetParentID() const { return parentID; }
   bool SetTitle(string title);
   string GetTitle() const { return title; }
+  bool SetCreator(string creator);
+  string GetCreator() const { return creator; }
   bool SetUpnpClass(string upnpClass);
   string GetUpnpClass() const { return upnpClass; }
   bool SetRestricted(bool restricted);
@@ -173,6 +175,7 @@ private:
   string objectID;
   string parentID;
   string title;
+  string creator;
   string upnpClass;
   bool   restricted;
   string description;
@@ -368,6 +371,22 @@ public:
   virtual size_t Read(char* buf, size_t bufLen);
 
   /**
+   * Seeks in the stream
+   *
+   * This function sets the file curser to the specific byte position.
+   *
+   * The offset is added to the position relatively to "origin".
+   * This can be (from <cstdio>):
+   *
+   * - SEEK_SET
+   * - SEEK_CUR
+   * - SEEK_END
+   *
+   * Returns true, if seeking was successful, false otherwise.
+   */
+  virtual bool Seek(size_t offset, int origin);
+
+  /**
    * Closes the file
    *
    * This function closes the file opened by Open(). It MUST free all
@@ -415,7 +434,7 @@ protected:
    *    - change of the parent container, where the file or container
    *      was moved to
    */
-  void OnContainerUpdate(string uri, long containerUpdateId);
+  void OnContainerUpdate(string uri, long containerUpdateId, string changesUri = string());
 
 };
 

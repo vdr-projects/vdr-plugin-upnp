@@ -9,6 +9,7 @@
 #define SERVICE_H_
 
 #include <upnp/upnp.h>
+#include <vdr/thread.h>
 #include <string>
 
 namespace upnp {

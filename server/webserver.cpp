@@ -17,7 +17,7 @@ cWebserver::cWebserver(std::string address)
 , mWebserverThread(*this)
 {
   SetWebserverRootDir(string(), string(), string());
-  SetServiceUrl("services/", string());
+  SetServiceUrl(string(), string());
 }
 
 cWebserver::~cWebserver(){
@@ -109,14 +109,15 @@ void cWebserver::SetWebserverRootDir(std::string rootDirectory, std::string stat
 void cWebserver::SetServiceUrl(std::string descriptionUrl, std::string controlUrl){
   if(mWebserverThread.Active()) return;
 
-  if(descriptionUrl.empty())
+  if(descriptionUrl.empty()){
     mServiceUrl = "services/";
+  }
   else
     mServiceUrl = descriptionUrl;
 
   if(controlUrl.empty()){
     stringstream s;
-    s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/" << mServiceUrl;
+    s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/" << "services/";
 
     mControlUrl = s.str();
   } else {

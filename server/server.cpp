@@ -114,6 +114,8 @@ bool cMediaServer::Start(){
     return false;
   }
 
+
+
   mIsRunning = true;
 
   return IsRunning();
@@ -284,7 +286,7 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
   case UPNP_EVENT_SUBSCRIPTION_REQUEST:
     eventRequest = (Upnp_Subscription_Request*) event;
 
-    dsyslog("UPnP\tSubscription request: %s", eventRequest->ServiceId);
+    dsyslog("UPnP\tSubscription request from: %s", eventRequest->ServiceId);
 
     if(!mediaServer->CheckDeviceUUID(eventRequest->UDN)){
       esyslog("UPnP\tUPnP Callback - event request not for this device");

@@ -10,6 +10,7 @@
 #include "../include/server.h"
 #include <upnp/upnp.h>
 #include <sstream>
+#include <tntdb/statement.h>
 #include <tntdb/result.h>
 
 namespace upnp {
@@ -43,22 +44,47 @@ void cMediaManager::OnContainerUpdate(string containerID, long updateID){
 }
 
 StringList cMediaManager::GetSearchCapabilities() const {
-  // TODO: SearchCapabilities ermitteln und zurückgeben.
   StringList list;
+
+  list.push_back("dc:title");
+  list.push_back("dc:creator");
+  list.push_back("dc:description");
+  list.push_back("upnp:longDescription");
+  list.push_back("res@protocolInfo");
+  list.push_back("upnp:class");
+  list.push_back("dc:date");
+  list.push_back("dc:language");
 
   return list;
 }
 
 StringList cMediaManager::GetSortCapabilities() const {
-  // TODO: SortCapabilities ermitteln und zurückgeben.
   StringList list;
+
+  list.push_back("dc:title");
+  list.push_back("dc:creator");
+  list.push_back("dc:description");
+  list.push_back("upnp:longDescription");
+  list.push_back("res@protocolInfo");
+  list.push_back("upnp:class");
+  list.push_back("dc:date");
+  list.push_back("dc:language");
 
   return list;
 }
 
 StringList cMediaManager::GetSupportedProtocolInfos() const {
-  // TODO: ProtocolInfos ermitteln und zurückgeben.
+  tntdb::Connection conn = mConnection;
+  tntdb::Statement stmt = conn.prepare(
+      "SELECT DISTINCT protocolInfo FROM resources;"
+      );
+
   StringList list;
+
+  for(tntdb::Statement::const_iterator it = stmt.begin(); it != stmt.end(); ++it){
+    tntdb::Row row = (*it);
+    list.push_back(row.getString("protocolInfo"));
+  }
 
   return list;
 }

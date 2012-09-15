@@ -182,8 +182,6 @@ bool cMetadata::Resource::SetResourceUri(string resourceUri){
 }
 
 bool cMetadata::Resource::SetProtocolInfo(string protocolInfo){
-  //TODO validiere protocolInfo.
-
   this->protocolInfo = protocolInfo;
   return true;
 }
@@ -252,6 +250,10 @@ bool cUPnPResourceProvider::Open(string uri){
 
 size_t cUPnPResourceProvider::Read(char* buf, size_t bufLen){
   return -1;
+}
+
+bool cUPnPResourceProvider::Seek(size_t offset, int origin){
+  return false;
 }
 
 void cUPnPResourceProvider::Close(){
