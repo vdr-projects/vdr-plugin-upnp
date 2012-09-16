@@ -100,6 +100,26 @@ int cMediaManager::Browse(BrowseRequest& request){
   request.totalMatches = 0;
   request.updateID = 0;
 
+  stringstream sql;
+
+  sql << "SELECT * FROM metadata LEFT JOIN resources WHERE :where";
+
+  cSortCriteria::SortCriteriaList list = cSortCriteria::parse(request.sortCriteria);
+  if(!list.empty()){
+    sql << " ORDER BY ";
+    upnp::cSortCriteria::SortCriteriaList::iterator it = list.begin();
+    sql << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
+    for(++it; it != list.end(); ++it){
+      sql << ", " << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
+    }
+  }
+
+  if(request.requestCount){
+    sql << " LIMIT " << request.requestCount << ", " << request.startIndex << ";";
+  }
+
+  tntdb::Statement select = mConnection.prepare(sql.str());
+
   switch (request.browseMetadata){
   case CD_BROWSE_METADATA:
 
@@ -199,16 +219,20 @@ bool cMediaManager::Initialise(){
     resourcesTable.execute();
 
     tntdb::Statement rootContainer = mConnection.prepare(
-        "INSERT INTO metadata (objectID,  parentID,  title,  class,  restricted,  description)"
-        "              VALUES (:objectID, :parentID, :title, :class, :restricted, :description)"
+        "INSERT INTO metadata (objectID,  parentID,  title,  creator,  class,  restricted,  description,  longDescription)"
+        "              VALUES (:objectID, :parentID, :title, :creator, :class, :restricted, :description, :longDescription)"
         );
+
+    const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
 
     rootContainer.setString("objectID", "0")
                  .setString("parentID", "-1")
-                 .setString("title", cMediaServer::GetInstance()->GetServerDescription().friendlyName)
+                 .setString("title", desc.friendlyName)
+                 .setString("creator", desc.manufacturer)
                  .setString("class", "object.container")
                  .setBool("restricted", true)
-                 .setString("description", cMediaServer::GetInstance()->GetServerDescription().modelDescription)
+                 .setString("description", desc.modelName)
+                 .setString("longDescription", desc.modelDescription)
                  .execute();
 
     mConnection.commitTransaction();
