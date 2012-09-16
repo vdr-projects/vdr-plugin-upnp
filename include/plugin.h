@@ -55,6 +55,8 @@ namespace resource {
 
 }
 
+class PropertyValidator;
+
 /**
  * Metadata class
  *
@@ -166,6 +168,7 @@ public:
   typedef multimap<string, Property> PropertyMap;
   typedef pair<PropertyMap::iterator,PropertyMap::iterator> PropertyRange;
   typedef list<Resource> ResourceList;
+  typedef map<string, PropertyValidator*> ValidatorMap;
 
   bool AddProperty(Property property);
   bool SetProperty(Property property, int index = 0);
@@ -176,54 +179,19 @@ public:
 
   bool SetObjectID(string objectID);
   bool SetObjectIDByUri(string uri);
-  string GetObjectID() const { return objectID; }
+  string GetObjectID();
   bool SetParentID(string parentID);
   bool SetParentIDByUri(string uri);
-  string GetParentID() const { return parentID; }
-  bool SetTitle(string title);
-  string GetTitle() const { return title; }
-  bool SetCreator(string creator);
-  string GetCreator() const { return creator; }
-  bool SetUpnpClass(string upnpClass);
-  string GetUpnpClass() const { return upnpClass; }
-  bool SetRestricted(bool restricted);
-  bool GetRestricted() const { return restricted; }
-  bool SetDescription(string description);
-  string GetDescription() const { return description; }
-  bool SetLongDescription(string longDescription);
-  string GetLongDescription() const { return longDescription; }
-  bool SetDate(string date);
-  string GetDate() const { return date; }
-  bool SetLanguage(string language);
-  string GetLanguage() const { return language; }
-  bool SetChannelNr(int channelNr);
-  int GetChannelNr() const { return channelNr; }
-  bool SetChannelName(string channelName);
-  string GetChannelName() const { return channelName; }
-  bool SetScheduledStart(string scheduledStart);
-  string GetScheduledStart() const { return scheduledStart; }
-  bool SetScheduledEnd(string scheduledEnd);
-  string GetScheduledEnd() const { return scheduledEnd; }
+  string GetParentID();
+
+  static void RegisterPropertyValidator(PropertyValidator* validator);
 
 private:
 
   PropertyMap properties;
   ResourceList resources;
 
-  string objectID;
-  string parentID;
-  string title;
-  string creator;
-  string upnpClass;
-  bool   restricted;
-  string description;
-  string longDescription;
-  string date;
-  string language;
-  int    channelNr;
-  string channelName;
-  string scheduledStart;
-  string scheduledEnd;
+  static ValidatorMap validators;
 
 };
 

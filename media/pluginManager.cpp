@@ -13,6 +13,38 @@ using namespace std;
 
 namespace upnp {
 
+class PropertyValidator {
+  PropertyValidator(){
+    cMetadata::RegisterPropertyValidator(this);
+  }
+  virtual ~PropertyValidator(){}
+  virtual string GetPropertyKey() = 0;
+  virtual bool Validate(cMetadata::Property property) = 0;
+};
+
+class ClassValidator : PropertyValidator {
+  virtual string GetPropertyKey(){
+    return property::object::KEY_CLASS;
+  }
+  virtual bool Validate(cMetadata::Property property){
+    string value = property.GetString();
+
+    if(value.find("object.container", 0) == 0 ||
+       value.find("object.item", 0) == 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+} ClassValidatorInst;
+
+void cMetadata::RegisterPropertyValidator(PropertyValidator* validator){
+  validators[validator->GetPropertyKey()] = validator;
+}
+
 bool cMetadata::SetObjectIDByUri(string uri){
   return SetObjectID(tools::GenerateUUIDFromURL(uri));
 }
@@ -24,93 +56,60 @@ bool cMetadata::SetParentIDByUri(string uri){
 bool cMetadata::SetObjectID(string objectID){
   if(objectID.empty() || objectID.compare("0") == 0) return false;
 
-  this->objectID = objectID;
+  SetProperty(Property(property::object::KEY_OBJECTID, objectID));
 
   return true;
 };
 
 bool cMetadata::SetParentID(string parentID){
-  if(objectID.compare("-1") == 0) return false;
+  if(parentID.compare("-1") == 0) return false;
 
-  this->parentID = parentID;
-
-  return true;
-};
-
-bool cMetadata::SetTitle(string title){
-  this->title = title;
+  SetProperty(Property(property::object::KEY_PARENTID, parentID));
 
   return true;
 };
-
-bool cMetadata::SetUpnpClass(string upnpClass){
-  //TODO: Validiere upnpClass.
-  this->upnpClass = upnpClass;
-
-  return true;
-};
-
-bool cMetadata::SetRestricted(bool restricted){
-  this->restricted = restricted;
-
-  return true;
-};
-
-bool cMetadata::SetDescription(string description){
-  this->description = description;
-
-  return true;
-};
-
-bool cMetadata::SetLongDescription(string longDescription){
-  this->longDescription = longDescription;
-
-  return true;
-};
-
-bool cMetadata::SetDate(string date){
-  this->date = date;
-
-  return true;
-};
-
-bool cMetadata::SetLanguage(string language){
-  this->language = language;
-
-  return true;
-};
-
-bool cMetadata::SetChannelNr(int channelNr){
-  this->channelNr = channelNr;
-
-  return true;
-};
-
-bool cMetadata::SetChannelName(string channelName){
-  this->channelName = channelName;
-
-  return true;
-};
-
-bool cMetadata::SetScheduledStart(string scheduledStart){
-  this->scheduledStart = scheduledStart;
-
-  return true;
-};
-
-bool cMetadata::SetScheduledEnd(string scheduledEnd){
-  this->scheduledEnd = scheduledEnd;
-
-  return true;
-};
-
 
 bool cMetadata::AddProperty(Property property){
+  string key = property.GetKey();
+
+  // Try to find a validator
+  PropertyValidator* validator = validators[key];
+  // If there is one and it fails to validate the property, return false.
+  // Otherwise ignore it.
+  if(validator && !validator->Validate(property)) return false;
+
+  if(properties.find(key) != properties.end()){
+    if(key.compare(property::object::KEY_CHANNEL_NAME) == 0 ||
+       key.compare(property::object::KEY_CHANNEL_NR) == 0 ||
+       key.compare(property::object::KEY_CLASS) == 0 ||
+       key.compare(property::object::KEY_CREATOR) == 0 ||
+       key.compare(property::object::KEY_DATE) == 0 ||
+       key.compare(property::object::KEY_DESCRIPTION) == 0 ||
+       key.compare(property::object::KEY_LANGUAGE) == 0 ||
+       key.compare(property::object::KEY_LONG_DESCRIPTION) == 0 ||
+       key.compare(property::object::KEY_OBJECTID) == 0 ||
+       key.compare(property::object::KEY_PARENTID) == 0 ||
+       key.compare(property::object::KEY_RESTRICTED) == 0 ||
+       key.compare(property::object::KEY_SCHEDULED_END) == 0 ||
+       key.compare(property::object::KEY_SCHEDULED_START) == 0 ||
+       key.compare(property::object::KEY_TITLE) == 0)
+    {
+      esyslog("UPnP\tProperty '%s' already exist!", key);
+      return false;
+    }
+  }
+
   properties.insert(pair<string, Property>(property.GetKey(), property));
   return true;
 }
 
 bool cMetadata::SetProperty(Property property, int index){
+  // Try to find a validator
+  PropertyValidator* validator = validators[property.GetKey()];
+  // If there is one and it fails to validate the property, return false.
+  // Otherwise ignore it.
+  if(validator && !validator->Validate(property)) return false;
+
   PropertyRange ret = properties.equal_range(property.GetKey());
 
   // No property with the given name found. Let's add it to the map.
@@ -230,11 +229,11 @@ cMetadata* cUPnPResourceProvider::GetMetadata(string uri){
 
   cMetadata* metadata = new cMetadata;
 
-  metadata->SetTitle(uri.substr(uri.find_last_of("/")+1));
-  metadata->SetUpnpClass("object.container");
   metadata->SetObjectIDByUri(uri);
   metadata->SetParentIDByUri(uri.substr(0,uri.find_last_of("/")));
-  metadata->SetRestricted(true);
+  metadata->SetProperty(cMetadata::Property(property::object::KEY_TITLE, uri.substr(uri.find_last_of("/")+1)));
+  metadata->SetProperty(cMetadata::Property(property::object::KEY_CLASS, "object.container"));
+  metadata->SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
   return metadata;
 
