@@ -19,6 +19,18 @@ void checkSearch(string t, string e) {
 
 }
 
+void checkFilter(string f){
+
+  upnp::StringList list = upnp::cFilterCriteria::parse(f);
+
+  cout << "Filter:  \"" << f << "\"" << endl;
+  for(upnp::StringList::iterator it = list.begin(); it != list.end(); ++it){
+    cout << "  " << (*it) << endl;
+  }
+  cout << endl;
+
+}
+
 int main(){
   checkSearch("upnp:class = \"object.item.imageItem\" and ( dc:date >= \"2001-10-01\" and dc:date <= \"2001-10-31\" )",
               "class == 'object.item.imageItem' AND ( date >= '2001-10-01' AND date <= '2001-10-31' ) ");
@@ -31,6 +43,12 @@ int main(){
 
   checkSearch("upnp:class derivedfrom \"object.container.album\"",
               "class LIKE '%object.container.album%' ");
+
+  checkFilter("@id,@parentID,@restricted,dc:title");
+
+  checkFilter("*");
+
+  checkFilter("@id,dc:title,upnp:longDescription,res");
 
   return 0;
 }
