@@ -8,6 +8,7 @@
 #include "../include/plugin.h"
 #include "../include/media/mediaManager.h"
 #include "../include/server.h"
+#include "../include/parser.h"
 #include <upnp/upnp.h>
 #include <sstream>
 #include <tntdb/statement.h>
@@ -37,10 +38,15 @@ IdList cMediaManager::GetContainerUpdateIDs(bool unevented){
   return list;
 }
 
-void cMediaManager::OnContainerUpdate(string containerID, long updateID){
+void cMediaManager::OnContainerUpdate(string uri, long updateID){
   ++mSystemUpdateID;
 
-  mEventedContainerUpdateIDs[containerID] = updateID;
+  mEventedContainerUpdateIDs[tools::GenerateUUIDFromURL(uri)] = updateID;
+
+  mScanDirectories.push_back(uri);
+
+  // Start scanning for changed files.
+  Start();
 }
 
 StringList cMediaManager::GetSearchCapabilities() const {
@@ -94,6 +100,20 @@ int cMediaManager::Browse(BrowseRequest& request){
   request.totalMatches = 0;
   request.updateID = 0;
 
+  switch (request.browseMetadata){
+  case CD_BROWSE_METADATA:
+
+
+
+  case CD_BROWSE_DIRECT_CHILDREN:
+
+
+
+  default:
+    esyslog("UPnP\tInvalid arguments. Browse flag invalid");
+    return UPNP_SOAP_E_INVALID_ARGS;
+  }
+
   return UPNP_E_SUCCESS;
 }
 
@@ -130,19 +150,20 @@ bool cMediaManager::Initialise(){
     tntdb::Statement objectTable = mConnection.prepare(
         "CREATE TABLE metadata"
         "("
-        "  objectID       TEXT    PRIMARY KEY,"
-        "  parentID       TEXT    NOT NULL,"
-        "  title          TEXT    NOT NULL,"
-        "  class          TEXT    NOT NULL,"
-        "  restricted     INTEGER NOT NULL,"
-        "  description    TEXT,"
-        "  ldescription   TEXT,"
-        "  date           TEXT,"
-        "  language       TEXT,"
-        "  channelNr      INTEGER,"
-        "  channelName    TEXT,"
-        "  scheduledStart TEXT,"
-        "  scheduledEnd   TEXT"
+        "  objectID         TEXT    PRIMARY KEY,"
+        "  parentID         TEXT    NOT NULL,"
+        "  title            TEXT    NOT NULL,"
+        "  class            TEXT    NOT NULL,"
+        "  restricted       INTEGER NOT NULL,"
+        "  creator          TEXT,"
+        "  description      TEXT,"
+        "  longDescription  TEXT,"
+        "  date             TEXT,"
+        "  language         TEXT,"
+        "  channelNr        INTEGER,"
+        "  channelName      TEXT,"
+        "  scheduledStart   TEXT,"
+        "  scheduledEnd     TEXT"
         ")");
 
     objectTable.execute();

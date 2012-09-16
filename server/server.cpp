@@ -26,7 +26,7 @@ cMediaServer::serviceMap cMediaServer::mServices;
 
 cMediaServer::cMediaServer()
 : mServerDescription("VDR UPnP/DLNA MS", "Denis Loh", "http://upnp.vdr-developer.org",
-                     DESCRIPTION, "VDR UPnP/DLNA MS", VERSION,
+                     DESCRIPTION, "VDR UPnP-DLNA MS", VERSION,
                      "http://projects.vdr-developer.org/projects/plg-upnp/files", VERSION)
 , mDeviceHandle(0)
 , mAnnounceMaxAge(1800)

@@ -65,6 +65,7 @@ OBJS = 	$(PLUGIN).o \
 		server/contentDirectory.o \
 		common/config.o \
 		common/tools.o \
+		common/parser.o \
 		media/profile.o \
 		media/mediaManager.o \
 		media/pluginManager.o \

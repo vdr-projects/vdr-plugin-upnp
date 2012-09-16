@@ -5,8 +5,9 @@
  *      Author: savop
  */
 
-#include "../include/server.h"
+
 #include "../include/service.h"
+#include "../include/server.h"
 #include "../include/tools.h"
 #include <vdr/i18n.h>
 

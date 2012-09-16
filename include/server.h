@@ -12,12 +12,12 @@
 #include <upnp/upnp.h>
 #include "../include/webserver.h"
 #include "../include/config.h"
+#include "../include/service.h"
 
 using namespace std;
 
 namespace upnp {
 
-class cUPnPService;
 class cMediaManager;
 
 class cMediaServer {

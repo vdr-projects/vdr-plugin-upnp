@@ -5,6 +5,7 @@
  *      Author: savop
  */
 
+#include "../include/server.h"
 #include "../include/connectionManager.h"
 #include "../include/tools.h"
 #include "../include/media/mediaManager.h"

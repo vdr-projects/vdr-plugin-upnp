@@ -13,6 +13,21 @@ using namespace std;
 
 namespace upnp {
 
+const char* cMetadata::KEY_OBJECTID         = "object@id";
+const char* cMetadata::KEY_PARENTID         = "object@parentID";
+const char* cMetadata::KEY_TITLE            = "dc:title";
+const char* cMetadata::KEY_CREATOR          = "dc:creator";
+const char* cMetadata::KEY_CLASS            = "upnp:class";
+const char* cMetadata::KEY_RESTRICTED       = "object@container";
+const char* cMetadata::KEY_DESCRIPTION      = "dc:description";
+const char* cMetadata::KEY_LONG_DESCRIPTION = "upnp:longDescription";
+const char* cMetadata::KEY_DATE             = "dc:date";
+const char* cMetadata::KEY_LANGUAGE         = "dc:language";
+const char* cMetadata::KEY_CHANNEL_NR       = "upnp:channelNr";
+const char* cMetadata::KEY_CHANNEL_NAME     = "upnp:channelName";
+const char* cMetadata::KEY_SCHEDULED_START  = "upnp:scheduledStartTime";
+const char* cMetadata::KEY_SCHEDULED_END    = "upnp:scheduledEndTime";
+
 bool cMetadata::SetObjectIDByUri(string uri){
   return SetObjectID(tools::GenerateUUIDFromURL(uri));
 }

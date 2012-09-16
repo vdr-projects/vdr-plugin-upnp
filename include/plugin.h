@@ -49,6 +49,21 @@ namespace upnp {
 class cMetadata {
 public:
 
+  static const char* KEY_OBJECTID;
+  static const char* KEY_PARENTID;
+  static const char* KEY_TITLE;
+  static const char* KEY_CREATOR;
+  static const char* KEY_CLASS;
+  static const char* KEY_RESTRICTED;
+  static const char* KEY_DESCRIPTION;
+  static const char* KEY_LONG_DESCRIPTION;
+  static const char* KEY_DATE;
+  static const char* KEY_LANGUAGE;
+  static const char* KEY_CHANNEL_NR;
+  static const char* KEY_CHANNEL_NAME;
+  static const char* KEY_SCHEDULED_START;
+  static const char* KEY_SCHEDULED_END;
+
   /**
    * Property class
    *

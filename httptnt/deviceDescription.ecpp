@@ -48,7 +48,7 @@ using namespace upnp;
     <modelNumber><$ serverDescription.modelNumber $></modelNumber> 
     <modelURL><$ serverDescription.modelURL $></modelURL> 
     <serialNumber><$ serverDescription.serialNumber $></serialNumber> 
-    <UDN><$ deviceUUID $></UDN> 
+    <UDN>uuid:<$ deviceUUID $></UDN> 
     <presentationURL><$ urlBase $><$ presentationUrl $></presentationURL> 
     <dlna:X_DLNADOC>DMS-1.50</dlna:X_DLNADOC> 
     <serviceList>

@@ -72,10 +72,11 @@ private:
   void Action();
   bool CheckIntegrity();
 
-  void OnContainerUpdate(string containerID, long updateID);
+  void OnContainerUpdate(string uri, long updateID);
 
   uint32_t mSystemUpdateID;
   IdList   mEventedContainerUpdateIDs;
+  StringList mScanDirectories;
   string   mDatabaseFile;
   tntdb::Connection mConnection;
 
