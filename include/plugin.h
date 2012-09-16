@@ -17,6 +17,44 @@ using namespace std;
 
 namespace upnp {
 
+namespace property {
+
+namespace object {
+
+  static const char* KEY_OBJECTID           = "@id";
+  static const char* KEY_PARENTID           = "@parentID";
+  static const char* KEY_TITLE              = "dc:title";
+  static const char* KEY_CREATOR            = "dc:creator";
+  static const char* KEY_CLASS              = "upnp:class";
+  static const char* KEY_RESTRICTED         = "@restricted";
+  static const char* KEY_DESCRIPTION        = "dc:description";
+  static const char* KEY_LONG_DESCRIPTION   = "upnp:longDescription";
+  static const char* KEY_DATE               = "dc:date";
+  static const char* KEY_LANGUAGE           = "dc:language";
+  static const char* KEY_CHANNEL_NR         = "upnp:channelNr";
+  static const char* KEY_CHANNEL_NAME       = "upnp:channelName";
+  static const char* KEY_SCHEDULED_START    = "upnp:scheduledStartTime";
+  static const char* KEY_SCHEDULED_END      = "upnp:scheduledEndTime";
+
+}
+
+namespace resource {
+
+  static const char* KEY_RESOURCE           = "res";
+  static const char* KEY_PROTOCOL_INFO      = "res@protocolInfo";
+  static const char* KEY_SIZE               = "res@size";
+  static const char* KEY_DURATION           = "res@duration";
+  static const char* KEY_SAMPLE_FREQUENCY   = "res@sampleFrequency";
+  static const char* KEY_RESOLUTION         = "res@resolution";
+  static const char* KEY_BITRATE            = "res@bitrate";
+  static const char* KEY_BITS_PER_SAMPLE    = "res@bitsPerSample";
+  static const char* KEY_NR_AUDIO_CHANNELS  = "res@nrAudioChannels";
+  static const char* KEY_COLOR_DEPTH        = "res@colorDepth";
+
+}
+
+}
+
 /**
  * Metadata class
  *
@@ -48,21 +86,6 @@ namespace upnp {
  */
 class cMetadata {
 public:
-
-  static const char* KEY_OBJECTID;
-  static const char* KEY_PARENTID;
-  static const char* KEY_TITLE;
-  static const char* KEY_CREATOR;
-  static const char* KEY_CLASS;
-  static const char* KEY_RESTRICTED;
-  static const char* KEY_DESCRIPTION;
-  static const char* KEY_LONG_DESCRIPTION;
-  static const char* KEY_DATE;
-  static const char* KEY_LANGUAGE;
-  static const char* KEY_CHANNEL_NR;
-  static const char* KEY_CHANNEL_NAME;
-  static const char* KEY_SCHEDULED_START;
-  static const char* KEY_SCHEDULED_END;
 
   /**
    * Property class
