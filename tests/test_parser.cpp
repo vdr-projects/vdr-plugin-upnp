@@ -8,6 +8,18 @@
 #include "../include/parser.h"
 #include <iostream>
 
+void checkSort(string s){
+
+  upnp::cSortCriteria::SortCriteriaList list = upnp::cSortCriteria::parse(s);
+
+  cout << "Sort:    \"" << s << "\"" << endl;
+  for(upnp::cSortCriteria::SortCriteriaList::iterator it = list.begin(); it != list.end(); ++it){
+    cout << "  " << (*it).property << " " <<((*it).sortDescending ? "DESC" : "ASC") << endl;
+  }
+  cout << endl;
+
+}
+
 void checkSearch(string t, string e) {
 
   string r = upnp::cSearch::parse(t);
@@ -49,6 +61,16 @@ int main(){
   checkFilter("*");
 
   checkFilter("@id,dc:title,upnp:longDescription,res");
+
+  checkSort("");
+
+  checkSort("+dc:title,-dc:creator");
+
+  checkSort("dc:title");
+
+  checkSort("+upnp:class");
+
+  checkSort("+@id");
 
   return 0;
 }
