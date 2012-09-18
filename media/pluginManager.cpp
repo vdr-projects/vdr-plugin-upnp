@@ -13,36 +13,24 @@ using namespace std;
 
 namespace upnp {
 
+cMetadata::ValidatorMap cMetadata::validators;
+
 class PropertyValidator {
-  PropertyValidator(){
+private:
+  string key;
+public:
+  PropertyValidator(string key) : key(key) {
     cMetadata::RegisterPropertyValidator(this);
   }
   virtual ~PropertyValidator(){}
-  virtual string GetPropertyKey() = 0;
+  virtual string GetPropertyKey() const { return key; };
   virtual bool Validate(cMetadata::Property property) = 0;
 };
 
-class ClassValidator : PropertyValidator {
-  virtual string GetPropertyKey(){
-    return property::object::KEY_CLASS;
-  }
-  virtual bool Validate(cMetadata::Property property){
-    string value = property.GetString();
-
-    if(value.find("object.container", 0) == 0 ||
-       value.find("object.item", 0) == 0)
-    {
-      return true;
-    }
-    else
-    {
-      return false;
-    }
-  }
-} ClassValidatorInst;
-
 void cMetadata::RegisterPropertyValidator(PropertyValidator* validator){
-  validators[validator->GetPropertyKey()] = validator;
+  string key = validator->GetPropertyKey();
+
+  validators[key] = validator;
 }
 
 bool cMetadata::SetObjectIDByUri(string uri){
@@ -94,7 +82,7 @@ bool cMetadata::AddProperty(Property property){
        key.compare(property::object::KEY_SCHEDULED_START) == 0 ||
        key.compare(property::object::KEY_TITLE) == 0)
     {
-      esyslog("UPnP\tProperty '%s' already exist!", key);
+      esyslog("UPnP\tProperty '%s' already exist!", key.c_str());
       return false;
     }
   }
@@ -224,6 +212,24 @@ bool cMetadata::Resource::SetColorDepth(uint32_t colorDepth){
   this->colorDepth = colorDepth;
   return true;
 }
+
+class ClassValidator : public PropertyValidator {
+public:
+  ClassValidator() : PropertyValidator(property::object::KEY_CLASS) {}
+  virtual bool Validate(cMetadata::Property property){
+    string value = property.GetString();
+
+    if(value.find("object.container", 0) == 0 ||
+       value.find("object.item", 0) == 0)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
+  }
+} ClassValidatorInst;
 
 cMetadata* cUPnPResourceProvider::GetMetadata(string uri){
 

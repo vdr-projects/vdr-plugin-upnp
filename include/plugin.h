@@ -184,14 +184,16 @@ public:
   bool SetParentIDByUri(string uri);
   string GetParentID();
 
-  static void RegisterPropertyValidator(PropertyValidator* validator);
-
 private:
 
   PropertyMap properties;
   ResourceList resources;
 
   static ValidatorMap validators;
+
+public:
+
+  static void RegisterPropertyValidator(PropertyValidator* validator);
 
 };
 

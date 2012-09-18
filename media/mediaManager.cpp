@@ -52,14 +52,14 @@ void cMediaManager::OnContainerUpdate(string uri, long updateID){
 StringList cMediaManager::GetSearchCapabilities() const {
   StringList list;
 
-  list.push_back("dc:title");
-  list.push_back("dc:creator");
-  list.push_back("dc:description");
-  list.push_back("upnp:longDescription");
-  list.push_back("res@protocolInfo");
-  list.push_back("upnp:class");
-  list.push_back("dc:date");
-  list.push_back("dc:language");
+  list.push_back(property::object::KEY_TITLE);
+  list.push_back(property::object::KEY_CREATOR);
+  list.push_back(property::object::KEY_DESCRIPTION);
+  list.push_back(property::object::KEY_LONG_DESCRIPTION);
+  list.push_back(property::object::KEY_CLASS);
+  list.push_back(property::object::KEY_DATE);
+  list.push_back(property::object::KEY_LANGUAGE);
+  list.push_back(property::resource::KEY_PROTOCOL_INFO);
 
   return list;
 }
@@ -67,14 +67,14 @@ StringList cMediaManager::GetSearchCapabilities() const {
 StringList cMediaManager::GetSortCapabilities() const {
   StringList list;
 
-  list.push_back("dc:title");
-  list.push_back("dc:creator");
-  list.push_back("dc:description");
-  list.push_back("upnp:longDescription");
-  list.push_back("res@protocolInfo");
-  list.push_back("upnp:class");
-  list.push_back("dc:date");
-  list.push_back("dc:language");
+  list.push_back(property::object::KEY_TITLE);
+  list.push_back(property::object::KEY_CREATOR);
+  list.push_back(property::object::KEY_DESCRIPTION);
+  list.push_back(property::object::KEY_LONG_DESCRIPTION);
+  list.push_back(property::object::KEY_CLASS);
+  list.push_back(property::object::KEY_DATE);
+  list.push_back(property::object::KEY_LANGUAGE);
+  list.push_back(property::resource::KEY_PROTOCOL_INFO);
 
   return list;
 }
@@ -82,14 +82,17 @@ StringList cMediaManager::GetSortCapabilities() const {
 StringList cMediaManager::GetSupportedProtocolInfos() const {
   tntdb::Connection conn = mConnection;
   tntdb::Statement stmt = conn.prepare(
-      "SELECT DISTINCT protocolInfo FROM resources;"
+      "SELECT DISTINCT :protocolInfo FROM :resourceTable;"
       );
+
+  stmt.setString("protocolInfo", property::resource::KEY_PROTOCOL_INFO)
+      .setString("resourceTable", "resources");
 
   StringList list;
 
   for(tntdb::Statement::const_iterator it = stmt.begin(); it != stmt.end(); ++it){
     tntdb::Row row = (*it);
-    list.push_back(row.getString("protocolInfo"));
+    list.push_back(row.getString(property::resource::KEY_PROTOCOL_INFO));
   }
 
   return list;
@@ -167,61 +170,82 @@ bool cMediaManager::Initialise(){
 
     mConnection.beginTransaction();
 
-    tntdb::Statement objectTable = mConnection.prepare(
-        "CREATE TABLE metadata"
-        "("
-        "  objectID         TEXT    PRIMARY KEY,"
-        "  parentID         TEXT    NOT NULL,"
-        "  title            TEXT    NOT NULL,"
-        "  class            TEXT    NOT NULL,"
-        "  restricted       INTEGER NOT NULL,"
-        "  creator          TEXT,"
-        "  description      TEXT,"
-        "  longDescription  TEXT,"
-        "  date             TEXT,"
-        "  language         TEXT,"
-        "  channelNr        INTEGER,"
-        "  channelName      TEXT,"
-        "  scheduledStart   TEXT,"
-        "  scheduledEnd     TEXT"
-        ")");
+    ss.str(string());
+
+    ss << "CREATE TABLE metadata"
+       << "("
+       << "`" << property::object::KEY_OBJECTID          << "` TEXT    PRIMARY KEY,"
+       << "`" << property::object::KEY_PARENTID          << "` TEXT    NOT NULL,"
+       << "`" << property::object::KEY_TITLE             << "` TEXT    NOT NULL,"
+       << "`" << property::object::KEY_CLASS             << "` TEXT    NOT NULL,"
+       << "`" << property::object::KEY_RESTRICTED        << "` INTEGER NOT NULL,"
+       << "`" << property::object::KEY_CREATOR           << "` TEXT,"
+       << "`" << property::object::KEY_DESCRIPTION       << "` TEXT,"
+       << "`" << property::object::KEY_LONG_DESCRIPTION  << "` TEXT,"
+       << "`" << property::object::KEY_DATE              << "` TEXT,"
+       << "`" << property::object::KEY_LANGUAGE          << "` TEXT,"
+       << "`" << property::object::KEY_CHANNEL_NR        << "` INTEGER,"
+       << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
+       << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
+       << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT"
+       << ")";
+
+    tntdb::Statement objectTable = mConnection.prepare(ss.str());
 
     objectTable.execute();
 
-    tntdb::Statement detailsTable = mConnection.prepare(
-        "CREATE TABLE details"
-        "("
-        "  propertyID INTEGER PRIMARY KEY,"
-        "  objectID   TEXT    REFERENCES metadata (objectID) ON DELETE CASCADE ON UPDATE CASCADE,"
-        "  property   TEXT,"
-        "  value      TEXT"
-        ")");
+    ss.str(string());
+
+    ss << "CREATE TABLE details"
+       << "("
+       << "  `propertyID` INTEGER PRIMARY KEY,"
+       << "  `" << property::object::KEY_OBJECTID << "` TEXT "
+       << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+       << "  `property`   TEXT,"
+       << "  `value`      TEXT"
+       << ")";
+
+    tntdb::Statement detailsTable = mConnection.prepare(ss.str());
 
     detailsTable.execute();
 
-    tntdb::Statement resourcesTable = mConnection.prepare(
-        "CREATE TABLE resources"
-        "("
-        "  resourceID       INTEGER PRIMARY KEY,"
-        "  objectID         TEXT    REFERENCES metadata (objectID) ON DELETE CASCADE ON UPDATE CASCADE,"
-        "  resourceUri      TEXT    NOT NULL,"
-        "  protocolInfo     TEXT    NOT NULL,"
-        "  size             INTEGER,"
-        "  duration         TEXT,"
-        "  resolution       TEXT,"
-        "  bitrate          INTEGER,"
-        "  sampleFreq       INTEGER,"
-        "  bitsPerSample    INTEGER,"
-        "  nrAudioChannels  INTEGER,"
-        "  colorDepth       INTEGER"
-        ")");
+    ss.str(string());
+
+    ss << "CREATE TABLE resources"
+       << "("
+       << "  resourceID        INTEGER PRIMARY KEY,"
+       << "  `" << property::object::KEY_OBJECTID << "` TEXT "
+       << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+       << "`" << property::resource::KEY_RESOURCE           << "` TEXT    NOT NULL,"
+       << "`" << property::resource::KEY_PROTOCOL_INFO      << "` TEXT    NOT NULL,"
+       << "`" << property::resource::KEY_SIZE               << "` INTEGER,"
+       << "`" << property::resource::KEY_DURATION           << "` TEXT,"
+       << "`" << property::resource::KEY_RESOLUTION         << "` TEXT,"
+       << "`" << property::resource::KEY_BITRATE            << "` INTEGER,"
+       << "`" << property::resource::KEY_SAMPLE_FREQUENCY   << "` INTEGER,"
+       << "`" << property::resource::KEY_BITS_PER_SAMPLE    << "` INTEGER,"
+       << "`" << property::resource::KEY_NR_AUDIO_CHANNELS  << "` INTEGER,"
+       << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER"
+       << ")";
+
+    tntdb::Statement resourcesTable = mConnection.prepare(ss.str());
 
     resourcesTable.execute();
 
-    tntdb::Statement rootContainer = mConnection.prepare(
-        "INSERT INTO metadata (objectID,  parentID,  title,  creator,  class,  restricted,  description,  longDescription)"
-        "              VALUES (:objectID, :parentID, :title, :creator, :class, :restricted, :description, :longDescription)"
-        );
+    ss.str(string());
+
+    ss << "INSERT INTO metadata ("
+       << "`" << property::object::KEY_OBJECTID          << "`, "
+       << "`" << property::object::KEY_PARENTID          << "`, "
+       << "`" << property::object::KEY_TITLE             << "`, "
+       << "`" << property::object::KEY_CLASS             << "`, "
+       << "`" << property::object::KEY_RESTRICTED        << "`, "
+       << "`" << property::object::KEY_CREATOR           << "`, "
+       << "`" << property::object::KEY_DESCRIPTION       << "`, "
+       << "`" << property::object::KEY_LONG_DESCRIPTION  << "`) "
+       << " VALUES (:objectID, :parentID, :title, :class, :restricted, :creator, :description, :longDescription)";
+
+    tntdb::Statement rootContainer = mConnection.prepare(ss.str());
 
     const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
 
