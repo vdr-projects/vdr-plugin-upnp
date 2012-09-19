@@ -105,7 +105,23 @@ int cMediaManager::Browse(BrowseRequest& request){
 
   stringstream sql;
 
-  sql << "SELECT * FROM metadata LEFT JOIN resources WHERE :where";
+  sql << "SELECT * FROM metadata LEFT JOIN resources USING "
+      << "(`" << property::object::KEY_OBJECTID << "`)"
+      << " WHERE ";
+
+  switch (request.browseMetadata){
+  case CD_BROWSE_METADATA:
+    sql << "`" << property::object::KEY_OBJECTID << "`";
+    break;
+  case CD_BROWSE_DIRECT_CHILDREN:
+    sql << "`" << property::object::KEY_PARENTID << "`";
+    break;
+  default:
+    esyslog("UPnP\tInvalid arguments. Browse flag invalid");
+    return UPNP_SOAP_E_INVALID_ARGS;
+  }
+
+  sql << " = '" << request.objectID << "'";
 
   cSortCriteria::SortCriteriaList list = cSortCriteria::parse(request.sortCriteria);
   if(!list.empty()){
@@ -118,23 +134,16 @@ int cMediaManager::Browse(BrowseRequest& request){
   }
 
   if(request.requestCount){
-    sql << " LIMIT " << request.requestCount << ", " << request.startIndex << ";";
+    sql << " LIMIT " << request.startIndex << ", " << request.requestCount;
   }
+
+  cout << sql.str() << endl;
 
   tntdb::Statement select = mConnection.prepare(sql.str());
 
-  switch (request.browseMetadata){
-  case CD_BROWSE_METADATA:
-
-
-
-  case CD_BROWSE_DIRECT_CHILDREN:
-
-
-
-  default:
-    esyslog("UPnP\tInvalid arguments. Browse flag invalid");
-    return UPNP_SOAP_E_INVALID_ARGS;
+  for(tntdb::Statement::const_iterator it = select.begin(); it != select.end(); ++it){
+    tntdb::Row row = (*it);
+    cout << row.getString(property::object::KEY_TITLE) << endl;
   }
 
   return UPNP_E_SUCCESS;
@@ -280,15 +289,31 @@ bool cMediaManager::CheckIntegrity(){
           "SELECT name FROM sqlite_master WHERE type='table' AND name=:table;"
           );
 
-  if( checkTable.setString("table", "metadata").select().empty() ) return false;
-  if( checkTable.setString("table", "details").select().empty() ) return false;
-  if( checkTable.setString("table", "resources").select().empty() ) return false;
+  if( checkTable.setString("table", "metadata").select().empty() ){
+    isyslog("UPnP\tTable metadata does not exist");
+    return false;
+  }
+  if( checkTable.setString("table", "details").select().empty() ){
+    isyslog("UPnP\tTable details does not exist");
+    return false;
+  }
+  if( checkTable.setString("table", "resources").select().empty() ){
+    isyslog("UPnP\tTable resources does not exist");
+    return false;
+  }
 
-  tntdb::Statement checkObject = mConnection.prepare(
-          "SELECT objectID FROM metadata WHERE objectID='0' AND parentID='-1';"
-          );
+  stringstream ss;
 
-  if( checkObject.select().size() != 1 ) return false;
+  ss << "SELECT `" << property::object::KEY_OBJECTID << "` FROM metadata WHERE `"
+                  << property::object::KEY_OBJECTID << "` = '0' AND `"
+                  << property::object::KEY_PARENTID << "` = '-1';";
+
+  tntdb::Statement checkObject = mConnection.prepare(ss.str());
+
+  if( checkObject.select().size() != 1 ){
+    isyslog("UPnP\tRoot item does not exist or more than one root item exist.");
+    return false;
+  }
 
   return true;
 }

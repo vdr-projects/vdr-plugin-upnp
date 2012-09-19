@@ -66,7 +66,7 @@ public:
   const cWebserver& GetWebserver() const { return *mWebserver; }
   cMediaManager& GetManager() const { return *mMediaManager; }
 
-  const string GetDeviceUUID() const { return mCurrentConfiguration.deviceUUID; }
+  const string GetDeviceUUID() const { return string("uuid:") + mCurrentConfiguration.deviceUUID; }
 
   const Description& GetServerDescription() const { return mServerDescription; }
   const iconList& GetServerIcons() const { return mServerIcons; }

@@ -314,7 +314,7 @@ const char* cMediaServer::RuntimeException::what() const throw() {
 }
 
 bool cMediaServer::CheckDeviceUUID(string deviceUUID) const {
-  return deviceUUID.compare(mCurrentConfiguration.deviceUUID) == 0;
+  return deviceUUID.find(mCurrentConfiguration.deviceUUID) != string::npos;
 }
 
 cMediaServer::Description::Description(

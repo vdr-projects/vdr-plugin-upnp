@@ -86,6 +86,7 @@ void cContentDirectory::Action(){
     /* The container update IDs as CSV list */
     UpnpAddToPropertySet(&PropertySet, "ContainerUpdateIDs",
         tools::IdListToCSV(mMediaServer->GetManager().GetContainerUpdateIDs()).c_str());
+
     int ret = UpnpNotifyExt(this->mDeviceHandle, this->mMediaServer->GetDeviceUUID().c_str(),
                             this->mServiceDescription.serviceID.c_str(), PropertySet);
     ixmlDocument_free(PropertySet);
@@ -193,7 +194,7 @@ int cContentDirectory::CreateObject(Upnp_Action_Request* request){
 int cContentDirectory::Search(Upnp_Action_Request* request){
   cMediaManager::SearchRequest searchRequest;
 
-  if(this->ParseIntegerValue(request->ActionRequest, "ContainerID", searchRequest.objectID)){
+  if(this->ParseStringValue(request->ActionRequest, "ContainerID", searchRequest.objectID)){
     esyslog("UPnP\tInvalid arguments. ObjectID missing or wrong");
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;
@@ -260,7 +261,7 @@ int cContentDirectory::Search(Upnp_Action_Request* request){
 int cContentDirectory::Browse(Upnp_Action_Request* request){
   cMediaManager::BrowseRequest browseRequest;
 
-  if(this->ParseIntegerValue(request->ActionRequest, "ObjectID", browseRequest.objectID)){
+  if(this->ParseStringValue(request->ActionRequest, "ObjectID", browseRequest.objectID)){
     esyslog("UPnP\tInvalid arguments. ObjectID missing or wrong");
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;

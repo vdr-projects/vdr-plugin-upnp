@@ -22,7 +22,7 @@ class cMediaManager : public cThread {
 private:
 
   struct MediaRequest {
-    int64_t     objectID;
+    std::string objectID;
     std::string filter;
     uint32_t    startIndex;
     uint32_t    requestCount;
