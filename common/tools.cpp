@@ -328,32 +328,26 @@ int IxmlGetFirstDocumentItem( IN IXML_Document * doc, IN std::string item, std::
   return error;
 }
 
-//TODO const char* mit std::string ersetzen
-IXML_Element* IxmlAddProperty(IXML_Document* document, IXML_Element* node, const char* upnpproperty, const char* value){
+IXML_Element* IxmlAddProperty(IXML_Document* document, IXML_Element* node, const string& upnpproperty, const string& value){
   if(!node) return NULL;
   IXML_Element* PropertyNode = NULL;
 
-  //TODO Bug #887
-  char tvalue[MAX_METADATA_LENGTH];
-  // trim the value to max metadata size
-  if(value){
-    strncpy(tvalue, value, MAX_METADATA_LENGTH);
-  }
+  string tvalue = value.substr(MAX_METADATA_LENGTH);
+  string attribute = upnpproperty.substr(upnpproperty.find('@')+1);
+  string property = upnpproperty.substr(0, upnpproperty.find('@'));
 
-  const char* attribute = att(upnpproperty);
-  const char* property = prop(upnpproperty);
-  if(attribute){
-    if(!strcmp(property,"")){
-      if(ixmlElement_setAttribute(node, attribute, tvalue)!=IXML_SUCCESS){
+  if(!attribute.empty()){
+    if(property.empty()){
+      if(ixmlElement_setAttribute(node, attribute.c_str(), tvalue.c_str())!=IXML_SUCCESS){
         return NULL;
       }
     }
     else {
-      IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property);
+      IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property.c_str());
       if(NodeList!=NULL){
         PropertyNode = (IXML_Element*) ixmlNodeList_item(NodeList, 0);
         if(PropertyNode){
-          if(ixmlElement_setAttribute(PropertyNode, attribute, tvalue)!=IXML_SUCCESS){
+          if(ixmlElement_setAttribute(PropertyNode, attribute.c_str(), tvalue.c_str())!=IXML_SUCCESS){
             return NULL;
           }
         }
@@ -368,64 +362,58 @@ IXML_Element* IxmlAddProperty(IXML_Document* document, IXML_Element* node, const
     }
   }
   else {
-    PropertyNode = ixmlDocument_createElement(document, property);
-    IXML_Node* PropertyText = ixmlDocument_createTextNode(document, tvalue);
+    PropertyNode = ixmlDocument_createElement(document, property.c_str());
+    IXML_Node* PropertyText = ixmlDocument_createTextNode(document, tvalue.c_str());
     ixmlNode_appendChild((IXML_Node*) PropertyNode, PropertyText);
     ixmlNode_appendChild((IXML_Node*) node, (IXML_Node*) PropertyNode);
   }
   return PropertyNode;
 }
 
-//TODO const char* mit std::string ersetzen
-IXML_Element* IxmlAddFilteredProperty(cStringList* Filter, IXML_Document* document, IXML_Element* node, const char* upnpproperty, const char* value){
+IXML_Element* IxmlAddFilteredProperty(const StringList& Filter, IXML_Document* document, IXML_Element* node, const string& upnpproperty, const string& value){
   // leave out empty values.
-  if(!value || !strcmp(value, "") || !strcmp(value, "0")){
+  if(value.empty() || !value.compare("0")){
     return NULL;
   }
 
-  if(!Filter || Filter->Find(upnpproperty))
-    return IxmlAddProperty(document, node, upnpproperty, value);
-  else
-    return NULL;
+  for(StringList::const_iterator it = Filter.begin(); it != Filter.end(); ++it){
+    if((*it).compare(upnpproperty) == 0) return IxmlAddProperty(document, node, upnpproperty, value);
+  }
+
+  return NULL;
 }
 
-//TODO const char* mit std::string ersetzen
-IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, const char* upnpproperty, const char* newValue){
+IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, const string& upnpproperty, const string& newValue){
   if(!node) return NULL;
   IXML_Element* PropertyNode = NULL;
 
-  //TODO Bug #887
-  char tvalue[MAX_METADATA_LENGTH];
-  // trim the value to max metadata size
-  if(newValue){
-    strncpy(tvalue, newValue, MAX_METADATA_LENGTH);
-  }
+  string tvalue = newValue.substr(0, MAX_METADATA_LENGTH);
+  string attribute = upnpproperty.substr(upnpproperty.find('@')+1);
+  string property = upnpproperty.substr(0, upnpproperty.find('@'));
 
-  const char* attribute = att(upnpproperty);
-  const char* property = prop(upnpproperty);
-  if(attribute){
-    if(!strcmp(property,"")){
-      if(newValue){
-        if(ixmlElement_setAttribute(node, attribute, tvalue)!=IXML_SUCCESS){
+  if(!attribute.empty()){
+    if(property.empty()){
+      if(tvalue.empty()){
+        if(ixmlElement_setAttribute(node, attribute.c_str(), tvalue.c_str())!=IXML_SUCCESS){
           return NULL;
         }
       }
       else {
-        ixmlElement_removeAttribute(node, attribute);
+        ixmlElement_removeAttribute(node, attribute.c_str());
       }
     }
     else {
-      IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property);
+      IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property.c_str());
       if(NodeList!=NULL){
         PropertyNode = (IXML_Element*) ixmlNodeList_item(NodeList, 0);
         if(PropertyNode){
           if(newValue){
-            if(ixmlElement_setAttribute(PropertyNode, attribute, tvalue)!=IXML_SUCCESS){
+            if(ixmlElement_setAttribute(PropertyNode, attribute.c_str(), tvalue.c_str())!=IXML_SUCCESS){
               return NULL;
             }
           }
           else {
-            ixmlElement_removeAttribute(PropertyNode, attribute);
+            ixmlElement_removeAttribute(PropertyNode, attribute.c_str());
           }
         }
         else {
@@ -439,7 +427,7 @@ IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, c
     }
   }
   else {
-    IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property);
+    IXML_NodeList* NodeList = ixmlElement_getElementsByTagName(node, property.c_str());
     if(NodeList!=NULL){
       PropertyNode = (IXML_Element*) ixmlNodeList_item(NodeList, 0);
       IXML_Node* PropertyText = ixmlNode_getFirstChild((IXML_Node*) PropertyNode);
@@ -448,7 +436,7 @@ IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, c
         return NULL;
       }
       if(newValue){
-        PropertyText = ixmlDocument_createTextNode(document, tvalue);
+        PropertyText = ixmlDocument_createTextNode(document, tvalue.c_str());
       }
       ixmlNode_appendChild((IXML_Node*) PropertyNode, PropertyText);
     }

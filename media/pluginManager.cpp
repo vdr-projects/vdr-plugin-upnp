@@ -24,7 +24,7 @@ public:
   }
   virtual ~PropertyValidator(){}
   virtual string GetPropertyKey() const { return key; };
-  virtual bool Validate(cMetadata::Property property) = 0;
+  virtual bool Validate(const cMetadata::Property& property) = 0;
 };
 
 void cMetadata::RegisterPropertyValidator(PropertyValidator* validator){
@@ -33,31 +33,15 @@ void cMetadata::RegisterPropertyValidator(PropertyValidator* validator){
   validators[key] = validator;
 }
 
-bool cMetadata::SetObjectIDByUri(string uri){
-  return SetObjectID(tools::GenerateUUIDFromURL(uri));
+bool cMetadata::SetObjectIDByUri(const string& uri){
+  return SetProperty(Property(property::object::KEY_OBJECTID, tools::GenerateUUIDFromURL(uri)));
 }
 
-bool cMetadata::SetParentIDByUri(string uri){
-  return SetParentID(tools::GenerateUUIDFromURL(uri));
+bool cMetadata::SetParentIDByUri(const string& uri){
+  return SetProperty(Property(property::object::KEY_PARENTID, tools::GenerateUUIDFromURL(uri)));
 }
 
-bool cMetadata::SetObjectID(string objectID){
-  if(objectID.empty() || objectID.compare("0") == 0) return false;
-
-  SetProperty(Property(property::object::KEY_OBJECTID, objectID));
-
-  return true;
-};
-
-bool cMetadata::SetParentID(string parentID){
-  if(parentID.compare("-1") == 0) return false;
-
-  SetProperty(Property(property::object::KEY_PARENTID, parentID));
-
-  return true;
-};
-
-bool cMetadata::AddProperty(Property property){
+bool cMetadata::AddProperty(const Property& property){
   string key = property.GetKey();
 
   // Try to find a validator
@@ -91,7 +75,7 @@ bool cMetadata::AddProperty(Property property){
   return true;
 }
 
-bool cMetadata::SetProperty(Property property, int index){
+bool cMetadata::SetProperty(const Property& property, int index){
   // Try to find a validator
   PropertyValidator* validator = validators[property.GetKey()];
   // If there is one and it fails to validate the property, return false.
@@ -116,7 +100,7 @@ bool cMetadata::SetProperty(Property property, int index){
 
 }
 
-cMetadata::PropertyRange cMetadata::GetPropertiesByKey(string property) {
+cMetadata::PropertyRange cMetadata::GetPropertiesByKey(const string& property) {
   return properties.equal_range(property);
 }
 
@@ -125,7 +109,7 @@ cMetadata::PropertyRange cMetadata::GetAllProperties() {
   return range;
 }
 
-cMetadata::Property& cMetadata::GetPropertyByKey(string property) {
+cMetadata::Property& cMetadata::GetPropertyByKey(const string& property) {
   return (*properties.find(property)).second;
 }
 
@@ -216,7 +200,7 @@ bool cMetadata::Resource::SetColorDepth(uint32_t colorDepth){
 class ClassValidator : public PropertyValidator {
 public:
   ClassValidator() : PropertyValidator(property::object::KEY_CLASS) {}
-  virtual bool Validate(cMetadata::Property property){
+  virtual bool Validate(const cMetadata::Property& property){
     string value = property.GetString();
 
     if(value.find("object.container", 0) == 0 ||
@@ -231,15 +215,15 @@ public:
   }
 } ClassValidatorInst;
 
-cMetadata* cUPnPResourceProvider::GetMetadata(string uri){
+cMetadata cUPnPResourceProvider::GetMetadata(string uri){
 
-  cMetadata* metadata = new cMetadata;
+  cMetadata metadata;
 
-  metadata->SetObjectIDByUri(uri);
-  metadata->SetParentIDByUri(uri.substr(0,uri.find_last_of("/")));
-  metadata->SetProperty(cMetadata::Property(property::object::KEY_TITLE, uri.substr(uri.find_last_of("/")+1)));
-  metadata->SetProperty(cMetadata::Property(property::object::KEY_CLASS, "object.container"));
-  metadata->SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
+  metadata.SetObjectIDByUri(uri);
+  metadata.SetParentIDByUri(uri.substr(0,uri.find_last_of("/")));
+  metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, uri.substr(uri.find_last_of("/")+1)));
+  metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, "object.container"));
+  metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
   return metadata;
 

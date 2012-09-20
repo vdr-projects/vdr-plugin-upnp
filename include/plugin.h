@@ -27,6 +27,7 @@ namespace object {
   static const char* KEY_CREATOR            = "dc:creator";
   static const char* KEY_CLASS              = "upnp:class";
   static const char* KEY_RESTRICTED         = "@restricted";
+  static const char* KEY_CHILD_COUNT        = "@childCount";
   static const char* KEY_DESCRIPTION        = "dc:description";
   static const char* KEY_LONG_DESCRIPTION   = "upnp:longDescription";
   static const char* KEY_DATE               = "dc:date";
@@ -35,6 +36,8 @@ namespace object {
   static const char* KEY_CHANNEL_NAME       = "upnp:channelName";
   static const char* KEY_SCHEDULED_START    = "upnp:scheduledStartTime";
   static const char* KEY_SCHEDULED_END      = "upnp:scheduledEndTime";
+  static const char* KEY_OBJECT_UPDATE_ID   = "upnp:objectUpdateID";
+  static const char* KEY_CONTAINER_UPDATE_ID= "upnp:containerUpdateID";
 
 }
 
@@ -87,6 +90,7 @@ class PropertyValidator;
  *
  */
 class cMetadata {
+  friend class cMediaManager;
 public:
 
   /**
@@ -170,19 +174,15 @@ public:
   typedef list<Resource> ResourceList;
   typedef map<string, PropertyValidator*> ValidatorMap;
 
-  bool AddProperty(Property property);
-  bool SetProperty(Property property, int index = 0);
+  bool AddProperty(const Property& property);
+  bool SetProperty(const Property& property, int index = 0);
 
-  Property& GetPropertyByKey(string property);
-  PropertyRange GetPropertiesByKey(string property);
+  Property& GetPropertyByKey(const string& property);
+  PropertyRange GetPropertiesByKey(const string& property);
   PropertyRange GetAllProperties();
 
-  bool SetObjectID(string objectID);
-  bool SetObjectIDByUri(string uri);
-  string GetObjectID();
-  bool SetParentID(string parentID);
-  bool SetParentIDByUri(string uri);
-  string GetParentID();
+  bool SetObjectIDByUri(const string& uri);
+  bool SetParentIDByUri(const string& uri);
 
 private:
 
@@ -309,7 +309,7 @@ public:
   /**
    * Returns the meta data of a specific container.
    *
-   * This function is used to retrieve meta informatio about a
+   * This function is used to retrieve meta information about a
    * container. It is NOT used to get information about files or
    * resources, as this is done by the media plugins.
    *
@@ -329,7 +329,7 @@ public:
    * - Restricted: true
    *
    */
-  virtual cMetadata* GetMetadata(string uri);
+  virtual cMetadata GetMetadata(string uri);
 
   /**
    * Get the HTTP Uri.
@@ -502,7 +502,7 @@ public:
    * @param uri the absolute path to the resource.
    * @return the media resource information.
    */
-  virtual cMetadata* GetMetadata(string uri) = 0;
+  virtual cMetadata GetMetadata(string uri) = 0;
 protected:
 };
 

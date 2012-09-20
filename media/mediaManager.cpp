@@ -98,55 +98,97 @@ StringList cMediaManager::GetSupportedProtocolInfos() const {
   return list;
 }
 
-int cMediaManager::Browse(BrowseRequest& request){
+void cMediaManager::CreateResponse(MediaRequest& request, const string& select){
+  stringstream resources, details;
+
+  resources << "SELECT * FROM resources WHERE "
+            << "`" << property::object::KEY_OBJECTID << "` = "
+            << "':objectID'";
+
+  tntdb::Statement select1 = mConnection.prepare(select);
+  tntdb::Statement select2 = mConnection.prepare(resources.str());
+
+  StringList filterList = cFilterCriteria::parse(request.filter);
+
   request.numberReturned = 0;
-  request.totalMatches = 0;
   request.updateID = 0;
 
-  stringstream sql;
+  // Using cursors, cannot calculate totalMatches as this would require another SQL request.
+  request.totalMatches = 0;
 
-  sql << "SELECT * FROM metadata LEFT JOIN resources USING "
-      << "(`" << property::object::KEY_OBJECTID << "`)"
-      << " WHERE ";
+  string didl = "<DIDL-Lite "
+                "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" "
+                "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
+                "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" "
+                "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\"></DIDL-Lite>";
+
+
+
+  for(tntdb::Statement::const_iterator it = select1.begin(); it != select1.end(); ++it){
+    tntdb::Row row = (*it);
+
+
+    select2.setString("objectID", row.getString(property::object::KEY_OBJECTID));
+
+    for(tntdb::Statement::const_iterator it2 = select.begin(); it2 != select.end(); ++it2){
+        tntdb::Row row2 = (*it2);
+
+        cMetadata::Resource resource;
+
+        resource.SetBitrate(row2.getInt(property::resource::KEY_BITRATE));
+        resource.SetBitsPerSample(row2.getInt(property::resource::KEY_BITS_PER_SAMPLE));
+
+    }
+
+    ++request.numberReturned;
+  }
+
+  request.result;
+}
+
+int cMediaManager::Browse(BrowseRequest& request){
+  stringstream metadata;
+
+  metadata << "SELECT *,(SELECT COUNT(1) FROM metadata m WHERE "
+      << "m.`" << property::object::KEY_PARENTID << "` = "
+      << "p.`" << property::object::KEY_OBJECTID << "`) as "
+      << "`" << property::object::KEY_CHILD_COUNT << "` FROM metadata p WHERE ";
 
   switch (request.browseMetadata){
   case CD_BROWSE_METADATA:
-    sql << "`" << property::object::KEY_OBJECTID << "`";
+    metadata << "`" << property::object::KEY_OBJECTID << "`";
+
+    // Set the offset and count to 0,1 as this is the only allowed option here.
+    request.requestCount = 1;
+    request.startIndex = 0;
     break;
   case CD_BROWSE_DIRECT_CHILDREN:
-    sql << "`" << property::object::KEY_PARENTID << "`";
+    metadata << "`" << property::object::KEY_PARENTID << "`";
     break;
   default:
     esyslog("UPnP\tInvalid arguments. Browse flag invalid");
     return UPNP_SOAP_E_INVALID_ARGS;
   }
 
-  sql << " = '" << request.objectID << "'";
+  metadata << " = '" << request.objectID << "'";
 
   cSortCriteria::SortCriteriaList list = cSortCriteria::parse(request.sortCriteria);
   if(!list.empty()){
-    sql << " ORDER BY ";
+    metadata << " ORDER BY ";
     upnp::cSortCriteria::SortCriteriaList::iterator it = list.begin();
-    sql << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
+    metadata << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
     for(++it; it != list.end(); ++it){
-      sql << ", " << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
+      metadata << ", " << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
     }
   }
 
   if(request.requestCount){
-    sql << " LIMIT " << request.startIndex << ", " << request.requestCount;
+    metadata << " LIMIT " << request.startIndex << ", " << request.requestCount;
   }
 
-  cout << sql.str() << endl;
 
-  tntdb::Statement select = mConnection.prepare(sql.str());
 
-  for(tntdb::Statement::const_iterator it = select.begin(); it != select.end(); ++it){
-    tntdb::Row row = (*it);
-    cout << row.getString(property::object::KEY_TITLE) << endl;
-  }
-
-  return UPNP_E_SUCCESS;
+  return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
 
 int cMediaManager::Search(SearchRequest& request){
@@ -197,6 +239,7 @@ bool cMediaManager::Initialise(){
        << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
        << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
        << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT"
+       << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
        << ")";
 
     tntdb::Statement objectTable = mConnection.prepare(ss.str());

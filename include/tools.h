@@ -150,11 +150,11 @@ namespace ixml {
    * @param upnpproperty the upnp property
    * @param value the value of the upnp property
    */
-  IXML_Element* IxmlAddProperty(IN IXML_Document* document, IN IXML_Element* node, IN const char* upnpproperty, IN const char* value );
+  IXML_Element* IxmlAddProperty(IN IXML_Document* document, IN IXML_Element* node, IN const string& upnpproperty, IN const string& value );
 
-  IXML_Element* IxmlAddFilteredProperty(IN cStringList* Filter, IN IXML_Document* document, IN IXML_Element* node, IN const char* upnpproperty, IN const char* value );
+  IXML_Element* IxmlAddFilteredProperty(IN const StringList& Filter, IN IXML_Document* document, IN IXML_Element* node, IN const string& upnpproperty, IN const string& value );
 
-  IXML_Element* IxmlReplaceProperty(IN IXML_Document* document, IN IXML_Element* node, IN const char* upnpproperty, IN const char* newValue );
+  IXML_Element* IxmlReplaceProperty(IN IXML_Document* document, IN IXML_Element* node, IN const string& upnpproperty, IN const string& newValue );
 }
 
 }
