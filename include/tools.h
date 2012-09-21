@@ -31,7 +31,8 @@ using namespace std;
 #define att(s)                  strchr(s,'@')!=NULL?strchr(s,'@')+1:NULL
 #define prop(s)                 substr(s, 0, strchr(s,'@')-s)
 
-#define MAX_METADATA_LENGTH     1024
+#define MAX_METADATA_LENGTH_L     1024
+#define MAX_METADATA_LENGTH_S     256
 
 /**
  * creates a part of a string

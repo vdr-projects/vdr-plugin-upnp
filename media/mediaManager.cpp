@@ -9,12 +9,20 @@
 #include "../include/media/mediaManager.h"
 #include "../include/server.h"
 #include "../include/parser.h"
+#include "../include/tools.h"
 #include <upnp/upnp.h>
 #include <sstream>
 #include <tntdb/statement.h>
 #include <tntdb/result.h>
+#include <upnp/ixml.h>
 
 namespace upnp {
+
+static const char* DIDLFragment = "<DIDL-Lite "
+                                  "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" "
+                                  "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
+                                  "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" "
+                                  "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\"></DIDL-Lite>";
 
 cMediaManager::cMediaManager()
 : mSystemUpdateID(0)
@@ -98,7 +106,7 @@ StringList cMediaManager::GetSupportedProtocolInfos() const {
   return list;
 }
 
-void cMediaManager::CreateResponse(MediaRequest& request, const string& select){
+int cMediaManager::CreateResponse(MediaRequest& request, const string& select){
   stringstream resources, details;
 
   resources << "SELECT * FROM resources WHERE "
@@ -116,34 +124,92 @@ void cMediaManager::CreateResponse(MediaRequest& request, const string& select){
   // Using cursors, cannot calculate totalMatches as this would require another SQL request.
   request.totalMatches = 0;
 
-  string didl = "<DIDL-Lite "
-                "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" "
-                "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
-                "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" "
-                "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\"></DIDL-Lite>";
+  IXML_Document* DIDLDoc = NULL;
+  if(ixmlParseBufferEx(DIDLFragment, &DIDLDoc)==IXML_SUCCESS){
+
+    IXML_Node* root = ixmlNode_getFirstChild((IXML_Node*) DIDLDoc);
+
+    for(tntdb::Statement::const_iterator it = select1.begin(); it != select1.end(); ++it){
+
+      tntdb::Row row = (*it);
+
+      IXML_Element* object;
+      string upnpClass = row.getString(property::object::KEY_CLASS);
+
+      bool isContainer;
+
+      if(upnpClass.find("object.item",0) == 0){
+        object = ixmlDocument_createElement(DIDLDoc, "item");
+        isContainer = false;
+      } else if(upnpClass.find("object.container",0) == 0) {
+        object = ixmlDocument_createElement(DIDLDoc, "container");
+        isContainer = true;
+      } else {
+        goto error;
+      }
+      ixmlNode_appendChild(root, (IXML_Node*)object);
+
+      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, row.getString(property::object::KEY_OBJECTID));
+      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_PARENTID, row.getString(property::object::KEY_PARENTID));
+      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_RESTRICTED, row.getString(property::object::KEY_RESTRICTED));
+      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_TITLE, row.getString(property::object::KEY_TITLE).substr(0, MAX_METADATA_LENGTH_S));
+      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_CLASS, row.getString(property::object::KEY_CLASS).substr(0, MAX_METADATA_LENGTH_S));
+
+      if(isContainer){
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHILD_COUNT, row.getString(property::object::KEY_CHILD_COUNT));
+      }
+      else {
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NR, row.getString(property::object::KEY_CHANNEL_NR));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, row.getString(property::object::KEY_CHANNEL_NAME));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_START, row.getString(property::object::KEY_SCHEDULED_START));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_END, row.getString(property::object::KEY_SCHEDULED_END));
+      }
+
+      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CREATOR, row.getString(property::object::KEY_CREATOR));
+      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DESCRIPTION, row.getString(property::object::KEY_DESCRIPTION));
+      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LONG_DESCRIPTION, row.getString(property::object::KEY_LONG_DESCRIPTION));
+      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DATE, row.getDatetime(property::object::KEY_DATE).getIso());
+      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LANGUAGE, row.getString(property::object::KEY_LANGUAGE));
 
 
+      select2.setString("objectID", row.getString(property::object::KEY_OBJECTID));
 
-  for(tntdb::Statement::const_iterator it = select1.begin(); it != select1.end(); ++it){
-    tntdb::Row row = (*it);
+      for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
+          tntdb::Row row2 = (*it2);
 
+          string resourceURI;
 
-    select2.setString("objectID", row.getString(property::object::KEY_OBJECTID));
+          IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
 
-    for(tntdb::Statement::const_iterator it2 = select.begin(); it2 != select.end(); ++it2){
-        tntdb::Row row2 = (*it2);
+          if(resource){
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row.getString(property::resource::KEY_PROTOCOL_INFO));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row.getString(property::resource::KEY_BITRATE));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row.getString(property::resource::KEY_BITS_PER_SAMPLE));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row.getString(property::resource::KEY_COLOR_DEPTH));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row.getTime(property::resource::KEY_DURATION).getIso());
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row.getString(property::resource::KEY_RESOLUTION));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row.getString(property::resource::KEY_SAMPLE_FREQUENCY));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, row.getString(property::resource::KEY_SIZE));
+          }
 
-        cMetadata::Resource resource;
+      }
 
-        resource.SetBitrate(row2.getInt(property::resource::KEY_BITRATE));
-        resource.SetBitsPerSample(row2.getInt(property::resource::KEY_BITS_PER_SAMPLE));
-
+      ++request.numberReturned;
     }
 
-    ++request.numberReturned;
+    request.result = ixmlDocumenttoString(DIDLDoc);
+
+    cout << request.result << endl;
+
+    ixmlDocument_free(DIDLDoc);
+    return UPNP_E_SUCCESS;
   }
 
-  request.result;
+  error:
+  esyslog("UPnP\tFailed to process the request");
+  ixmlDocument_free(DIDLDoc);
+  return UPNP_CDS_E_CANT_PROCESS_REQUEST;
 }
 
 int cMediaManager::Browse(BrowseRequest& request){
@@ -186,7 +252,10 @@ int cMediaManager::Browse(BrowseRequest& request){
     metadata << " LIMIT " << request.startIndex << ", " << request.requestCount;
   }
 
+  metadata << ";";
 
+  int ret = 0;
+  if((ret = CreateResponse(request, metadata.str())) == UPNP_E_SUCCESS) return ret;
 
   return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }

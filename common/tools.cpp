@@ -332,9 +332,11 @@ IXML_Element* IxmlAddProperty(IXML_Document* document, IXML_Element* node, const
   if(!node) return NULL;
   IXML_Element* PropertyNode = NULL;
 
-  string tvalue = value.substr(MAX_METADATA_LENGTH);
-  string attribute = upnpproperty.substr(upnpproperty.find('@')+1);
-  string property = upnpproperty.substr(0, upnpproperty.find('@'));
+  string tvalue = value.substr(0,MAX_METADATA_LENGTH_L);
+
+  string::size_type pos = upnpproperty.find('@');
+  string attribute = pos!=string::npos ? upnpproperty.substr(pos+1) : string();
+  string property = pos!=string::npos ? upnpproperty.substr(0, pos) : upnpproperty;
 
   if(!attribute.empty()){
     if(property.empty()){
@@ -376,6 +378,8 @@ IXML_Element* IxmlAddFilteredProperty(const StringList& Filter, IXML_Document* d
     return NULL;
   }
 
+  if((*Filter.begin()).compare("*") == 0) return IxmlAddProperty(document, node, upnpproperty, value);
+
   for(StringList::const_iterator it = Filter.begin(); it != Filter.end(); ++it){
     if((*it).compare(upnpproperty) == 0) return IxmlAddProperty(document, node, upnpproperty, value);
   }
@@ -387,9 +391,11 @@ IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, c
   if(!node) return NULL;
   IXML_Element* PropertyNode = NULL;
 
-  string tvalue = newValue.substr(0, MAX_METADATA_LENGTH);
-  string attribute = upnpproperty.substr(upnpproperty.find('@')+1);
-  string property = upnpproperty.substr(0, upnpproperty.find('@'));
+  string tvalue = newValue.substr(0, MAX_METADATA_LENGTH_L);
+
+  string::size_type pos = upnpproperty.find('@');
+  string attribute = pos!=string::npos ? upnpproperty.substr(pos+1) : string();
+  string property = pos!=string::npos ? upnpproperty.substr(0, pos) : upnpproperty;
 
   if(!attribute.empty()){
     if(property.empty()){
@@ -407,7 +413,7 @@ IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, c
       if(NodeList!=NULL){
         PropertyNode = (IXML_Element*) ixmlNodeList_item(NodeList, 0);
         if(PropertyNode){
-          if(newValue){
+          if(!tvalue.empty()){
             if(ixmlElement_setAttribute(PropertyNode, attribute.c_str(), tvalue.c_str())!=IXML_SUCCESS){
               return NULL;
             }
@@ -435,7 +441,7 @@ IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, c
       if(ixmlNode_removeChild((IXML_Node*) PropertyNode, PropertyText, NULL)!=IXML_SUCCESS){
         return NULL;
       }
-      if(newValue){
+      if(!tvalue.empty()){
         PropertyText = ixmlDocument_createTextNode(document, tvalue.c_str());
       }
       ixmlNode_appendChild((IXML_Node*) PropertyNode, PropertyText);

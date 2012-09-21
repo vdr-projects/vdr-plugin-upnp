@@ -72,7 +72,7 @@ private:
   void Action();
   bool CheckIntegrity();
 
-  void CreateResponse(MediaRequest&, const string&);
+  int CreateResponse(MediaRequest&, const string&);
 
   void OnContainerUpdate(string uri, long updateID);
 
