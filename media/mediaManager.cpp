@@ -24,6 +24,14 @@ static const char* DIDLFragment = "<DIDL-Lite "
                                   "xmlns:upnp=\"urn:schemas-upnp-org:metadata-1-0/upnp/\" "
                                   "xmlns:dlna=\"urn:schemas-dlna-org:metadata-1-0/\"></DIDL-Lite>";
 
+namespace db {
+
+static const char* Metadata   = "metadata";
+static const char* Resources  = "resources";
+static const char* Details    = "details";
+
+}
+
 cMediaManager::cMediaManager()
 : mSystemUpdateID(0)
 , mDatabaseFile("metadata.db")
@@ -92,7 +100,7 @@ StringList cMediaManager::GetSupportedProtocolInfos() const {
 
   stringstream ss;
 
-  ss << "SELECT DISTINCT `" << property::resource::KEY_PROTOCOL_INFO << "` FROM resources";
+  ss << "SELECT DISTINCT `" << property::resource::KEY_PROTOCOL_INFO << "` FROM " << db::Resources;
 
   tntdb::Statement stmt = conn.prepare(ss.str());
 
@@ -112,11 +120,11 @@ StringList cMediaManager::GetSupportedProtocolInfos() const {
 int cMediaManager::CreateResponse(MediaRequest& request, const string& select, const string& count){
   stringstream resources, details;
 
-  resources << "SELECT * FROM resources WHERE "
+  resources << "SELECT * FROM " << db::Resources << " WHERE "
             << "`" << property::object::KEY_OBJECTID << "` = "
             << ":objectID";
 
-  details   << "SELECT * FROM details WHERE "
+  details   << "SELECT * FROM " << db::Details << " WHERE "
             << "`" << property::object::KEY_OBJECTID << "` = "
             << ":objectID";
 
@@ -234,12 +242,12 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
 int cMediaManager::Browse(BrowseRequest& request){
   stringstream metadata, count, where;
 
-  metadata << "SELECT *,(SELECT COUNT(1) FROM metadata m WHERE "
+  metadata << "SELECT *,(SELECT COUNT(1) FROM " << db::Metadata << " m WHERE "
       << "m.`" << property::object::KEY_PARENTID << "` = "
       << "p.`" << property::object::KEY_OBJECTID << "`) as "
-      << "`" << property::object::KEY_CHILD_COUNT << "` FROM metadata p WHERE ";
+      << "`" << property::object::KEY_CHILD_COUNT << "` FROM " << db::Metadata << " p WHERE ";
 
-  count << "SELECT COUNT(1) as totalMatches FROM metadata WHERE ";
+  count << "SELECT COUNT(1) as totalMatches FROM " << db::Metadata << " WHERE ";
 
   switch (request.browseMetadata){
   case CD_BROWSE_METADATA:
@@ -289,6 +297,8 @@ int cMediaManager::Search(SearchRequest& request){
 
   stringstream metadata, count;
 
+  // TODO: Finish search method
+
   int ret = 0;
   if((ret = CreateResponse(request, metadata.str(), count.str())) == UPNP_E_SUCCESS) return ret;
 
@@ -319,7 +329,7 @@ bool cMediaManager::Initialise(){
 
     ss.str(string());
 
-    ss << "CREATE TABLE metadata"
+    ss << "CREATE TABLE " << db::Metadata
        << "("
        << "`" << property::object::KEY_OBJECTID          << "` TEXT    PRIMARY KEY,"
        << "`" << property::object::KEY_PARENTID          << "` TEXT    NOT NULL,"
@@ -344,7 +354,7 @@ bool cMediaManager::Initialise(){
 
     ss.str(string());
 
-    ss << "CREATE TABLE details"
+    ss << "CREATE TABLE " << db::Details
        << "("
        << "  `propertyID` INTEGER PRIMARY KEY,"
        << "  `" << property::object::KEY_OBJECTID << "` TEXT "
@@ -359,7 +369,7 @@ bool cMediaManager::Initialise(){
 
     ss.str(string());
 
-    ss << "CREATE TABLE resources"
+    ss << "CREATE TABLE " << db::Resources
        << "("
        << "  resourceID        INTEGER PRIMARY KEY,"
        << "  `" << property::object::KEY_OBJECTID << "` TEXT "
@@ -382,7 +392,7 @@ bool cMediaManager::Initialise(){
 
     ss.str(string());
 
-    ss << "INSERT INTO metadata ("
+    ss << "INSERT INTO " << db::Metadata << " ("
        << "`" << property::object::KEY_OBJECTID          << "`, "
        << "`" << property::object::KEY_PARENTID          << "`, "
        << "`" << property::object::KEY_TITLE             << "`, "
@@ -428,22 +438,22 @@ bool cMediaManager::CheckIntegrity(){
           "SELECT name FROM sqlite_master WHERE type='table' AND name=:table;"
           );
 
-  if( checkTable.setString("table", "metadata").select().empty() ){
-    isyslog("UPnP\tTable metadata does not exist");
+  if( checkTable.setString("table", db::Metadata).select().empty() ){
+    isyslog("UPnP\tTable '%s' does not exist", db::Metadata);
     return false;
   }
-  if( checkTable.setString("table", "details").select().empty() ){
-    isyslog("UPnP\tTable details does not exist");
+  if( checkTable.setString("table", db::Details).select().empty() ){
+    isyslog("UPnP\tTable '%s' does not exist", db::Details);
     return false;
   }
-  if( checkTable.setString("table", "resources").select().empty() ){
-    isyslog("UPnP\tTable resources does not exist");
+  if( checkTable.setString("table", db::Resources).select().empty() ){
+    isyslog("UPnP\tTable '%s' does not exist", db::Resources);
     return false;
   }
 
   stringstream ss;
 
-  ss << "SELECT `" << property::object::KEY_OBJECTID << "` FROM metadata WHERE `"
+  ss << "SELECT `" << property::object::KEY_OBJECTID << "` FROM " << db::Metadata << " WHERE `"
                   << property::object::KEY_OBJECTID << "` = '0' AND `"
                   << property::object::KEY_PARENTID << "` = '-1';";
 
