@@ -62,6 +62,8 @@ int main(){
 
   checkFilter("@id,dc:title,upnp:longDescription,res");
 
+  checkFilter("@id,@parentID,@restricted,dc:title,upnp:class,res,dc:date,@childCount,sec:CaptionInfo,sec:CaptionInfoEx,sec:dcmInfo,sec:MetaFileInfo,res@resolution,res@size,upnp:genre,dc:date,upnp:album,res@duration,upnp:albumArtURI,res@bitrate,dc:creator");
+
   checkSort("");
 
   checkSort("+dc:title,-dc:creator");

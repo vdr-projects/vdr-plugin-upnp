@@ -89,49 +89,58 @@ StringList cMediaManager::GetSortCapabilities() const {
 
 StringList cMediaManager::GetSupportedProtocolInfos() const {
   tntdb::Connection conn = mConnection;
-  tntdb::Statement stmt = conn.prepare(
-      "SELECT DISTINCT :protocolInfo FROM :resourceTable;"
-      );
 
-  stmt.setString("protocolInfo", property::resource::KEY_PROTOCOL_INFO)
-      .setString("resourceTable", "resources");
+  stringstream ss;
+
+  ss << "SELECT DISTINCT `" << property::resource::KEY_PROTOCOL_INFO << "` FROM resources";
+
+  tntdb::Statement stmt = conn.prepare(ss.str());
 
   StringList list;
 
   for(tntdb::Statement::const_iterator it = stmt.begin(); it != stmt.end(); ++it){
     tntdb::Row row = (*it);
+
+    cout << row.getString(property::resource::KEY_PROTOCOL_INFO) << endl;
+
     list.push_back(row.getString(property::resource::KEY_PROTOCOL_INFO));
   }
 
   return list;
 }
 
-int cMediaManager::CreateResponse(MediaRequest& request, const string& select){
+int cMediaManager::CreateResponse(MediaRequest& request, const string& select, const string& count){
   stringstream resources, details;
 
   resources << "SELECT * FROM resources WHERE "
             << "`" << property::object::KEY_OBJECTID << "` = "
-            << "':objectID'";
+            << ":objectID";
+
+  details   << "SELECT * FROM details WHERE "
+            << "`" << property::object::KEY_OBJECTID << "` = "
+            << ":objectID";
 
   tntdb::Statement select1 = mConnection.prepare(select);
+  tntdb::Result result = mConnection.select(count);
   tntdb::Statement select2 = mConnection.prepare(resources.str());
+  tntdb::Statement select3 = mConnection.prepare(details.str());
 
   StringList filterList = cFilterCriteria::parse(request.filter);
 
   request.numberReturned = 0;
   request.updateID = 0;
-
-  // Using cursors, cannot calculate totalMatches as this would require another SQL request.
-  request.totalMatches = 0;
+  request.totalMatches = result.getRow(0).getInt32("totalMatches");
 
   IXML_Document* DIDLDoc = NULL;
   if(ixmlParseBufferEx(DIDLFragment, &DIDLDoc)==IXML_SUCCESS){
 
     IXML_Node* root = ixmlNode_getFirstChild((IXML_Node*) DIDLDoc);
 
+    tntdb::Row row, row2, row3;
+
     for(tntdb::Statement::const_iterator it = select1.begin(); it != select1.end(); ++it){
 
-      tntdb::Row row = (*it);
+      row = (*it);
 
       IXML_Element* object;
       string upnpClass = row.getString(property::object::KEY_CLASS);
@@ -149,7 +158,9 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select){
       }
       ixmlNode_appendChild(root, (IXML_Node*)object);
 
-      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, row.getString(property::object::KEY_OBJECTID));
+      string objectID = row.getString(property::object::KEY_OBJECTID);
+
+      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, objectID);
       ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_PARENTID, row.getString(property::object::KEY_PARENTID));
       ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_RESTRICTED, row.getString(property::object::KEY_RESTRICTED));
       ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_TITLE, row.getString(property::object::KEY_TITLE).substr(0, MAX_METADATA_LENGTH_S));
@@ -168,31 +179,39 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select){
       ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CREATOR, row.getString(property::object::KEY_CREATOR));
       ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DESCRIPTION, row.getString(property::object::KEY_DESCRIPTION));
       ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LONG_DESCRIPTION, row.getString(property::object::KEY_LONG_DESCRIPTION));
-      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DATE, row.getDatetime(property::object::KEY_DATE).getIso());
+      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DATE, row.getString(property::object::KEY_DATE));
       ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LANGUAGE, row.getString(property::object::KEY_LANGUAGE));
 
 
-      select2.setString("objectID", row.getString(property::object::KEY_OBJECTID));
+      select2.setString("objectID", objectID);
 
       for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
-          tntdb::Row row2 = (*it2);
+          row2 = (*it2);
 
-          string resourceURI;
+          string resourceURI = row2.getString(property::resource::KEY_RESOURCE);
 
           IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
 
           if(resource){
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row.getString(property::resource::KEY_PROTOCOL_INFO));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row.getString(property::resource::KEY_BITRATE));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row.getString(property::resource::KEY_BITS_PER_SAMPLE));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row.getString(property::resource::KEY_COLOR_DEPTH));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row.getTime(property::resource::KEY_DURATION).getIso());
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row.getString(property::resource::KEY_RESOLUTION));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row.getString(property::resource::KEY_SAMPLE_FREQUENCY));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, row.getString(property::resource::KEY_SIZE));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
+            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
           }
 
+      }
+
+      select3.setString("objectID", objectID);
+
+      for(tntdb::Statement::const_iterator it3 = select3.begin(); it3 != select2.end(); ++it3){
+        row3 = (*it3);
+
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, row3.getString("property"), row3.getString("value"));
       }
 
       ++request.numberReturned;
@@ -213,30 +232,35 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select){
 }
 
 int cMediaManager::Browse(BrowseRequest& request){
-  stringstream metadata;
+  stringstream metadata, count, where;
 
   metadata << "SELECT *,(SELECT COUNT(1) FROM metadata m WHERE "
       << "m.`" << property::object::KEY_PARENTID << "` = "
       << "p.`" << property::object::KEY_OBJECTID << "`) as "
       << "`" << property::object::KEY_CHILD_COUNT << "` FROM metadata p WHERE ";
 
+  count << "SELECT COUNT(1) as totalMatches FROM metadata WHERE ";
+
   switch (request.browseMetadata){
   case CD_BROWSE_METADATA:
-    metadata << "`" << property::object::KEY_OBJECTID << "`";
+    where << "`" << property::object::KEY_OBJECTID << "`";
 
     // Set the offset and count to 0,1 as this is the only allowed option here.
     request.requestCount = 1;
     request.startIndex = 0;
     break;
   case CD_BROWSE_DIRECT_CHILDREN:
-    metadata << "`" << property::object::KEY_PARENTID << "`";
+    where << "`" << property::object::KEY_PARENTID << "`";
     break;
   default:
     esyslog("UPnP\tInvalid arguments. Browse flag invalid");
     return UPNP_SOAP_E_INVALID_ARGS;
   }
 
-  metadata << " = '" << request.objectID << "'";
+  where << " = '" << request.objectID << "'";
+
+  metadata << where.str();
+  count << where.str();
 
   cSortCriteria::SortCriteriaList list = cSortCriteria::parse(request.sortCriteria);
   if(!list.empty()){
@@ -252,10 +276,8 @@ int cMediaManager::Browse(BrowseRequest& request){
     metadata << " LIMIT " << request.startIndex << ", " << request.requestCount;
   }
 
-  metadata << ";";
-
   int ret = 0;
-  if((ret = CreateResponse(request, metadata.str())) == UPNP_E_SUCCESS) return ret;
+  if((ret = CreateResponse(request, metadata.str(), count.str())) == UPNP_E_SUCCESS) return ret;
 
   return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
@@ -265,7 +287,12 @@ int cMediaManager::Search(SearchRequest& request){
   request.totalMatches = 0;
   request.updateID = 0;
 
-  return UPNP_E_SUCCESS;
+  stringstream metadata, count;
+
+  int ret = 0;
+  if((ret = CreateResponse(request, metadata.str(), count.str())) == UPNP_E_SUCCESS) return ret;
+
+  return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
 
 cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(std::string browseFlag) {
