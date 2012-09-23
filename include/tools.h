@@ -106,12 +106,13 @@ char* substr(const char* str, unsigned int offset, unsigned int length);
 namespace upnp {
 
   typedef std::list<std::string> StringList;
+  typedef std::vector<std::string> StringVector;
   typedef std::map<std::string, uint32_t> IdList;
 
 namespace tools {
   string GetAddressByInterface(string Interface);
   string GetNetworkInterfaceByIndex(int Index, bool skipLoop);
-  vector<string> GetNetworkInterfaces(bool skipLoop);
+  StringVector GetNetworkInterfaces(bool skipLoop);
 
   string ToString(long number);
 

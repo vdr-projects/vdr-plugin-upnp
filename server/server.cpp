@@ -27,11 +27,11 @@ cMediaServer::serviceMap cMediaServer::mServices;
 cMediaServer::cMediaServer()
 : mServerDescription("VDR UPnP/DLNA MS", "Denis Loh", "http://upnp.vdr-developer.org",
                      DESCRIPTION, "VDR UPnP-DLNA MS", VERSION,
-                     "http://projects.vdr-developer.org/projects/plg-upnp/files", VERSION)
+                     "http://projects.vdr-developer.org/projects/plg-upnp/files", VERSION,
+                     "deviceDescription.xml")
 , mDeviceHandle(0)
 , mAnnounceMaxAge(1800)
 , mMaxContentLength(KB(20))
-, mIsRunning(false)
 , mWebserver(NULL)
 , mMediaManager(NULL)
 {
@@ -44,10 +44,6 @@ cMediaServer::cMediaServer()
 cMediaServer::~cMediaServer(){
   delete mWebserver;
   delete mMediaManager;
-}
-
-bool cMediaServer::IsRunning() const {
-  return mIsRunning;
 }
 
 bool cMediaServer::Start(){
@@ -114,19 +110,20 @@ bool cMediaServer::Start(){
     return false;
   }
 
-
-
-  mIsRunning = true;
-
-  return IsRunning();
+  return true;
 }
 
 bool cMediaServer::Stop(){
 
-  isyslog("UPnP\tStopping UPnP media server");
-
   int ret = 0;
 
+  isyslog("UPnP\tStopping services...");
+  for(serviceMap::iterator it = cMediaServer::mServices.begin(); it != cMediaServer::mServices.end(); ++it){
+    isyslog("UPnP\t...%s", (*it).second->GetServiceDescription().serviceType.c_str());
+    (*it).second->Stop();
+  }
+
+  isyslog("UPnP\tStopping UPnP media server");
   UpnpUnRegisterRootDevice(mDeviceHandle);
   if (ret != UPNP_E_SUCCESS) {
     esyslog("UPnP\tError while sending first advertisments - Errorcode: %d", ret);
@@ -135,6 +132,7 @@ bool cMediaServer::Stop(){
 
   UpnpFinish();
 
+  isyslog("UPnP\tStopping web server...");
   if(mWebserver){
     mWebserver->Stop();
 
@@ -147,22 +145,31 @@ bool cMediaServer::Stop(){
     mMediaManager = NULL;
   }
 
-  mIsRunning = false;
-
-  return !IsRunning();
+  return true;
 }
 
 bool cMediaServer::Initialize(){
-  isyslog("UPnP\tInitializing UPnP media server");
+  string address;
+  uint16_t port = 0;
 
-  string address = mCurrentConfiguration.bindToAddress
-                   ? mCurrentConfiguration.address
-                   : tools::GetAddressByInterface(mCurrentConfiguration.interface);
+  if(mCurrentConfiguration.expertSettings){
+    address = mCurrentConfiguration.bindToAddress
+              ? mCurrentConfiguration.address
+              : tools::GetAddressByInterface(mCurrentConfiguration.interface);
 
-  if(!address.compare("0.0.0.0"))
+    if(address.empty() || !address.compare("0.0.0.0")){
+      address = tools::GetAddressByInterface(tools::GetNetworkInterfaceByIndex(0, true));
+    }
+
+    port = mCurrentConfiguration.port;
+  } else {
     address = tools::GetAddressByInterface(tools::GetNetworkInterfaceByIndex(0, true));
+    port = 0;
+  }
 
   int ret = 0;
+
+  isyslog("UPnP\tInitializing UPnP media server on %s:%d", address.c_str(), port);
 
   ret = UpnpInit(address.c_str(), mCurrentConfiguration.port);
 
@@ -182,9 +189,21 @@ bool cMediaServer::Initialize(){
       SetAnnounceMaxAge(mCurrentConfiguration.announceMaxAge);
 
     if(!mCurrentConfiguration.webServerRoot.empty())
-      mWebserver->SetWebserverRootDir(mCurrentConfiguration.webServerRoot,
-                                      mCurrentConfiguration.staticContentURL,
-                                      mCurrentConfiguration.presentationURL);
+      mWebserver->SetWebserverRootDir(mCurrentConfiguration.webServerRoot);
+
+    if(!mCurrentConfiguration.useLive){
+      if(!mCurrentConfiguration.presentationURL.empty())
+        mWebserver->SetPresentationUrl(mCurrentConfiguration.presentationURL);
+    } else {
+      stringstream ss;
+
+      uint16_t port = mCurrentConfiguration.livePort ? mCurrentConfiguration.livePort : 8008;
+
+      ss << "http://" << GetServerIPAddress() << ":" << port << "/";
+
+      mWebserver->SetPresentationUrl(ss.str());
+    }
+
 
     if(mCurrentConfiguration.webServerPort)
       mWebserver->SetListenerPort(mCurrentConfiguration.webServerPort);
@@ -239,7 +258,7 @@ uint16_t cMediaServer::GetServerPort() const {
 }
 
 string cMediaServer::GetDeviceDescriptionUrl() const {
-  return mWebserver->GetBaseUrl() + mCurrentConfiguration.serviceURL + "deviceDescription.xml";
+  return mWebserver->GetServiceUrl() + mServerDescription.descriptionFile;
 }
 
 void cMediaServer::RegisterService(cUPnPService* service){
@@ -309,10 +328,6 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
 
 }
 
-const char* cMediaServer::RuntimeException::what() const throw() {
-  return "Runtime error: media server is not running";
-}
-
 bool cMediaServer::CheckDeviceUUID(string deviceUUID) const {
   return deviceUUID.find(mCurrentConfiguration.deviceUUID) != string::npos;
 }
@@ -320,7 +335,7 @@ bool cMediaServer::CheckDeviceUUID(string deviceUUID) const {
 cMediaServer::Description::Description(
     string fn, string m, string murl,
     string mod, string mon, string mono,
-    string mourl, string sno)
+    string mourl, string sno, string desc)
 : friendlyName(fn)
 , manufacturer(m)
 , manufacturerURL(murl)
@@ -329,6 +344,7 @@ cMediaServer::Description::Description(
 , modelNumber(mono)
 , modelURL(mourl)
 , serialNumber(sno)
+, descriptionFile(desc)
 {
 }
 

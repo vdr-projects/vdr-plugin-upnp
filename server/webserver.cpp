@@ -8,20 +8,24 @@
 #include "../include/webserver.h"
 #include "../upnp.h"
 #include <sstream>
+#include <tnt/job.h>
 
 namespace upnp {
 
 cWebserver::cWebserver(std::string address)
 : mListenerAddress(address)
 , mListenerPort(7649)
+, mStaticContentUrl("http/")
+, mServiceUrl("services/")
 , mWebserverThread(*this)
 {
-  SetWebserverRootDir(string(), string(), string());
-  SetServiceUrl(string(), string());
+  SetWebserverRootDir(string());
+  SetPresentationUrl(string());
 }
 
 cWebserver::~cWebserver(){
-
+  mApplication.shutdown();
+  mWebserverThread.Stop();
 }
 
 bool cWebserver::Start(){
@@ -87,42 +91,22 @@ void cWebserver::SetListenerPort(uint16_t port){
   mListenerPort = port ? port : 7649;
 }
 
-void cWebserver::SetWebserverRootDir(std::string rootDirectory, std::string staticContentUrl, std::string presentationUrl){
+void cWebserver::SetWebserverRootDir(std::string rootDirectory){
   if(mWebserverThread.Active()) return;
 
   if(rootDirectory.empty())
     mWebserverRootDir = std::string(cPluginUpnp::ConfigDirectory(PLUGIN_NAME_I18N)) + "/httpdocs/";
   else
     mWebserverRootDir = rootDirectory;
+}
 
-  if(staticContentUrl.empty())
-    mStaticContentUrl = "http/";
-  else
-    mStaticContentUrl = staticContentUrl;
+void cWebserver::SetPresentationUrl(std::string presentationUrl){
+  if(mWebserverThread.Active()) return;
 
   if(presentationUrl.empty())
     mPresentationUrl = "index.html";
   else
     mPresentationUrl = presentationUrl;
-}
-
-void cWebserver::SetServiceUrl(std::string descriptionUrl, std::string controlUrl){
-  if(mWebserverThread.Active()) return;
-
-  if(descriptionUrl.empty()){
-    mServiceUrl = "services/";
-  }
-  else
-    mServiceUrl = descriptionUrl;
-
-  if(controlUrl.empty()){
-    stringstream s;
-    s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/" << "services/";
-
-    mControlUrl = s.str();
-  } else {
-    mControlUrl = controlUrl;
-  }
 }
 
 const std::string cWebserver::GetBaseUrl() const {
@@ -133,25 +117,26 @@ const std::string cWebserver::GetBaseUrl() const {
 }
 
 const std::string cWebserver::GetServiceUrl() const {
-  return mServiceUrl;
+  return GetBaseUrl() + mServiceUrl;
 }
 
 const std::string cWebserver::GetControlUrl() const {
-  return mControlUrl;
+  stringstream s;
+  s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/" << "services/";
+  return s.str();
 }
 
 const std::string cWebserver::GetPresentationUrl() const {
-  return mPresentationUrl;
+  return (mPresentationUrl.find("http://",0) == 0) ? mPresentationUrl : (GetBaseUrl() + mPresentationUrl);
 }
 
 const std::string cWebserver::GetStaticContentUrl() const {
-  return mStaticContentUrl;
+  return GetBaseUrl() + mStaticContentUrl;
 }
 
 cWebserver::cWSThread::cWSThread(cWebserver& webServer)
 : mWebserver(webServer)
 {
-
 }
 
 void cWebserver::cWSThread::Action(){
@@ -160,6 +145,10 @@ void cWebserver::cWSThread::Action(){
   } catch (const std::exception& e){
     esyslog("UPnP\tError while starting web server: %s", e.what());
   }
+}
+
+void cWebserver::cWSThread::Stop(){
+  Cancel(5);
 }
 
 }  // namespace upnp

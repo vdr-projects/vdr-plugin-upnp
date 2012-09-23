@@ -23,7 +23,6 @@ using namespace upnp;
   
   const upnp::cMediaServer::Description& serverDescription = server->GetServerDescription();
   std::string deviceUUID = server->GetDeviceUUID();
-  std::string urlBase = webserver.GetBaseUrl();
   std::string presentationUrl = webserver.GetPresentationUrl();
   std::string staticContentUrl = webserver.GetStaticContentUrl();
   
@@ -49,7 +48,7 @@ using namespace upnp;
     <modelURL><$ serverDescription.modelURL $></modelURL> 
     <serialNumber><$ serverDescription.serialNumber $></serialNumber> 
     <UDN><$ deviceUUID $></UDN> 
-    <presentationURL><$ urlBase $><$ presentationUrl $></presentationURL> 
+    <presentationURL><$ presentationUrl $></presentationURL> 
     <dlna:X_DLNADOC>DMS-1.50</dlna:X_DLNADOC> 
     <serviceList>
 <{
@@ -62,7 +61,7 @@ using namespace upnp;
       <service>
         <serviceType><$ serviceDescription.serviceType $></serviceType>
         <serviceId><$ serviceDescription.serviceID $></serviceId>
-        <SCPDURL><$ urlBase $><$ serviceUrl $><$ serviceDescription.SCPDXML $></SCPDURL>
+        <SCPDURL><$ serviceUrl $><$ serviceDescription.SCPDXML $></SCPDURL>
         <controlURL><$ controlUrl $><$ serviceDescription.controlDescriptor $></controlURL>
         <eventSubURL><$ controlUrl $><$ serviceDescription.eventSubscriberDescriptor $></eventSubURL>
       </service>
@@ -79,7 +78,7 @@ using namespace upnp;
         <width><$ (*it).profile.width $></width>
         <height><$ (*it).profile.height $></height>
         <depth><$ (int)(*it).profile.bitDepth $></depth>
-        <url><$ urlBase $><$ staticContentUrl $><$ (*it).filename $></url>
+        <url><$ staticContentUrl $><$ (*it).filename $></url>
       </icon>
 %  };
     </iconList>

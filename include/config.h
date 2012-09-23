@@ -32,13 +32,7 @@ struct cConfig {
    * debugging.
    */
   bool expertSettings;
-  /**
-   * Use the internal web server
-   *
-   * If this is true, the internal web server is used for streaming of files.
-   * Otherwise an external URL is used.
-   */
-  bool useInternalWebserver;
+
   /**
    * Web server root directory
    *
@@ -46,12 +40,14 @@ struct cConfig {
    * is empty, the default directory (plugins configuration folder) is used.
    */
   string webServerRoot;
+
   /**
    * Web server port
    *
    * This is the port where the web server is listening on.
    */
   uint16_t webServerPort;
+
   /**
    * External web server URL
    *
@@ -59,6 +55,10 @@ struct cConfig {
    * empty, the default presentation URL, which is /index.html is used.
    */
   string presentationURL;
+
+  bool useLive;
+  uint16_t livePort;
+
   /**
    * Maximum size of SOAP messages
    *
@@ -81,21 +81,8 @@ struct cConfig {
    * it will be generated.
    */
   string deviceUUID;
+  void GenerateNewDeviceUUID();
 
-  /**
-   * Service URL
-   *
-   * This is the URL to the services and service descriptors of that services.
-   */
-  string serviceURL;
-
-  /**
-   * Static content URL
-   *
-   * This is the URL to the static content of the server. They must be located within the
-   * network of the server.
-   */
-  string staticContentURL;
   /**
    * Bind the server to an IP address
    *
@@ -106,6 +93,7 @@ struct cConfig {
 
   string address;
   string interface;
+
   /**
    * The media server listening port
    *

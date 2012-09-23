@@ -55,8 +55,8 @@ string GetNetworkInterfaceByIndex(int Index, bool skipLoop){
   return GetNetworkInterfaces(skipLoop)[Index];
 }
 
-vector<string> GetNetworkInterfaces(bool skipLoop){
-  vector<string> interfaces;
+StringVector GetNetworkInterfaces(bool skipLoop){
+  StringVector interfaces;
 
   int fd;
   struct ifconf ifc;
@@ -457,3 +457,4 @@ IXML_Element* IxmlReplaceProperty(IXML_Document* document, IXML_Element* node, c
 }  // namespace ixml
 
 }  // namespace upnp
+

@@ -22,8 +22,8 @@ namespace upnp {
     cWebserver(std::string address);
     virtual ~cWebserver();
 
-    void SetWebserverRootDir(std::string rootDirectory, std::string staticContentUrl, std::string presentationUrl);
-    void SetServiceUrl(std::string descriptionUrl, std::string controlUrl);
+    void SetWebserverRootDir(std::string rootDirectory);
+    void SetPresentationUrl(std::string presentationUrl);
 
     void SetListenerPort(uint16_t port);
 
@@ -47,14 +47,14 @@ namespace upnp {
     std::string mListenerAddress;
     uint16_t    mListenerPort;
 
-    std::string mServiceUrl;
-    std::string mControlUrl;
-    std::string mStaticContentUrl;
     std::string mPresentationUrl;
+    std::string mStaticContentUrl;
+    std::string mServiceUrl;
 
     class cWSThread : public cThread {
     public:
       cWSThread(cWebserver& webServer);
+      void Stop();
       virtual void Action(void);
     private:
       cWebserver& mWebserver;

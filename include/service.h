@@ -33,6 +33,7 @@ public:
   virtual ~cUPnPService();
 
   virtual void Init(cMediaServer* server, UpnpDevice_Handle deviceHandle);
+  virtual void Stop();
 
   virtual int Subscribe(
     Upnp_Subscription_Request* Request      ///< Information about the subscription

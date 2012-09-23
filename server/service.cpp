@@ -28,6 +28,10 @@ void cUPnPService::Init(cMediaServer* server, UpnpDevice_Handle deviceHandle){
   mDeviceHandle = deviceHandle;
 }
 
+void cUPnPService::Stop(){
+  return;
+}
+
 void cUPnPService::SetError(Upnp_Action_Request* request, int error){
   request->ErrCode = error;
   switch(error){

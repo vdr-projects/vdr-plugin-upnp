@@ -8,7 +8,7 @@
 
 #include <iostream>
 #include "upnp.h"
-#include "include/connection.h"
+#include "include/setup.h"
 
 using namespace std;
 using namespace upnp;
@@ -64,27 +64,22 @@ void cPluginUpnp::MainThreadHook(void)
   // WARNING: Use with great care - see PLUGINS.html!
 }
 
-cString cPluginUpnp::Active(void)
-{
-  // Return a message string if shutdown should be postponed
-  if(mMediaServer->IsRunning()){
-    isyslog("UPnP\tPlugin is still active. Shutdown is postponed.");
-    return tr("The UPnP server is still running.");
-  }
-
-  return NULL;
-}
-
 cMenuSetupPage *cPluginUpnp::SetupMenu(void)
 {
   // Return a setup menu in case the plugin supports one.
-  return NULL;
+  return new cMenuSetupUPnP();
 }
 
 bool cPluginUpnp::SetupParse(const char *Name, const char *Value)
 {
   // Parse your own setup parameters and store their values.
-  return false;
+  upnp::cConfig config = mMediaServer->GetConfiguration();
+
+  if(!cMenuSetupUPnP::SetupParse(Name, Value, config)) return false;
+
+  mMediaServer->SetConfiguration(config);
+
+  return true;
 }
 
 VDRPLUGINCREATOR(cPluginUpnp); // Don't touch this!

@@ -24,7 +24,7 @@ class cMediaServer {
 public:
 
   struct Description {
-    Description(string, string, string , string, string, string , string, string);
+    Description(string, string, string , string, string, string , string, string, string);
     string friendlyName;
     string manufacturer;
     string manufacturerURL;
@@ -33,6 +33,7 @@ public:
     string modelNumber;
     string modelURL;
     string serialNumber;
+    string descriptionFile;
   };
 
   struct ServerIcon {
@@ -49,8 +50,6 @@ public:
 	bool Initialize();
 	bool Start();
 	bool Stop();
-
-	bool IsRunning() const;
 
   static cMediaServer* GetInstance();
 
@@ -75,11 +74,6 @@ public:
   static void RegisterService(cUPnPService* service);
 
 private:
-  class RuntimeException : public std::exception {
-  public:
-    virtual const char* what() const throw();
-  };
-
 	cMediaServer();
 
 	string GetDeviceDescriptionUrl() const;
@@ -95,7 +89,6 @@ private:
 	UpnpDevice_Handle   mDeviceHandle;
 	int                 mAnnounceMaxAge;
 	size_t              mMaxContentLength;
-	bool                mIsRunning;
 
 	cWebserver*         mWebserver;
 	cMediaManager*      mMediaManager;

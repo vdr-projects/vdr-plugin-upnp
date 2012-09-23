@@ -108,6 +108,10 @@ void cContentDirectory::Action(){
   }
 }
 
+void cContentDirectory::Stop(){
+  this->Cancel(2);
+}
+
 int cContentDirectory::Execute(Upnp_Action_Request* request){
   if (request == NULL) {
     esyslog("UPnP\tCMS Action Handler - request is null");

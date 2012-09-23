@@ -33,6 +33,7 @@ public:
   virtual void SetError(Upnp_Action_Request* request, int error);
 
   virtual void Init(cMediaServer* server, UpnpDevice_Handle deviceHandle);
+  virtual void Stop();
 private:
   int GetSearchCapabilities(Upnp_Action_Request* Request);
   int GetSortCapabilities(Upnp_Action_Request* Request);
