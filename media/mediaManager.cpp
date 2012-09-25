@@ -32,6 +32,67 @@ static const char* Details    = "details";
 
 }
 
+cResourceStreamer::cResourceStreamer(cMediaManager* manager, cUPnPResourceProvider* provider, cMetadata::Resource* resource)
+: provider(provider)
+, resource(resource)
+, manager(manager)
+{
+  if(resource)
+    tools::StringExplode(resource->protocolInfo,"*",protocolInfo);
+}
+
+std::string cResourceStreamer::GetContentFeatures() const {
+  if(resource == NULL) return string();
+
+  return protocolInfo[3];
+}
+
+std::string cResourceStreamer::GetContentType() const {
+  if(resource == NULL) return string();
+
+  return protocolInfo[2];
+}
+
+size_t cResourceStreamer::GetContentLength() const {
+  if(resource == NULL) return 0;
+
+  return resource->GetSize();
+}
+
+std::string cResourceStreamer::GetTransferMode(const string&) const {
+  std::string mime = GetContentType();
+
+  if(mime.empty()) return mime;
+
+  if(mime.find("video",0) == 0 || mime.find("audio",0) == 0) return "Streaming";
+  else return "Interactive";
+}
+
+std::string cResourceStreamer::GetRange() const {
+  return string();
+}
+
+std::string cResourceStreamer::GetAvailableSeekRange(const string& seekRequest) const {
+  return string();
+}
+
+bool cResourceStreamer::Open(string uri){
+  return provider->Open(uri);
+}
+
+size_t cResourceStreamer::Read(char* buf, size_t bufLen){
+  return provider->Read(buf, bufLen);
+}
+
+bool cResourceStreamer::Seek(size_t offset, int origin){
+  return provider->Seek(offset, origin);
+}
+
+void cResourceStreamer::Close(){
+  provider->Close();
+}
+
+
 cMediaManager::cMediaManager()
 : mSystemUpdateID(0)
 , mDatabaseFile("metadata.db")

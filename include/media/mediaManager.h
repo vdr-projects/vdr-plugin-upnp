@@ -18,6 +18,33 @@
 
 namespace upnp {
 
+class cMediaManager;
+
+class cResourceStreamer {
+  friend class cMediaManager;
+private:
+  cUPnPResourceProvider* provider;
+  cMetadata::Resource* resource;
+
+  cMediaManager* manager;
+
+  StringVector protocolInfo;
+
+  cResourceStreamer(cMediaManager* manager, cUPnPResourceProvider* provider, cMetadata::Resource* resource);
+public:
+  std::string GetContentFeatures() const;
+  size_t GetContentLength() const;
+  std::string GetContentType() const;
+  std::string GetTransferMode(const std::string& requestedMode ) const;
+  std::string GetRange() const;
+  std::string GetAvailableSeekRange(const std::string& seekRequest) const;
+
+  bool Open(string uri);
+  size_t Read(char* buf, size_t bufLen);
+  bool Seek(size_t offset, int origin);
+  void Close();
+};
+
 class cMediaManager : public cThread {
 private:
 
@@ -66,6 +93,8 @@ public:
   int Search(SearchRequest& request);
 
   static BrowseFlag ToBrowseFlag(std::string browseFlag);
+
+  cResourceStreamer* GetResourceStreamer(std::string objectID);
 
 private:
 

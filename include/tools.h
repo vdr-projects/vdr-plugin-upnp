@@ -121,6 +121,8 @@ namespace tools {
 
   string GenerateUUIDFromURL(string url);
   string GenerateUUIDRandomly();
+
+  void StringExplode(string str, string separator, StringVector results);
 }
 
 namespace ixml {
