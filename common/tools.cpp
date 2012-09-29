@@ -137,8 +137,8 @@ string GenerateUUIDRandomly(){
   return uuid.str();
 }
 
-void StringExplode(string str, string separator, StringVector results) {
-  int found;
+void StringExplode(string str, string separator, StringVector& results) {
+  string::size_type found;
   found = str.find_first_of(separator);
   while(found != string::npos){
       if(found > 0){

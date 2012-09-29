@@ -14,6 +14,7 @@
 #include <stdint.h>
 #include <tntdb/connection.h>
 #include <tntdb/connect.h>
+#include "../../include/plugin.h"
 #include "../../include/tools.h"
 
 namespace upnp {
@@ -32,12 +33,12 @@ private:
 
   cResourceStreamer(cMediaManager* manager, cUPnPResourceProvider* provider, cMetadata::Resource* resource);
 public:
+  virtual ~cResourceStreamer();
   std::string GetContentFeatures() const;
   size_t GetContentLength() const;
   std::string GetContentType() const;
   std::string GetTransferMode(const std::string& requestedMode ) const;
-  std::string GetRange() const;
-  std::string GetAvailableSeekRange(const std::string& seekRequest) const;
+  bool Seekable() const;
 
   bool Open(string uri);
   size_t Read(char* buf, size_t bufLen);
@@ -92,9 +93,9 @@ public:
   int Browse(BrowseRequest& request);
   int Search(SearchRequest& request);
 
-  static BrowseFlag ToBrowseFlag(std::string browseFlag);
+  static BrowseFlag ToBrowseFlag(const std::string& browseFlag);
 
-  cResourceStreamer* GetResourceStreamer(std::string objectID);
+  cResourceStreamer* GetResourceStreamer(const std::string& objectID, int resourceID = 0);
 
 private:
 
@@ -104,6 +105,8 @@ private:
   int CreateResponse(MediaRequest&, const string&, const string&);
 
   void OnContainerUpdate(string uri, long updateID);
+
+  cUPnPResourceProvider* CreateResourceProvider(const std::string& uri);
 
   uint32_t mSystemUpdateID;
   IdList   mEventedContainerUpdateIDs;

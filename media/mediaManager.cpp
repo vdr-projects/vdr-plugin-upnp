@@ -15,6 +15,7 @@
 #include <tntdb/statement.h>
 #include <tntdb/result.h>
 #include <upnp/ixml.h>
+#include <memory>
 
 namespace upnp {
 
@@ -38,19 +39,24 @@ cResourceStreamer::cResourceStreamer(cMediaManager* manager, cUPnPResourceProvid
 , manager(manager)
 {
   if(resource)
-    tools::StringExplode(resource->protocolInfo,"*",protocolInfo);
+    tools::StringExplode(resource->GetProtocolInfo(),":",protocolInfo);
+}
+
+cResourceStreamer::~cResourceStreamer(){
+  delete resource;
+  delete provider;
 }
 
 std::string cResourceStreamer::GetContentFeatures() const {
   if(resource == NULL) return string();
 
-  return protocolInfo[3];
+  return protocolInfo.size() == 4 ? protocolInfo[3] : string();
 }
 
 std::string cResourceStreamer::GetContentType() const {
   if(resource == NULL) return string();
 
-  return protocolInfo[2];
+  return protocolInfo.size() == 4 ? protocolInfo[2] : string();
 }
 
 size_t cResourceStreamer::GetContentLength() const {
@@ -68,28 +74,28 @@ std::string cResourceStreamer::GetTransferMode(const string&) const {
   else return "Interactive";
 }
 
-std::string cResourceStreamer::GetRange() const {
-  return string();
-}
-
-std::string cResourceStreamer::GetAvailableSeekRange(const string& seekRequest) const {
-  return string();
+bool cResourceStreamer::Seekable() const {
+  if(!provider) return false;
+  return provider->Seekable();
 }
 
 bool cResourceStreamer::Open(string uri){
+  if(!provider) return false;
   return provider->Open(uri);
 }
 
 size_t cResourceStreamer::Read(char* buf, size_t bufLen){
+  if(!provider) return 0;
   return provider->Read(buf, bufLen);
 }
 
 bool cResourceStreamer::Seek(size_t offset, int origin){
+  if(!provider) return false;
   return provider->Seek(offset, origin);
 }
 
 void cResourceStreamer::Close(){
-  provider->Close();
+  if(provider) provider->Close();
 }
 
 
@@ -216,6 +222,7 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
 
       bool isContainer;
 
+
       if(upnpClass.find("object.item",0) == 0){
         object = ixmlDocument_createElement(DIDLDoc, "item");
         isContainer = false;
@@ -257,20 +264,24 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
       for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
           row2 = (*it2);
 
-          string resourceURI = row2.getString(property::resource::KEY_RESOURCE);
+          std::auto_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
 
-          IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
+          if(provider.get()){
+            string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE));
 
-          if(resource){
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
-            ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
+            IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
+
+            if(resource){
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
+            }
           }
 
       }
@@ -366,7 +377,7 @@ int cMediaManager::Search(SearchRequest& request){
   return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
 
-cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(std::string browseFlag) {
+cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(const std::string& browseFlag) {
   if      (browseFlag.compare("BrowseMetadata") == 0)
     return CD_BROWSE_METADATA;
   else if (browseFlag.compare("BrowseDirectChildren") == 0)
@@ -526,6 +537,65 @@ bool cMediaManager::CheckIntegrity(){
   }
 
   return true;
+}
+
+cResourceStreamer* cMediaManager::GetResourceStreamer(const string& objectID, int resourceID){
+  dsyslog("UPnP\tTry to stream resource[%d] of objectID %s", resourceID, objectID.c_str());
+
+  stringstream resourceSQL;
+
+  resourceSQL << "SELECT * FROM " << db::Resources << " WHERE "
+              << "`" << property::object::KEY_OBJECTID << "` = "
+              << ":objectID"
+              << " ORDER BY resourceID ASC LIMIT " << resourceID << ",1";
+
+  tntdb::Statement select = mConnection.prepare(resourceSQL.str());
+
+  tntdb::Result result = select.setString("objectID", objectID)
+                               .select();
+
+  if(result.size() == 0) return NULL;
+
+  tntdb::Row row = result.getRow(0);
+
+  cMetadata::Resource* resource = new cMetadata::Resource();
+
+  bool ret = true;
+  if(!row.isNull(property::resource::KEY_BITRATE))
+    ret = resource->SetBitrate(row.getInt32(property::resource::KEY_BITRATE));
+  if(!row.isNull(property::resource::KEY_BITS_PER_SAMPLE))
+    ret = resource->SetBitsPerSample(row.getInt32(property::resource::KEY_BITS_PER_SAMPLE));
+  if(!row.isNull(property::resource::KEY_COLOR_DEPTH))
+    ret = resource->SetColorDepth(row.getInt32(property::resource::KEY_COLOR_DEPTH));
+  if(!row.isNull(property::resource::KEY_DURATION))
+    ret = resource->SetDuration(row.getString(property::resource::KEY_DURATION));
+  if(!row.isNull(property::resource::KEY_NR_AUDIO_CHANNELS))
+    ret = resource->SetNrAudioChannels(row.getInt32(property::resource::KEY_NR_AUDIO_CHANNELS));
+  if(!row.isNull(property::resource::KEY_PROTOCOL_INFO))
+    ret = resource->SetProtocolInfo(row.getString(property::resource::KEY_PROTOCOL_INFO));
+  if(!row.isNull(property::resource::KEY_RESOLUTION))
+    ret = resource->SetResolution(row.getString(property::resource::KEY_RESOLUTION));
+  if(!row.isNull(property::resource::KEY_RESOURCE))
+    ret = resource->SetResourceUri(row.getString(property::resource::KEY_RESOURCE));
+  if(!row.isNull(property::resource::KEY_SAMPLE_FREQUENCY))
+    ret = resource->SetSampleFrequency(row.getInt32(property::resource::KEY_SAMPLE_FREQUENCY));
+  if(!row.isNull(property::resource::KEY_SIZE))
+    ret = resource->SetSize(row.getInt32(property::resource::KEY_SIZE));
+
+  if(!ret) {
+    delete resource;
+    return NULL;
+  }
+
+  cUPnPResourceProvider* provider = CreateResourceProvider(resource->GetResourceUri());
+
+  cResourceStreamer* streamer = new cResourceStreamer(this, provider, resource);
+
+  return streamer;
+}
+
+cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
+  return NULL;
 }
 
 void cMediaManager::SetDatabaseFile(string file){

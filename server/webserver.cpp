@@ -66,14 +66,7 @@ bool cWebserver::Initialise(){
 
     mApplication.mapUrl(ss1.str(), ss2.str(), "static@tntnet");
 
-    // Map static contents
-    ss1.clear(); ss1.str(string());
-    ss1 << "^/" << mServiceUrl << "([^/.]+)";
-
-    ss2.clear(); ss2.str(string());
-    ss2 << mServiceUrl << "$1";
-
-    mApplication.mapUrl(ss1.str(), ss2.str(), "serviceRedirect");
+    mApplication.mapUrl("^/getStream", "resourceStreamer");
 
     isyslog("UPnP\tUsing %s for static content delivery.", mWebserverRootDir.c_str());
 

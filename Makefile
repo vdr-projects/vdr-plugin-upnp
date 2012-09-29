@@ -54,7 +54,8 @@ DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
 
 TNTOBJ =	httptnt/deviceDescription.o \
 			httptnt/cds_scpd.o \
-			httptnt/cms_scpd.o
+			httptnt/cms_scpd.o \
+			httptnt/resourceStreamer.o
 
 OBJS = 	$(PLUGIN).o \
 		server/server.o \

@@ -233,6 +233,10 @@ string cUPnPResourceProvider::GetHTTPUri(string uri){
   return string();
 }
 
+bool cUPnPResourceProvider::Seekable() const {
+  return false;
+}
+
 bool cUPnPResourceProvider::Open(string uri){
   return false;
 }

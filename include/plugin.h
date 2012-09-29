@@ -348,6 +348,8 @@ public:
    */
   virtual string GetHTTPUri(string uri);
 
+  virtual bool Seekable() const;
+
   /**
    * Opens a resource
    *
@@ -480,12 +482,8 @@ public:
    * object which contains all information about the resource.
    *
    * If the plugin is not able to fill the required information about the resource,
-   * it MUST return NULL. The plugin manager will then rotate through all the
+   * it MUST return false. The plugin manager will then rotate through all the
    * registered plugins until it finds a suitable one.
-   *
-   * The required information MUST be set in the cMediaResource::Create function
-   * correctly. Otherwise the object creation might fail and a NULL pointer will
-   * be returned.
    *
    * Additionally, a plugin implementor is advised to add as many as possible
    * metadata about a resource. Especially, information about the contents might
@@ -500,9 +498,11 @@ public:
    * A change of a resource is indicated by the resource provider.
    *
    * @param uri the absolute path to the resource.
-   * @return the media resource information.
+   * @param metadata the metadate object, where the information shall be saved.
+   * @return true, if this profiler was able to get the specific metadata,
+   * false, if not.
    */
-  virtual cMetadata GetMetadata(string uri) = 0;
+  virtual bool GetMetadata(string uri, cMetadata& metadata) = 0;
 protected:
 };
 
