@@ -1,0 +1,105 @@
+<%args>
+objectID;
+int resourceID = 0;
+</%args>
+<%pre>
+#include <string>
+#include <stdint.h>
+#include <limits>
+#include <memory>
+#include "../include/tools.h"
+#include "../include/media/mediaManager.h"
+#include "../include/server.h"
+
+#include <tnt/httpreply.h>
+#include <tnt/httprequest.h>
+#include <tnt/http.h>
+
+using namespace upnp;
+</%pre>
+<#
+int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string objectID, int resourceID) {
+#>
+<%cpp>
+  if(objectID.empty()){
+    reply.out() << "Object ID missing";
+    return HTTP_BAD_REQUEST;
+  }
+
+  cMediaServer* server = cMediaServer::GetInstance();
+  cMediaManager& manager = server->GetManager();
+  std::auto_ptr<cResourceStreamer> streamer(manager.GetResourceStreamer(objectID, resourceID));
+
+  if(!streamer.get()){
+    reply.out() << "Object ID not found or invalid";
+    return HTTP_NOT_FOUND;
+  }
+
+  int code = HTTP_OK;
+
+  reply.setContentType(streamer->GetContentType());
+  reply.setHeader("friendlyName.dlna.org  ", server->GetServerDescription().friendlyName);
+  reply.setHeader("contentFeatures.dlna.org  ", streamer->GetContentFeatures());
+  reply.setHeader("transferMode.dlna.org  ", streamer->GetTransferMode(reply.getHeader("transferMode.dlna.org")));
+
+  if(streamer->GetContentLength() > 0){
+    reply.setContentLengthHeader(streamer->GetContentLength());
+    if(streamer->Seekable()) reply.setHeader("Accept-Ranges", "bytes");
+  }
+
+  if(!request.isMethodHEAD()){
+
+    int offset = 0, length = std::numeric_limits<long>::max();
+    bool hasRange = false;
+
+    if(streamer->Seekable() && streamer->GetContentLength() > 0){
+      if(request.hasHeader("Range")){
+        std::string rangeRequest = request.getHeader("Range");
+        if(rangeRequest.find("bytes=",0) == 0){
+          int minus = rangeRequest.find_first_of('-',6);
+          offset  = atoi(rangeRequest.substr(6, minus - 6).c_str());
+          length = atoi(rangeRequest.substr(minus + 1).c_str()) - offset;
+
+          if(length == 0) length = std::numeric_limits<long>::max();
+
+          hasRange = (offset == 0 && length == std::numeric_limits<long>::max()) ? false : true;
+        }
+      }
+
+      streamer->Seek(offset, SEEK_SET);
+    }
+
+    char buffer[KB(16)];
+    ssize_t bytesRead = 0;
+    size_t totalBytesRead = 0;
+    size_t toRead = std::min<size_t>(length, sizeof(buffer));
+    while (0 < (bytesRead = streamer->Read(buffer, toRead)) && length > 0) {
+      reply.out().write(buffer, bytesRead);
+      if (!reply.out()) {
+        code = HTTP_GONE;
+        goto ret;
+      }
+      length -= bytesRead;
+      totalBytesRead += bytesRead;
+      toRead = std::min<size_t>(length, sizeof(buffer));
+    }
+
+    reply.setContentLengthHeader(totalBytesRead);
+
+    if ((bytesRead < 0 || length <= 0) && hasRange) {
+      std::stringstream ss;
+      ss << "bytes " << offset << "-" << offset + totalBytesRead << "/" << streamer->GetContentLength();
+      reply.setHeader("Content-Range", ss.str());
+      code = HTTP_PARTIAL_CONTENT;
+      goto ret;
+    }
+
+  }
+
+  ret:
+  //reply.out() << std::flush;
+  return code;
+</%cpp>
+<#
+}
+#>
