@@ -27,6 +27,9 @@ VDRDIR ?= ../../..
 LIBDIR ?= ../../lib
 TMPDIR ?= /tmp
 
+PLUGINDIR= ./PLUGINS
+PLUGINLIBDIR= $(PLUGINDIR)/lib/upnp
+
 ### Make sure that necessary options are included:
 
 include $(VDRDIR)/Make.global
@@ -49,6 +52,7 @@ PACKAGE = vdr-$(ARCHIVE)
 INCLUDES += -I$(VDRDIR)/include
 
 DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
+DEFINES += -DPLUGINDIR=\"$(PLUGINLIBDIR)\"
 
 ### The object files (add further files here):
 

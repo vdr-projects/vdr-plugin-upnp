@@ -8,6 +8,8 @@
 #include "../include/plugin.h"
 #include "../include/tools.h"
 #include <string>
+#include <dlfcn.h>
+#include <dirent.h>
 
 using namespace std;
 
@@ -252,6 +254,79 @@ bool cUPnPResourceProvider::Seek(size_t offset, int origin){
 void cUPnPResourceProvider::Close(){
 }
 
-}  // namespace uünü
+upnp::cPluginManager::cPluginManager(cMediaManager* manager)
+: manager(manager)
+{}
+
+upnp::cPluginManager::~cPluginManager(){}
+
+#define UPNPPLUGIN_PREFIX "libupnp-"
+#define SO_INDICATOR      ".so."
+
+bool upnp::cPluginManager::LoadPlugins(const string& directory){
+
+  DIR* dirHandle;
+  struct dirent* dirEntry;
+
+  if((dirHandle = opendir(directory.c_str())) == NULL){
+    esyslog("UPnP\tLoading directory '%s' failed. Errno: %d", directory.c_str(), errno);
+    return false;
+  }
+
+  string filename;
+  while ((dirEntry = readdir(dirHandle)) != NULL) {
+    filename = dirEntry->d_name;
+    if(filename.compare(".") || filename.compare("..")){
+      if(filename.find(UPNPPLUGIN_PREFIX,0) == 0 &&
+         filename.find(UPNPPLUGIN_VERSION) != string::npos &&
+         filename.find(SO_INDICATOR) != string::npos)
+      {
+        boost::shared_ptr<DLL> dll(new DLL(filename));
+        if(dll->Load())
+          dlls.push_back(dll);
+      }
+    }
+  }
+  closedir(dp);
+
+  return true;
+}
+
+upnp::cPluginManager::DLL::DLL(const string& f)
+: file(f)
+, handle(NULL)
+, provider(NULL)
+, profiler(NULL)
+{
+}
+
+bool upnp::cPluginManager::DLL::Load(){
+  if(handle)
+    return true;
+
+  handle = dlopen(file.c_str(), RTLD_NOW);
+
+  const char* error = dlerror();
+  if(!error){
+    provider = (FunctionPtr)dlsym(handle, "UPnPCreateResourceProvider");
+    if (!(error = dlerror())){
+      isyslog("UPnP\tFound provider in %s", file.c_str());
+    }
+    profiler = (FunctionPtr)dlsym(handle, "UPnPCreateMediaProfiler");
+    if (!(error = dlerror())){
+      isyslog("UPnP\tFound profiler in %s", file.c_str());
+    }
+  }
+
+  return false;
+}
+
+upnp::cPluginManager::DLL::~DLL()
+{
+  if(handle)
+    dlclose(handle);
+}
+
+}  // namespace upnp
 
 

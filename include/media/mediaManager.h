@@ -40,13 +40,14 @@ public:
   std::string GetTransferMode(const std::string& requestedMode ) const;
   bool Seekable() const;
 
-  bool Open(string uri);
+  bool Open();
   size_t Read(char* buf, size_t bufLen);
   bool Seek(size_t offset, int origin);
   void Close();
 };
 
 class cMediaManager : public cThread {
+  friend class upnp::cPluginManager;
 private:
 
   struct MediaRequest {
@@ -80,7 +81,8 @@ public:
   cMediaManager();
   virtual ~cMediaManager();
 
-  void SetDatabaseFile(string file);
+  void SetPluginDirectory(const string& directory);
+  void SetDatabaseFile(const string& file);
 
   bool Initialise();
 
@@ -108,11 +110,23 @@ private:
 
   cUPnPResourceProvider* CreateResourceProvider(const std::string& uri);
 
-  uint32_t mSystemUpdateID;
-  IdList   mEventedContainerUpdateIDs;
-  StringList mScanDirectories;
-  string   mDatabaseFile;
-  tntdb::Connection mConnection;
+  void AddProviderFunctor(upnp::cPluginManager::FunctionPtr providerFunctor);
+  void AddProfiler(cMediaProfiler* profiler);
+
+  uint32_t          systemUpdateID;
+  IdList            eventedContainerUpdateIDs;
+  StringList        scanDirectories;
+  string            databaseFile;
+  string            pluginDirectory;
+  tntdb::Connection connection;
+
+  upnp::cPluginManager* pluginManager;
+
+  typedef std::map<std::string, upnp::cPluginManager::FunctionPtr> ProviderMap;
+  typedef std::list<boost::shared_ptr<cMediaProfiler>> ProfilerList;
+
+  ProviderMap   providers;
+  ProfilerList  profilers;
 
 };
 

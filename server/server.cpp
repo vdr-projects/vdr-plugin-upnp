@@ -179,6 +179,7 @@ bool cMediaServer::Initialize(){
   }
 
   mWebserver = new cWebserver(GetServerIPAddress());
+  mMediaManager = new cMediaManager();
 
   if(mCurrentConfiguration.expertSettings){
 
@@ -204,12 +205,12 @@ bool cMediaServer::Initialize(){
       mWebserver->SetPresentationUrl(ss.str());
     }
 
-
     if(mCurrentConfiguration.webServerPort)
       mWebserver->SetListenerPort(mCurrentConfiguration.webServerPort);
-  }
 
-  mMediaManager = new cMediaManager();
+    if(!mCurrentConfiguration.databaseFile.empty())
+      mMediaManager->SetDatabaseFile(mCurrentConfiguration.databaseFile);
+  }
 
   ret = UpnpSetMaxContentLength(GetMaxContentLength());
 

@@ -19,6 +19,8 @@
 
 namespace upnp {
 
+#define DEFAULTPLUGINDIR PLUGINDIR
+
 static const char* DIDLFragment = "<DIDL-Lite "
                                   "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" "
                                   "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
@@ -79,13 +81,13 @@ bool cResourceStreamer::Seekable() const {
   return provider->Seekable();
 }
 
-bool cResourceStreamer::Open(string uri){
-  if(!provider) return false;
-  return provider->Open(uri);
+bool cResourceStreamer::Open(){
+  if(!provider || !resource) return false;
+  return provider->Open(resource->GetResourceUri());
 }
 
 size_t cResourceStreamer::Read(char* buf, size_t bufLen){
-  if(!provider) return 0;
+  if(!provider) return -1;
   return provider->Read(buf, bufLen);
 }
 
@@ -100,33 +102,36 @@ void cResourceStreamer::Close(){
 
 
 cMediaManager::cMediaManager()
-: mSystemUpdateID(0)
-, mDatabaseFile("metadata.db")
+: systemUpdateID(0)
+, databaseFile("metadata.db")
+, pluginDirectory(DEFAULTPLUGINDIR)
+, pluginManager(NULL)
 {
 }
 
 cMediaManager::~cMediaManager(){
+  delete pluginManager;
 }
 
 uint32_t cMediaManager::GetSystemUpdateID() const {
-  return mSystemUpdateID;
+  return systemUpdateID;
 }
 
 IdList cMediaManager::GetContainerUpdateIDs(bool unevented){
-  IdList list = mEventedContainerUpdateIDs;
+  IdList list = eventedContainerUpdateIDs;
 
   if(!unevented)
-    mEventedContainerUpdateIDs.clear();
+    eventedContainerUpdateIDs.clear();
 
   return list;
 }
 
 void cMediaManager::OnContainerUpdate(string uri, long updateID){
-  ++mSystemUpdateID;
+  ++systemUpdateID;
 
-  mEventedContainerUpdateIDs[tools::GenerateUUIDFromURL(uri)] = updateID;
+  eventedContainerUpdateIDs[tools::GenerateUUIDFromURL(uri)] = updateID;
 
-  mScanDirectories.push_back(uri);
+  scanDirectories.push_back(uri);
 
   // Start scanning for changed files.
   Start();
@@ -163,7 +168,7 @@ StringList cMediaManager::GetSortCapabilities() const {
 }
 
 StringList cMediaManager::GetSupportedProtocolInfos() const {
-  tntdb::Connection conn = mConnection;
+  tntdb::Connection conn = connection;
 
   stringstream ss;
 
@@ -195,10 +200,10 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
             << "`" << property::object::KEY_OBJECTID << "` = "
             << ":objectID";
 
-  tntdb::Statement select1 = mConnection.prepare(select);
-  tntdb::Result result = mConnection.select(count);
-  tntdb::Statement select2 = mConnection.prepare(resources.str());
-  tntdb::Statement select3 = mConnection.prepare(details.str());
+  tntdb::Statement select1 = connection.prepare(select);
+  tntdb::Result result = connection.select(count);
+  tntdb::Statement select2 = connection.prepare(resources.str());
+  tntdb::Statement select3 = connection.prepare(details.str());
 
   StringList filterList = cFilterCriteria::parse(request.filter);
 
@@ -264,7 +269,7 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
       for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
           row2 = (*it2);
 
-          std::auto_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
+          boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
 
           if(provider.get()){
             string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE));
@@ -387,17 +392,25 @@ cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(const std::string& browseF
 }
 
 bool cMediaManager::Initialise(){
+
+  pluginManager = new upnp::cPluginManager(this);
+
+  if(!pluginManager->LoadPlugins(pluginDirectory)){
+    esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory);
+    return false;
+  }
+
   try {
     stringstream ss;
-    ss << "sqlite:" << mDatabaseFile;
+    ss << "sqlite:" << databaseFile;
 
-    mConnection = tntdb::connect(ss.str());
+    connection = tntdb::connect(ss.str());
 
     dsyslog("UPNP\tPreparing database structure...");
 
     if(CheckIntegrity()) return true;
 
-    mConnection.beginTransaction();
+    connection.beginTransaction();
 
     ss.str(string());
 
@@ -420,7 +433,7 @@ bool cMediaManager::Initialise(){
        << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
        << ")";
 
-    tntdb::Statement objectTable = mConnection.prepare(ss.str());
+    tntdb::Statement objectTable = connection.prepare(ss.str());
 
     objectTable.execute();
 
@@ -435,7 +448,7 @@ bool cMediaManager::Initialise(){
        << "  `value`      TEXT"
        << ")";
 
-    tntdb::Statement detailsTable = mConnection.prepare(ss.str());
+    tntdb::Statement detailsTable = connection.prepare(ss.str());
 
     detailsTable.execute();
 
@@ -458,7 +471,7 @@ bool cMediaManager::Initialise(){
        << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER"
        << ")";
 
-    tntdb::Statement resourcesTable = mConnection.prepare(ss.str());
+    tntdb::Statement resourcesTable = connection.prepare(ss.str());
 
     resourcesTable.execute();
 
@@ -475,7 +488,7 @@ bool cMediaManager::Initialise(){
        << "`" << property::object::KEY_LONG_DESCRIPTION  << "`) "
        << " VALUES (:objectID, :parentID, :title, :class, :restricted, :creator, :description, :longDescription)";
 
-    tntdb::Statement rootContainer = mConnection.prepare(ss.str());
+    tntdb::Statement rootContainer = connection.prepare(ss.str());
 
     const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
 
@@ -489,14 +502,14 @@ bool cMediaManager::Initialise(){
                  .setString("longDescription", desc.modelDescription)
                  .execute();
 
-    mConnection.commitTransaction();
+    connection.commitTransaction();
 
     return true;
 
   } catch (const std::exception& e) {
     esyslog("UPnP\tException occurred while initializing database: %s", e.what());
 
-    mConnection.rollbackTransaction();
+    connection.rollbackTransaction();
 
     return false;
   }
@@ -506,7 +519,7 @@ bool cMediaManager::Initialise(){
 
 bool cMediaManager::CheckIntegrity(){
 
-  tntdb::Statement checkTable = mConnection.prepare(
+  tntdb::Statement checkTable = connection.prepare(
           "SELECT name FROM sqlite_master WHERE type='table' AND name=:table;"
           );
 
@@ -529,7 +542,7 @@ bool cMediaManager::CheckIntegrity(){
                   << property::object::KEY_OBJECTID << "` = '0' AND `"
                   << property::object::KEY_PARENTID << "` = '-1';";
 
-  tntdb::Statement checkObject = mConnection.prepare(ss.str());
+  tntdb::Statement checkObject = connection.prepare(ss.str());
 
   if( checkObject.select().size() != 1 ){
     isyslog("UPnP\tRoot item does not exist or more than one root item exist.");
@@ -549,7 +562,7 @@ cResourceStreamer* cMediaManager::GetResourceStreamer(const string& objectID, in
               << ":objectID"
               << " ORDER BY resourceID ASC LIMIT " << resourceID << ",1";
 
-  tntdb::Statement select = mConnection.prepare(resourceSQL.str());
+  tntdb::Statement select = connection.prepare(resourceSQL.str());
 
   tntdb::Result result = select.setString("objectID", objectID)
                                .select();
@@ -598,9 +611,14 @@ cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
   return NULL;
 }
 
-void cMediaManager::SetDatabaseFile(string file){
-  if(file.empty()) mDatabaseFile = "metadata.db";
-  else mDatabaseFile = file;
+void cMediaManager::SetDatabaseFile(const string& file){
+  if(file.empty()) databaseFile = "metadata.db";
+  else databaseFile = file;
+}
+
+void cMediaManager::SetPluginDirectory(const string& directory){
+  if(directory.empty()) pluginDirectory = DEFAULTPLUGINDIR;
+  else pluginDirectory = directory;
 }
 
 void cMediaManager::Action(){

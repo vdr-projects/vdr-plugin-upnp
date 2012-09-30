@@ -9,21 +9,43 @@
 #define PLUGINMANAGER_H_
 
 #include "../include/plugin.h"
+#include <string>
+#include <map>
+#include <list>
 
 namespace upnp {
 
+class cMediaManager;
+
 class cPluginManager {
 public:
-  cUPnPResourceProvider* CreateResourceProviderInstance(const std::string& schema);
+  typedef void*(*FunctionPtr)(void);
+
+  cPluginManager(cMediaManager* manager);
+  virtual ~cPluginManager();
+
+  bool LoadPlugins(const std::string& directory);
 private:
-  void LoadPlugins();
-  void UnloadPlugins();
+  class DLL {
+  public:
+    DLL(const std::string& file);
+    virtual ~DLL();
 
-  typedef std::list<cUPnPResourceProvider> ProviderList;
-  typedef std::list<cMediaProfiler> ProfilerList;
+    bool Load();
+    FunctionPtr GetProvider() const { return provider; };
+    FunctionPtr GetProfiler() const { return profiler; };
+  private:
+    std::string file;
+    void* handle;
+    FunctionPtr provider;
+    FunctionPtr profiler;
+  };
 
-  ProviderList providers;
-  ProfilerList profilers;
+  typedef std::list<boost::shared_ptr<DLL>> DLLList;
+
+  DLLList dlls;
+  cMediaManager* manager;
+
 };
 
 }  // namespace upnp

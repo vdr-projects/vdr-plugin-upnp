@@ -15,6 +15,8 @@
 
 using namespace std;
 
+#define UPNPPLUGIN_VERSION  "1.0.0"
+
 namespace upnp {
 
 namespace property {
