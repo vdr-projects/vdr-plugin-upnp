@@ -7,6 +7,7 @@
 
 #include "../include/plugin.h"
 #include "../include/tools.h"
+#include "../include/pluginManager.h"
 #include <string>
 #include <dlfcn.h>
 #include <dirent.h>
@@ -287,7 +288,7 @@ bool upnp::cPluginManager::LoadPlugins(const string& directory){
       }
     }
   }
-  closedir(dp);
+  closedir(dirHandle);
 
   return true;
 }
@@ -311,10 +312,13 @@ bool upnp::cPluginManager::DLL::Load(){
     provider = (FunctionPtr)dlsym(handle, "UPnPCreateResourceProvider");
     if (!(error = dlerror())){
       isyslog("UPnP\tFound provider in %s", file.c_str());
+      return true;
     }
+
     profiler = (FunctionPtr)dlsym(handle, "UPnPCreateMediaProfiler");
     if (!(error = dlerror())){
       isyslog("UPnP\tFound profiler in %s", file.c_str());
+      return true;
     }
   }
 

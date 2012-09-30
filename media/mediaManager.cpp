@@ -396,7 +396,7 @@ bool cMediaManager::Initialise(){
   pluginManager = new upnp::cPluginManager(this);
 
   if(!pluginManager->LoadPlugins(pluginDirectory)){
-    esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory);
+    esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory.c_str());
     return false;
   }
 

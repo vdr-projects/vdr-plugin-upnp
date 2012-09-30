@@ -1,12 +1,12 @@
-//<%args>
-//objectID;
-//int resourceID = 0;
-//</%args>
-//<%pre>
+<%args>
+objectID;
+int resourceID = 0;
+</%args>
+<%pre>
 #include <string>
 #include <stdint.h>
 #include <limits>
-#include <memory>
+#include <boost/shared_ptr.hpp>
 #include "../include/tools.h"
 #include "../include/media/mediaManager.h"
 #include "../include/server.h"
@@ -16,11 +16,11 @@
 #include <tnt/http.h>
 
 using namespace upnp;
-//</%pre>
-//<#
+</%pre>
+<#
 int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string objectID, int resourceID) {
-//#>
-//<%cpp>
+#>
+<%cpp>
   if(objectID.empty()){
     reply.out() << "Object ID missing";
     return HTTP_BAD_REQUEST;
@@ -108,7 +108,7 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
   streamer->Close();
   //reply.out() << std::flush;
   return code;
-//</%cpp>
-//<#
+</%cpp>
+<#
 }
-//#>
+#>

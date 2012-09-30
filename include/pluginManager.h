@@ -12,6 +12,7 @@
 #include <string>
 #include <map>
 #include <list>
+#include <boost/shared_ptr.hpp>
 
 namespace upnp {
 
@@ -41,7 +42,7 @@ private:
     FunctionPtr profiler;
   };
 
-  typedef std::list<boost::shared_ptr<DLL>> DLLList;
+  typedef std::list< boost::shared_ptr<DLL> > DLLList;
 
   DLLList dlls;
   cMediaManager* manager;

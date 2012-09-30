@@ -16,6 +16,7 @@
 #include <tntdb/connect.h>
 #include "../../include/plugin.h"
 #include "../../include/tools.h"
+#include "../../include/pluginManager.h"
 
 namespace upnp {
 
@@ -123,7 +124,7 @@ private:
   upnp::cPluginManager* pluginManager;
 
   typedef std::map<std::string, upnp::cPluginManager::FunctionPtr> ProviderMap;
-  typedef std::list<boost::shared_ptr<cMediaProfiler>> ProfilerList;
+  typedef std::list<boost::shared_ptr<cMediaProfiler> > ProfilerList;
 
   ProviderMap   providers;
   ProfilerList  profilers;
