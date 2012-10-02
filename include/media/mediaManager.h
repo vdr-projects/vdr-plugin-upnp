@@ -8,15 +8,15 @@
 #ifndef MEDIAMANAGER_H_
 #define MEDIAMANAGER_H_
 
+#include "../../include/pluginManager.h"
+#include "../../include/plugin.h"
+#include "../../include/tools.h"
 #include <vdr/thread.h>
 #include <list>
 #include <string>
 #include <stdint.h>
 #include <tntdb/connection.h>
 #include <tntdb/connect.h>
-#include "../../include/plugin.h"
-#include "../../include/tools.h"
-#include "../../include/pluginManager.h"
 
 namespace upnp {
 

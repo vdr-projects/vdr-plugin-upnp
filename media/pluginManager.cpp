@@ -259,7 +259,7 @@ upnp::cPluginManager::cPluginManager(cMediaManager* manager)
 : manager(manager)
 {}
 
-upnp::cPluginManager::~cPluginManager(){}
+cPluginManager::~cPluginManager(){}
 
 #define UPNPPLUGIN_PREFIX "libupnp-"
 #define SO_INDICATOR      ".so."
@@ -282,7 +282,7 @@ bool upnp::cPluginManager::LoadPlugins(const string& directory){
          filename.find(UPNPPLUGIN_VERSION) != string::npos &&
          filename.find(SO_INDICATOR) != string::npos)
       {
-        boost::shared_ptr<DLL> dll(new DLL(filename));
+        boost::shared_ptr<DLL> dll(new DLL(directory + "/" + filename));
         if(dll->Load())
           dlls.push_back(dll);
       }
@@ -313,14 +313,22 @@ bool upnp::cPluginManager::DLL::Load(){
     if (!(error = dlerror())){
       isyslog("UPnP\tFound provider in %s", file.c_str());
       return true;
+    } else {
+      dsyslog("UPnP\tError: %s", error);
     }
 
     profiler = (FunctionPtr)dlsym(handle, "UPnPCreateMediaProfiler");
     if (!(error = dlerror())){
       isyslog("UPnP\tFound profiler in %s", file.c_str());
       return true;
+    } else {
+      dsyslog("UPnP\tError: %s", error);
     }
+  } else {
+    dsyslog("UPnP\tError: %s", error);
   }
+
+  isyslog("UPnP\tInvalid library '%s', no valid symbols found.", file.c_str());
 
   return false;
 }
@@ -332,5 +340,3 @@ upnp::cPluginManager::DLL::~DLL()
 }
 
 }  // namespace upnp
-
-

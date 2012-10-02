@@ -28,7 +28,7 @@ LIBDIR ?= ../../lib
 TMPDIR ?= /tmp
 
 PLUGINDIR= ./PLUGINS
-PLUGINLIBDIR= $(PLUGINDIR)/lib/upnp
+PLUGINLIBDIR= /usr/lib/vdr/plugins/upnp
 
 ### Make sure that necessary options are included:
 

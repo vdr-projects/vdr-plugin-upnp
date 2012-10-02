@@ -25,7 +25,7 @@ INCLUDES += -I$(UPNPDIR)/include
 
 DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
-OBJS     = $(SCHEMA)Provider.cpp
+OBJS     = $(SCHEMA)Provider.o
 
 all: libupnp-$(SCHEMA)-provider.so
 

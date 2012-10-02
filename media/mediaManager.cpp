@@ -5,13 +5,14 @@
  *      Author: savop
  */
 
-#include "../include/plugin.h"
 #include "../include/media/mediaManager.h"
+#include "../include/plugin.h"
 #include "../include/server.h"
 #include "../include/parser.h"
 #include "../include/tools.h"
 #include <upnp/upnp.h>
 #include <sstream>
+#include <tntdb/connection.h>
 #include <tntdb/statement.h>
 #include <tntdb/result.h>
 #include <upnp/ixml.h>
