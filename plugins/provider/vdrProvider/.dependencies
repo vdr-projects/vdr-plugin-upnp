@@ -1,0 +1,1 @@
+vdrProvider.o: vdrProvider.cpp ../../../include/plugin.h
