@@ -5,9 +5,9 @@
  *      Author: savop
  */
 
-#include "../include/plugin.h"
-#include "../include/tools.h"
 #include "../include/pluginManager.h"
+#include "../include/tools/string.h"
+#include "../include/tools/uuid.h"
 #include <string>
 #include <dlfcn.h>
 #include <dirent.h>
@@ -69,7 +69,6 @@ bool cMetadata::AddProperty(const Property& property){
        key.compare(property::object::KEY_SCHEDULED_START) == 0 ||
        key.compare(property::object::KEY_TITLE) == 0)
     {
-      esyslog("UPnP\tProperty '%s' already exist!", key.c_str());
       return false;
     }
   }
@@ -218,9 +217,7 @@ public:
   }
 } ClassValidatorInst;
 
-cMetadata cUPnPResourceProvider::GetMetadata(string uri){
-
-  cMetadata metadata;
+bool cUPnPResourceProvider::GetMetadata(const string& uri, cMetadata& metadata){
 
   metadata.SetObjectIDByUri(uri);
   metadata.SetParentIDByUri(uri.substr(0,uri.find_last_of("/")));
@@ -228,11 +225,11 @@ cMetadata cUPnPResourceProvider::GetMetadata(string uri){
   metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, "object.container"));
   metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
-  return metadata;
+  return true;
 
 }
 
-string cUPnPResourceProvider::GetHTTPUri(string uri){
+string cUPnPResourceProvider::GetHTTPUri(const string& uri, const string& currentIP){
   return string();
 }
 
@@ -240,7 +237,7 @@ bool cUPnPResourceProvider::Seekable() const {
   return false;
 }
 
-bool cUPnPResourceProvider::Open(string uri){
+bool cUPnPResourceProvider::Open(const string& uri){
   return false;
 }
 
@@ -255,11 +252,24 @@ bool cUPnPResourceProvider::Seek(size_t offset, int origin){
 void cUPnPResourceProvider::Close(){
 }
 
-upnp::cPluginManager::cPluginManager(cMediaManager* manager)
-: manager(manager)
+
+
+upnp::cPluginManager::cPluginManager()
 {}
 
-cPluginManager::~cPluginManager(){}
+upnp::cPluginManager::~cPluginManager(){}
+
+const cPluginManager::ProfilerList& upnp::cPluginManager::GetProfilers() const {
+  return profilers;
+}
+
+int upnp::cPluginManager::Count() const {
+  return dlls.size();
+}
+
+cUPnPResourceProvider* upnp::cPluginManager::CreateProvider(const string& schema) {
+  return providers[schema]();
+}
 
 #define UPNPPLUGIN_PREFIX "libupnp-"
 #define SO_INDICATOR      ".so."
@@ -270,7 +280,6 @@ bool upnp::cPluginManager::LoadPlugins(const string& directory){
   struct dirent* dirEntry;
 
   if((dirHandle = opendir(directory.c_str())) == NULL){
-    esyslog("UPnP\tLoading directory '%s' failed. Errno: %d", directory.c_str(), errno);
     return false;
   }
 
@@ -283,8 +292,17 @@ bool upnp::cPluginManager::LoadPlugins(const string& directory){
          filename.find(SO_INDICATOR) != string::npos)
       {
         boost::shared_ptr<DLL> dll(new DLL(directory + "/" + filename));
-        if(dll->Load())
+        if(dll->Load()){
           dlls.push_back(dll);
+
+          if(dll->IsProvider()){
+            boost::shared_ptr<cUPnPResourceProvider> provider((cUPnPResourceProvider*)(dll->GetFunc()()));
+            providers[provider->ProvidesSchema()] = (ResourceProviderFuncPtr)dll->GetFunc();
+          } else {
+            boost::shared_ptr<cMediaProfiler> profiler((cMediaProfiler*)(dll->GetFunc()()));
+            profilers.push_back( profiler );
+          }
+        }
       }
     }
   }
@@ -296,8 +314,8 @@ bool upnp::cPluginManager::LoadPlugins(const string& directory){
 upnp::cPluginManager::DLL::DLL(const string& f)
 : file(f)
 , handle(NULL)
-, provider(NULL)
-, profiler(NULL)
+, isProvider(false)
+, function(NULL)
 {
 }
 
@@ -309,26 +327,24 @@ bool upnp::cPluginManager::DLL::Load(){
 
   const char* error = dlerror();
   if(!error){
-    provider = (FunctionPtr)dlsym(handle, "UPnPCreateResourceProvider");
+    function = (FuncPtr)dlsym(handle, "UPnPCreateResourceProvider");
     if (!(error = dlerror())){
-      isyslog("UPnP\tFound provider in %s", file.c_str());
+      isProvider = true;
       return true;
     } else {
-      dsyslog("UPnP\tError: %s", error);
+      cerr << error << endl;
     }
 
-    profiler = (FunctionPtr)dlsym(handle, "UPnPCreateMediaProfiler");
+    function = (FuncPtr)dlsym(handle, "UPnPCreateMediaProfiler");
     if (!(error = dlerror())){
-      isyslog("UPnP\tFound profiler in %s", file.c_str());
+      isProvider = false;
       return true;
     } else {
-      dsyslog("UPnP\tError: %s", error);
+      cerr << error << endl;
     }
   } else {
-    dsyslog("UPnP\tError: %s", error);
+    cerr << error << endl;
   }
-
-  isyslog("UPnP\tInvalid library '%s', no valid symbols found.", file.c_str());
 
   return false;
 }

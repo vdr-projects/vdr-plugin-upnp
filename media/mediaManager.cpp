@@ -6,17 +6,14 @@
  */
 
 #include "../include/media/mediaManager.h"
-#include "../include/plugin.h"
 #include "../include/server.h"
 #include "../include/parser.h"
-#include "../include/tools.h"
 #include <upnp/upnp.h>
 #include <sstream>
-#include <tntdb/connection.h>
-#include <tntdb/statement.h>
 #include <tntdb/result.h>
 #include <upnp/ixml.h>
 #include <memory>
+#include <tntdb/statement.h>
 
 namespace upnp {
 
@@ -394,11 +391,13 @@ cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(const std::string& browseF
 
 bool cMediaManager::Initialise(){
 
-  pluginManager = new upnp::cPluginManager(this);
+  pluginManager = new upnp::cPluginManager();
 
   if(!pluginManager->LoadPlugins(pluginDirectory)){
     esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory.c_str());
     return false;
+  } else {
+    dsyslog("UPnP\tFound %d plugins", pluginManager->Count());
   }
 
   try {
@@ -508,7 +507,7 @@ bool cMediaManager::Initialise(){
     return true;
 
   } catch (const std::exception& e) {
-    esyslog("UPnP\tException occurred while initializing database: %s", e.what());
+    esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
 
     connection.rollbackTransaction();
 

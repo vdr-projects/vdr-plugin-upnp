@@ -20,35 +20,9 @@
 
 namespace upnp {
 
-class cMediaManager;
-
-class cResourceStreamer {
-  friend class cMediaManager;
-private:
-  cUPnPResourceProvider* provider;
-  cMetadata::Resource* resource;
-
-  cMediaManager* manager;
-
-  StringVector protocolInfo;
-
-  cResourceStreamer(cMediaManager* manager, cUPnPResourceProvider* provider, cMetadata::Resource* resource);
-public:
-  virtual ~cResourceStreamer();
-  std::string GetContentFeatures() const;
-  size_t GetContentLength() const;
-  std::string GetContentType() const;
-  std::string GetTransferMode(const std::string& requestedMode ) const;
-  bool Seekable() const;
-
-  bool Open();
-  size_t Read(char* buf, size_t bufLen);
-  bool Seek(size_t offset, int origin);
-  void Close();
-};
+class cResourceStreamer;
 
 class cMediaManager : public cThread {
-  friend class upnp::cPluginManager;
 private:
 
   struct MediaRequest {
@@ -111,9 +85,6 @@ private:
 
   cUPnPResourceProvider* CreateResourceProvider(const std::string& uri);
 
-  void AddProviderFunctor(upnp::cPluginManager::FunctionPtr providerFunctor);
-  void AddProfiler(cMediaProfiler* profiler);
-
   uint32_t          systemUpdateID;
   IdList            eventedContainerUpdateIDs;
   StringList        scanDirectories;
@@ -123,12 +94,31 @@ private:
 
   upnp::cPluginManager* pluginManager;
 
-  typedef std::map<std::string, upnp::cPluginManager::FunctionPtr> ProviderMap;
-  typedef std::list<boost::shared_ptr<cMediaProfiler> > ProfilerList;
+};
 
-  ProviderMap   providers;
-  ProfilerList  profilers;
+class cResourceStreamer {
+  friend class cMediaManager;
+private:
+  cUPnPResourceProvider* provider;
+  cMetadata::Resource* resource;
 
+  cMediaManager* manager;
+
+  StringVector protocolInfo;
+
+  cResourceStreamer(cMediaManager* manager, cUPnPResourceProvider* provider, cMetadata::Resource* resource);
+public:
+  virtual ~cResourceStreamer();
+  std::string GetContentFeatures() const;
+  size_t GetContentLength() const;
+  std::string GetContentType() const;
+  std::string GetTransferMode(const std::string& requestedMode ) const;
+  bool Seekable() const;
+
+  bool Open();
+  size_t Read(char* buf, size_t bufLen);
+  bool Seek(size_t offset, int origin);
+  void Close();
 };
 
 }  // namespace upnp

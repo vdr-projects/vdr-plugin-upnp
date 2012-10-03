@@ -257,7 +257,7 @@ public:
    *
    * The given URI is an absolute URI.
    */
-  virtual EntryList GetContainerEntries(string uri) = 0;
+  virtual EntryList GetContainerEntries(const string& uri) = 0;
 
   /**
    * Checks if the given URI is a container.
@@ -268,7 +268,7 @@ public:
    * If it is a container, the plugin manager will try to recurse
    * into that directory and get the elements of it.
    */
-  virtual bool IsContainer(string uri) = 0;
+  virtual bool IsContainer(const string& uri) = 0;
 
   /**
    * Checks if the given URI is a link to another element.
@@ -283,7 +283,7 @@ public:
    * registered as a reference to the original element. Otherwise
    * the element is skipped.
    */
-  virtual bool IsLink(string uri, string& target) = 0;
+  virtual bool IsLink(const string& uri, string& target) = 0;
 
   /**
    * Returns the containerUpdateId of the given container
@@ -306,7 +306,7 @@ public:
    * confused, if the elements differ though the updateId remains
    * the same.
    */
-  virtual long GetContainerUpdateId(string uri) = 0;
+  virtual long GetContainerUpdateId(const string& uri) = 0;
 
   /**
    * Returns the meta data of a specific container.
@@ -331,7 +331,7 @@ public:
    * - Restricted: true
    *
    */
-  virtual cMetadata GetMetadata(string uri);
+  virtual bool GetMetadata(const string& uri, cMetadata& metadata);
 
   /**
    * Get the HTTP Uri.
@@ -348,7 +348,7 @@ public:
    * The implementor of a resource provider MUST either implement
    * this function or the file access methods below.
    */
-  virtual string GetHTTPUri(string uri);
+  virtual string GetHTTPUri(const string& uri, const string& currentIP = string());
 
   virtual bool Seekable() const;
 
@@ -365,7 +365,7 @@ public:
    *
    * The default implementation return false.
    */
-  virtual bool Open(string uri);
+  virtual bool Open(const string& uri);
 
   /**
    * Reads data from the stream
@@ -446,7 +446,7 @@ protected:
    *    - change of the parent container, where the file or container
    *      was moved to
    */
-  void OnContainerUpdate(string uri, long containerUpdateId, string changesUri = string());
+  void OnContainerUpdate(const string& uri, long containerUpdateId, const string& changesUri = string());
 
 };
 
@@ -474,7 +474,7 @@ public:
    *
    * @return \b true if the plugin can handle the uri schema, \b false if not.
    */
-  virtual bool CanHandleSchema(string schema) = 0;
+  virtual bool CanHandleSchema(const string& schema) = 0;
 
   /**
    * Get the metadata from a specific resource.
@@ -504,7 +504,7 @@ public:
    * @return true, if this profiler was able to get the specific metadata,
    * false, if not.
    */
-  virtual bool GetMetadata(string uri, cMetadata& metadata) = 0;
+  virtual bool GetMetadata(const string& uri, cMetadata& metadata) = 0;
 protected:
 };
 

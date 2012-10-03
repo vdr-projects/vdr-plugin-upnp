@@ -16,36 +16,51 @@
 
 namespace upnp {
 
-class cMediaManager;
-
 class cPluginManager {
 public:
-  typedef void*(*FunctionPtr)(void);
 
-  cPluginManager(cMediaManager* manager);
+  typedef std::list< boost::shared_ptr<cMediaProfiler> > ProfilerList;
+
+  cPluginManager();
   virtual ~cPluginManager();
 
   bool LoadPlugins(const std::string& directory);
+
+  int Count() const;
+
+  const ProfilerList& GetProfilers() const;
+  cUPnPResourceProvider* CreateProvider(const string& schema);
+
 private:
+
+  typedef cUPnPResourceProvider*(*ResourceProviderFuncPtr)(void);
+  typedef cMediaProfiler*(*MediaProfilerFuncPtr)(void);
+
   class DLL {
   public:
     DLL(const std::string& file);
     virtual ~DLL();
 
     bool Load();
-    FunctionPtr GetProvider() const { return provider; };
-    FunctionPtr GetProfiler() const { return profiler; };
+
+    bool IsProvider() const { return isProvider; }
+
+    typedef void*(*FuncPtr)(void);
+
+    FuncPtr GetFunc() const { return function; };
   private:
     std::string file;
     void* handle;
-    FunctionPtr provider;
-    FunctionPtr profiler;
+    bool isProvider;
+    FuncPtr function;
   };
 
   typedef std::list< boost::shared_ptr<DLL> > DLLList;
+  typedef std::map<string, ResourceProviderFuncPtr > ProviderMap;
 
-  DLLList dlls;
-  cMediaManager* manager;
+  DLLList       dlls;
+  ProviderMap   providers;
+  ProfilerList  profilers;
 
 };
 

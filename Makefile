@@ -72,12 +72,13 @@ OBJS = 	$(PLUGIN).o \
 		common/tools.o \
 		common/parser.o \
 		common/setup.o \
+		common/ixml.o \
 		media/profile.o \
 		media/mediaManager.o \
 		media/pluginManager.o \
 		$(TNTOBJ)
 		
-LIBS += -lupnp -lcxxtools -ltntnet -ltntdb
+LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl
 
 ### The main target:
 
@@ -128,7 +129,7 @@ i18n: $(I18Nmsgs) $(I18Npot)
 ### Targets:
 
 libvdr-$(PLUGIN).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -rdynamic -shared $(OBJS) $(LIBS) -o $@
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
 dist: $(I18Npo) clean

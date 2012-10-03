@@ -8,13 +8,15 @@
 #include <plugin.h>
 #include <vdr/channels.h>
 #include <vdr/tools.h>
+#include <vdr/config.h>
 #include <string>
+#include <tools.h>
+
+using namespace std;
 
 namespace upnp {
 
-#define GROUP_CHANNELS
-
-class VdrProvider : cUPnPResourceProvider {
+class VdrProvider : public cUPnPResourceProvider {
 
   virtual string ProvidesSchema(){ return "vdr"; }
 
@@ -22,10 +24,10 @@ class VdrProvider : cUPnPResourceProvider {
     return ProvidesSchema() + "://";
   }
 
-  virtual EntryList GetContainerEntries(string uri){
+  virtual cUPnPResourceProvider::EntryList GetContainerEntries(const string& uri){
     if(uri.find(GetRootContainer(), 0) != 0){
       isyslog("VdrProvider\tUri does not contain the root.");
-      return EntryList;
+      return cUPnPResourceProvider::EntryList();
     }
 
     EntryList list;
@@ -43,24 +45,35 @@ class VdrProvider : cUPnPResourceProvider {
     return list;
   }
 
-  virtual bool IsContainer(string uri){
+  virtual bool IsContainer(const string& uri){
     return uri.compare(GetRootContainer()) == 0;
   }
 
-  virtual bool IsLink(string uri, string& target){
+  virtual bool IsLink(const string& uri, string& target){
     // TODO: what are Channel::RefChannel or LinkChannels ?
     return false;
   }
 
-  virtual long GetContainerUpdateId(string uri){
+  virtual long GetContainerUpdateId(const string& uri){
     // TODO: provide a container update id
     return 0;
   }
 
-  virtual cMetadata GetMetadata(string uri);
+  virtual bool GetMetadata(const string& uri, cMetadata& metadata){
+    if(uri.find(GetRootContainer(), 0) != 0){
+      isyslog("VdrProvider\tUri does not contain the root.");
+      return false;
+    }
 
-  virtual string GetHTTPUri(string uri){
-    // TODO: get streamdev settings from configuration
+    return false;
+  }
+
+  virtual string GetHTTPUri(const string& uri, const string& currentIP){
+    if(uri.find(GetRootContainer(), 0) != 0){
+      isyslog("VdrProvider\tUri does not contain the root.");
+      return string();
+    }
+
     return string();
   }
 

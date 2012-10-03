@@ -21,6 +21,8 @@ CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses -fPIC
 
 UPNPDIR ?= ../../..
 
+APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' $(UPNPDIR)/include/plugin.h)
+
 INCLUDES += -I$(UPNPDIR)/include
 
 DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
@@ -45,3 +47,7 @@ $(DEPFILE): Makefile
 
 libupnp-$(SCHEMA)-provider.so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
+	@cp --remove-destination $@ $@.$(APIVERSION)
+	
+clean:
+	@-rm -f $(OBJS) $(DEPFILE) *.so *.so.$(APIVERSION) core* *~
