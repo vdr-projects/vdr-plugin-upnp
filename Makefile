@@ -17,7 +17,7 @@ VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ pri
 
 ### The C++ compiler and options:
 
-CXX      ?= gcc
+CXX      ?= g++
 ECPPC	 ?= ecppc
 CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses
 

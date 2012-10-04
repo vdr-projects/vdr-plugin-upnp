@@ -16,10 +16,11 @@ VERSION = $(shell grep 'static const char \*VERSION *=' $(SCHEMA)Provider.cpp | 
 
 ### The C++ compiler and options:
 
-CXX      ?= gcc
+CXX      ?= g++
 CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses -fPIC
 
 UPNPDIR ?= ../../..
+VDRPLUGINDIR = /usr/lib/vdr/plugins/
 
 APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' $(UPNPDIR)/include/plugin.h)
 
@@ -28,6 +29,8 @@ INCLUDES += -I$(UPNPDIR)/include
 DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
 OBJS     = $(SCHEMA)Provider.o
+
+LIBS	 = -L$(VDRPLUGINDIR) -Wl,-R$(VDRPLUGINDIR) -lvdr-upnp
 
 all: libupnp-$(SCHEMA)-provider.so
 

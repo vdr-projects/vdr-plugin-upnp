@@ -323,7 +323,7 @@ bool upnp::cPluginManager::DLL::Load(){
   if(handle)
     return true;
 
-  handle = dlopen(file.c_str(), RTLD_NOW);
+  handle = dlopen(file.c_str(), RTLD_LAZY);
 
   const char* error = dlerror();
   if(!error){
@@ -343,7 +343,7 @@ bool upnp::cPluginManager::DLL::Load(){
       cerr << error << endl;
     }
   } else {
-    cerr << error << endl;
+    cerr << "Error while opening plugin: " << error << endl;
   }
 
   return false;
