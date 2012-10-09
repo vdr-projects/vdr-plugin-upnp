@@ -12,20 +12,25 @@ PROFILE = dvb
 
 ### The version number of this plugin (taken from the main source file):
 
-VERSION = $(shell grep 'static const char \*VERSION *=' $(PROFILE).cpp | awk '{ print $$6 }' | sed -e 's/[";]//g')
+VERSION = $(shell grep 'static const char \*VERSION *=' $(PROFILE)Profiler.cpp | awk '{ print $$6 }' | sed -e 's/[";]//g')
 
 ### The C++ compiler and options:
 
-CXX      ?= gcc
+CXX      ?= g++
 CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses -fPIC
 
 UPNPDIR ?= ../../..
+VDRLIBDIR = $(UPNPDIR)/../../lib
+
+APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' $(UPNPDIR)/include/plugin.h)
 
 INCLUDES += -I$(UPNPDIR)/include
 
 DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 
-OBJS     = $(PROFILE).cpp
+OBJS     = $(PROFILE)Profiler.o
+
+LIBS	 = -L$(VDRLIBDIR) -Wl,-R$(VDRLIBDIR) -lvdr-upnp
 
 all: libupnp-$(PROFILE)-profiler.so
 
@@ -45,3 +50,7 @@ $(DEPFILE): Makefile
 
 libupnp-$(PROFILE)-provider.so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
+	@cp --remove-destination $@ $@.$(APIVERSION)
+	
+clean:
+	@-rm -f $(OBJS) $(DEPFILE) *.so *.so.$(APIVERSION) core* *~

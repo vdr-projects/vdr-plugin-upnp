@@ -20,7 +20,7 @@ CXX      ?= g++
 CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses -fPIC
 
 UPNPDIR ?= ../../..
-VDRPLUGINDIR = /usr/lib/vdr/plugins/
+VDRLIBDIR ?= $(UPNPDIR)/../../lib
 
 APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' $(UPNPDIR)/include/plugin.h)
 
@@ -30,7 +30,7 @@ DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFIL
 
 OBJS     = $(SCHEMA)Provider.o
 
-LIBS	 = -L$(VDRPLUGINDIR) -Wl,-R$(VDRPLUGINDIR) -lvdr-upnp
+LIBS	 = -L$(VDRLIBDIR) -Wl,-R$(VDRLIBDIR) -lvdr-upnp
 
 all: libupnp-$(SCHEMA)-provider.so
 
