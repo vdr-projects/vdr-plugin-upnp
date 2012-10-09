@@ -10,13 +10,23 @@
 #include <vdr/tools.h>
 #include <vdr/config.h>
 #include <string>
+#include <sstream>
 #include <tools.h>
+#include <vdr/thread.h>
 
 using namespace std;
 
 namespace upnp {
 
-class VdrProvider : public cUPnPResourceProvider {
+class VdrProvider : public cUPnPResourceProvider, cThread {
+private:
+  int     lastUpdateID;
+
+public:
+
+  VdrProvider()
+  : lastUpdateID(0)
+  {}
 
   virtual string ProvidesSchema(){ return "vdr"; }
 
@@ -54,9 +64,9 @@ class VdrProvider : public cUPnPResourceProvider {
     return false;
   }
 
-  virtual long GetContainerUpdateId(const string& uri){
+  virtual long GetContainerUpdateId(const string&){
     // TODO: provide a container update id
-    return 0;
+    return lastUpdateID;
   }
 
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
@@ -74,7 +84,17 @@ class VdrProvider : public cUPnPResourceProvider {
       return string();
     }
 
-    return string();
+    int port = 3000;
+
+    stringstream ss;
+
+    ss << "http://" << currentIP << ":" << port << "/TS/" << uri.substr(6);
+
+    return ss.str();
+  }
+
+  virtual void Action(){
+
   }
 
 };

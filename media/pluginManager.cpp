@@ -229,7 +229,7 @@ bool cUPnPResourceProvider::GetMetadata(const string& uri, cMetadata& metadata){
 
 }
 
-string cUPnPResourceProvider::GetHTTPUri(const string& uri, const string& currentIP){
+string cUPnPResourceProvider::GetHTTPUri(const string&, const string&){
   return string();
 }
 
@@ -268,7 +268,10 @@ int upnp::cPluginManager::Count() const {
 }
 
 cUPnPResourceProvider* upnp::cPluginManager::CreateProvider(const string& schema) {
-  return providers[schema]();
+  if(providers[schema])
+    return providers[schema]();
+  else
+    return NULL;
 }
 
 #define UPNPPLUGIN_PREFIX "libupnp-"

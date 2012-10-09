@@ -270,7 +270,7 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
           boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
 
           if(provider.get()){
-            string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE));
+            string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE), cMediaServer::GetInstance()->GetServerIPAddress());
 
             IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
 
@@ -608,7 +608,7 @@ cResourceStreamer* cMediaManager::GetResourceStreamer(const string& objectID, in
 }
 
 cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
-  return NULL;
+  return pluginManager->CreateProvider(uri.substr(0, uri.find_first_of(':',0)));
 }
 
 void cMediaManager::SetDatabaseFile(const string& file){
