@@ -192,6 +192,11 @@ public:
   bool SetObjectIDByUri(const string& uri);
   bool SetParentIDByUri(const string& uri);
 
+  ResourceList& GetResources();
+
+  void AddResource(const Resource& resource);
+  void RemoveResource(const Resource& resource);
+
   string ToString();
 
 private:

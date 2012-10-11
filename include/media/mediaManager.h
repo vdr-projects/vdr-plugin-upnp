@@ -87,7 +87,7 @@ private:
 
   bool ScanURI(const string& uri, cUPnPResourceProvider* provider);
 
-  bool RefreshObject(const cMetadata& metadata);
+  bool RefreshObject(cMetadata& metadata);
 
   cUPnPResourceProvider* CreateResourceProvider(const std::string& uri);
 

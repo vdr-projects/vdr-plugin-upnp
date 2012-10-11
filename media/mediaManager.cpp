@@ -465,7 +465,7 @@ bool cMediaManager::Initialise(){
          << "`" << property::object::KEY_CHANNEL_NR        << "` INTEGER,"
          << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
          << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
-         << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT"
+         << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT,"
          << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
          << ")";
 
@@ -692,12 +692,23 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
   cMetadata metadata;
 
   if(!provider->IsContainer(uri)){
+    cPluginManager::ProfilerList profilers = pluginManager->GetProfilers();
 
-
-    if(!RefreshObject(metadata)){
-      isyslog("UPnP\tUnable to save the metadata of '%s'", uri.c_str());
-      return false;
+    string schema = uri.substr(0, uri.find_first_of(':',0));
+    for(cPluginManager::ProfilerList::iterator it = profilers.begin(); it != profilers.end(); ++it){
+      if((*it)->CanHandleSchema(schema)){
+        if(!(*it)->GetMetadata(uri, metadata) || !RefreshObject(metadata)){
+          isyslog("UPnP\tUnable to save the metadata of '%s'", uri.c_str());
+          return false;
+        } else {
+          return true;
+        }
+      }
     }
+
+    isyslog("UPnP\tCannot find a profiler for schema '%s'", schema.c_str());
+    return false;
+
   } else {
     if(!provider->GetMetadata(uri, metadata)){
       isyslog("UPnP\tUnable to get the metadata of '%s'", uri.c_str());
@@ -736,7 +747,170 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
   return true;
 }
 
-bool cMediaManager::RefreshObject(const cMetadata& metadata){
+bool cMediaManager::RefreshObject(cMetadata& metadata){
+  stringstream ss;
+
+  try {
+
+    connection.beginTransaction();
+
+    ss << "INSERT OR REPLACE INTO " << db::Metadata << " ("
+       << "`" << property::object::KEY_OBJECTID          << "`,"
+       << "`" << property::object::KEY_PARENTID          << "`,"
+       << "`" << property::object::KEY_TITLE             << "`,"
+       << "`" << property::object::KEY_CLASS             << "`,"
+       << "`" << property::object::KEY_RESTRICTED        << "`,"
+       << "`" << property::object::KEY_CREATOR           << "`,"
+       << "`" << property::object::KEY_DESCRIPTION       << "`,"
+       << "`" << property::object::KEY_LONG_DESCRIPTION  << "`,"
+       << "`" << property::object::KEY_DATE              << "`,"
+       << "`" << property::object::KEY_LANGUAGE          << "`,"
+       << "`" << property::object::KEY_CHANNEL_NR        << "`,"
+       << "`" << property::object::KEY_CHANNEL_NAME      << "`,"
+       << "`" << property::object::KEY_SCHEDULED_START   << "`,"
+       << "`" << property::object::KEY_SCHEDULED_END     << "`"
+       << ") VALUES ("
+       << ":objectID, :parentID, :title, :class, :restricted,"
+       << ":creator, :description, :longDescription, :date,"
+       << ":language, :channelNr, :channelName, :start, :end"
+       << ")";
+
+    tntdb::Statement object = connection.prepare(ss.str());
+
+    const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
+
+    string objectID = metadata.GetPropertyByKey(property::object::KEY_OBJECTID).GetString();
+
+    object.setString("objectID", objectID)
+          .setString("parentID", metadata.GetPropertyByKey(property::object::KEY_PARENTID).GetString())
+          .setString("title",    metadata.GetPropertyByKey(property::object::KEY_TITLE).GetString())
+          .setString("class",    metadata.GetPropertyByKey(property::object::KEY_CLASS).GetString())
+          .setBool  ("restricted", metadata.GetPropertyByKey(property::object::KEY_RESTRICTED).GetBoolean());
+
+    (!metadata.GetPropertyByKey(property::object::KEY_CREATOR).IsEmpty()) ?
+    object.setString("creator", metadata.GetPropertyByKey(property::object::KEY_CREATOR).GetString()) :
+    object.setNull("creator");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_DESCRIPTION).IsEmpty()) ?
+    object.setString("description", metadata.GetPropertyByKey(property::object::KEY_DESCRIPTION).GetString()) :
+    object.setNull("description");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_LONG_DESCRIPTION).IsEmpty()) ?
+    object.setString("longDescription", metadata.GetPropertyByKey(property::object::KEY_LONG_DESCRIPTION).GetString()) :
+    object.setNull("longDescription");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_DATE).IsEmpty()) ?
+    object.setString("date", metadata.GetPropertyByKey(property::object::KEY_DATE).GetString()) :
+    object.setNull("date");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_LANGUAGE).IsEmpty()) ?
+    object.setString("language", metadata.GetPropertyByKey(property::object::KEY_LANGUAGE).GetString()) :
+    object.setNull("language");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NR).IsEmpty()) ?
+    object.setInteger("channelNr", metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NR).GetString()) :
+    object.setNull("channelNr");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NAME).IsEmpty()) ?
+    object.setString("channelName", metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NAME).GetString()) :
+    object.setNull("channelName");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_SCHEDULED_START).IsEmpty()) ?
+    object.setString("start", metadata.GetPropertyByKey(property::object::KEY_SCHEDULED_START).GetString()) :
+    object.setNull("start");
+
+    (!metadata.GetPropertyByKey(property::object::KEY_SCHEDULED_END).IsEmpty()) ?
+    object.setString("end", metadata.GetPropertyByKey(property::object::KEY_SCHEDULED_END).GetString()) :
+    object.setNull("end");
+
+    object.execute();
+
+    stringstream resourcestr;
+
+    resourcestr << "DELETE FROM " << db::Resources << " WHERE "
+                << "`" << property::object::KEY_OBJECTID << "`"
+                << " = :objectID";
+
+    tntdb::Statement resourcestmt = connection.prepare(resourcestr.str());
+
+    resourcestmt.setString("objectID", objectID)
+                .execute();
+
+    resourcestr.str(string());
+
+    resourcestr << "INSERT INTO " << db::Resources << " ("
+                << "`" << property::object::KEY_OBJECTID            << "`, "
+                << "`" << property::resource::KEY_RESOURCE          << "`,"
+                << "`" << property::resource::KEY_PROTOCOL_INFO     << "`,"
+                << "`" << property::resource::KEY_SIZE              << "`,"
+                << "`" << property::resource::KEY_DURATION          << "`,"
+                << "`" << property::resource::KEY_RESOLUTION        << "`,"
+                << "`" << property::resource::KEY_BITRATE           << "`,"
+                << "`" << property::resource::KEY_SAMPLE_FREQUENCY  << "`,"
+                << "`" << property::resource::KEY_BITS_PER_SAMPLE   << "`,"
+                << "`" << property::resource::KEY_NR_AUDIO_CHANNELS << "`,"
+                << "`" << property::resource::KEY_COLOR_DEPTH       << "`"
+                << ") VALUES ( "
+                << ":objectID, :resource, :protocolInfo, :size,"
+                << ":duration, :resolution, :bitrate, :sampleFreq, :bpSample"
+                << ":nrChannels, :colorDepth"
+                << ")";
+
+    tntdb::Statement resourcestmt2 = connection.prepare(resourcestr.str());
+
+    cMetadata::ResourceList resources = metadata.GetResources();
+    for(cMetadata::ResourceList::iterator it = resources.begin(); it != resources.end(); ++it){
+      resourcestmt2.setString("objectID", objectID)
+                   .setString("resource", (*it).GetResourceUri())
+                   .setString("protocolInfo", (*it).GetProtocolInfo())
+
+      ((*it).GetSize()) ?
+            resourcestmt2.setInt("size",(*it).GetSize()) :
+            resourcestmt2.setNull("size");
+
+      (!(*it).GetDuration().empty()) ?
+            resourcestmt2.setString("duration",(*it).GetDuration()) :
+            resourcestmt2.setNull("duration");
+
+      (!(*it).GetResolution().empty()) ?
+            resourcestmt2.setString("resolution",(*it).GetResolution()) :
+            resourcestmt2.setNull("resolution");
+
+      ((*it).GetBitrate()) ?
+            resourcestmt2.setInt("bitrate",(*it).GetBitrate()) :
+            resourcestmt2.setNull("bitrate");
+
+      ((*it).GetSampleFrequency()) ?
+            resourcestmt2.setInt("sampleFreq",(*it).GetSampleFrequency()) :
+            resourcestmt2.setNull("sampleFreq");
+
+      ((*it).GetBitsPerSample()) ?
+            resourcestmt2.setInt("bpSample",(*it).GetBitsPerSample()) :
+            resourcestmt2.setNull("bpSample");
+
+      ((*it).GetNrAudioChannels()) ?
+            resourcestmt2.setInt("nrChannels",(*it).GetNrAudioChannels()) :
+            resourcestmt2.setNull("nrChannels");
+
+      ((*it).GetColorDepth()) ?
+            resourcestmt2.setInt("colorDepth",(*it).GetColorDepth()) :
+            resourcestmt2.setNull("colorDepth");
+
+      resourcestmt2.execute();
+    }
+
+
+
+    connection.commitTransaction();
+
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
+
+    connection.rollbackTransaction();
+
+    return false;
+  }
+
   return true;
 }
 
