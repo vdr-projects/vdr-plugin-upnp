@@ -899,7 +899,33 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
       resourcestmt2.execute();
     }
 
+    stringstream detailstr;
 
+    detailstr << "DELETE FROM " << db::Details << " WHERE "
+              << "`" << property::object::KEY_OBJECTID << "`"
+              << " = :objectID";
+
+    tntdb::Statement detailstmt = connection.prepare(resourcestr.str());
+
+    detailstmt.setString("objectID", objectID)
+              .execute();
+
+    detailstr.str(string());
+
+    detailstr << "INSERT INTO " << db::Details << " ("
+              << " `" << property::object::KEY_OBJECTID << "`,"
+              << " `property`,"
+              << " `value`"
+              << " ) VALUES ("
+              << ":objectID, :property, :value"
+              << ")";
+
+    tntdb::Statement detailstmt2 = connection.prepare(resourcestr.str());
+
+    cMetadata::PropertyRange properties = metadata.GetAllProperties();
+    for(cMetadata::PropertyMap::iterator it = properties.first; it != properties.second; ++it){
+      // TODO
+    }
 
     connection.commitTransaction();
 
