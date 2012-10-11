@@ -6,6 +6,7 @@
  */
 
 #include <plugin.h>
+#include <vdr/epg.h>
 #include <vdr/channels.h>
 #include <vdr/tools.h>
 #include <vdr/config.h>
@@ -13,20 +14,34 @@
 #include <sstream>
 #include <tools.h>
 #include <vdr/thread.h>
+#include <iostream>
 
 using namespace std;
 
 namespace upnp {
 
-class VdrProvider : public cUPnPResourceProvider, cThread {
+class VdrProvider : public cUPnPResourceProvider {
 private:
-  int     lastUpdateID;
+  time_t     lastModified;
+
+  bool IsRootContainer(const string& uri){
+    if(uri.find(GetRootContainer(), 0) != 0){
+      isyslog("VdrProvider\tUri does not contain the root.");
+      return false;
+    } else {
+      return true;
+    }
+  }
 
 public:
 
   VdrProvider()
-  : lastUpdateID(0)
+  : lastModified(0)
   {}
+
+  virtual ~VdrProvider(){
+    Cancel(2);
+  }
 
   virtual string ProvidesSchema(){ return "vdr"; }
 
@@ -34,13 +49,10 @@ public:
     return ProvidesSchema() + "://";
   }
 
-  virtual cUPnPResourceProvider::EntryList GetContainerEntries(const string& uri){
-    if(uri.find(GetRootContainer(), 0) != 0){
-      isyslog("VdrProvider\tUri does not contain the root.");
-      return cUPnPResourceProvider::EntryList();
-    }
+  virtual StringList GetContainerEntries(const string& uri){
+    if(!IsRootContainer(uri)) return StringList();
 
-    EntryList list;
+    StringList list;
 
     // Check if this is the root:
     if(uri.compare(GetRootContainer()) == 0){
@@ -64,37 +76,82 @@ public:
     return false;
   }
 
-  virtual long GetContainerUpdateId(const string&){
-    // TODO: provide a container update id
-    return lastUpdateID;
+  virtual long GetContainerUpdateId(const string& uri){
+    if(IsRootContainer(uri)) return 0;
+
+    // We have no containers. So just return the last modification date.
+    // Containers like groups are about to come soon.
+    return (long)lastModified;
   }
 
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
-    if(uri.find(GetRootContainer(), 0) != 0){
-      isyslog("VdrProvider\tUri does not contain the root.");
-      return false;
-    }
+    if(!IsRootContainer(uri)) return false;
 
-    return false;
+    if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
+
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_PARENTID, string("0")));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Live-TV")));
+    metadata.SetProperty(cMetadata::Property("dlna:containerType", string("Tuner_1_0")));
+
+    return true;
   }
 
   virtual string GetHTTPUri(const string& uri, const string& currentIP){
-    if(uri.find(GetRootContainer(), 0) != 0){
-      isyslog("VdrProvider\tUri does not contain the root.");
-      return string();
-    }
+    if(!IsRootContainer(uri)) return string();
 
     int port = 3000;
 
     stringstream ss;
 
-    ss << "http://" << currentIP << ":" << port << "/TS/" << uri.substr(6);
+    ss << "http://" << currentIP << ":" << port
+       << "/"
+       << "EXT;"
+       << "PROG=cat;"
+       << "DLNA_contentFeatures=DLNA.ORG_PN=MPEG_TS_SD_EU_ISO+DLNA.ORG_OP=00+DLNA.ORG_CI=0+DLNA.ORG_FLAGS=ED100000000000000000000000000000"
+       << "/"
+       << uri.substr(6);
 
     return ss.str();
   }
 
   virtual void Action(){
 
+    dsyslog("VdrProvider\tStarting vdrProvider thread");
+
+    const cSchedules* Schedules;
+    long now = 0;
+    bool modified = false;
+    while(Running()){
+      now = time(NULL);
+
+      if(!Channels.BeingEdited() && Channels.Modified() > 0){
+        OnContainerUpdate(GetRootContainer(), now);
+        modified = true;
+      }
+
+      { // Reduce Scope of Schedules lock.
+        cSchedulesLock lock;
+        Schedules = cSchedules::Schedules(lock);
+        // iterate over all the schedules, find those, which were modified and tell
+        // it to the media manager
+        for(cSchedule* Schedule = Schedules->First(); Schedule; Schedule = Schedules->Next(Schedule))
+        {
+          if(Schedule->Modified() > lastModified && Schedule->PresentSeenWithin(30)){
+            OnContainerUpdate(GetRootContainer(), now, *Schedule->ChannelID().ToString());
+            modified = true;
+          }
+        }
+      }
+
+      if(modified){
+        modified = false;
+        lastModified = now;
+      }
+
+      sleep(2);
+    }
+
+    dsyslog("VdrProvider\tStopping vdrProvider thread");
   }
 
 };

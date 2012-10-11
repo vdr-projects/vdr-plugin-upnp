@@ -12,6 +12,8 @@
 #include <map>
 #include <list>
 #include <stdint.h>
+#include <vdr/thread.h>
+#include "../include/tools.h"
 
 using namespace std;
 
@@ -116,6 +118,10 @@ public:
     long GetInteger() const;
     bool GetBoolean() const;
 
+    bool IsEmpty() { return key.empty() && value.empty(); }
+
+    static Property Empty;
+
   private:
     string key;
     string value;
@@ -186,6 +192,8 @@ public:
   bool SetObjectIDByUri(const string& uri);
   bool SetParentIDByUri(const string& uri);
 
+  string ToString();
+
 private:
 
   PropertyMap properties;
@@ -201,10 +209,9 @@ public:
 
 #define UPNP_REGISTER_RESOURCE_PROVIDER(cls) extern "C" void *UPnPCreateResourceProvider(void) { return new cls; }
 
-class cUPnPResourceProvider {
+class cUPnPResourceProvider : public cThread {
+  friend class cMediaManager;
 public:
-
-  typedef list<string> EntryList;
 
   virtual ~cUPnPResourceProvider(){};
 
@@ -257,7 +264,7 @@ public:
    *
    * The given URI is an absolute URI.
    */
-  virtual EntryList GetContainerEntries(const string& uri) = 0;
+  virtual StringList GetContainerEntries(const string& uri) = 0;
 
   /**
    * Checks if the given URI is a container.
@@ -445,8 +452,23 @@ protected:
    *      was moved from
    *    - change of the parent container, where the file or container
    *      was moved to
+   *
+   * The optional target must be an element inside the container
+   * specified in the URI. If the target is not empty, only this
+   * element will be checked for changes. Otherwise the full container
+   * is scanned.
    */
-  void OnContainerUpdate(const string& uri, long containerUpdateId, const string& changesUri = string());
+  void OnContainerUpdate(const string& uri, long containerUpdateId, const string& target = string());
+
+  /**
+   * Thread action to check for updates
+   *
+   * This should be used to determine changes on the containers. It should
+   * be overridden by the implementor. However, it is not required and
+   * therefore empty by default.
+   *
+   */
+  virtual void Action();
 
 };
 

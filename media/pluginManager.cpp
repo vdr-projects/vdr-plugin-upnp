@@ -5,10 +5,13 @@
  *      Author: savop
  */
 
+#include "../include/server.h"
+#include "../include/media/mediaManager.h"
 #include "../include/pluginManager.h"
 #include "../include/tools/string.h"
 #include "../include/tools/uuid.h"
 #include <string>
+#include <sstream>
 #include <dlfcn.h>
 #include <dirent.h>
 
@@ -112,8 +115,24 @@ cMetadata::PropertyRange cMetadata::GetAllProperties() {
 }
 
 cMetadata::Property& cMetadata::GetPropertyByKey(const string& property) {
-  return (*properties.find(property)).second;
+  PropertyMap::iterator it = properties.find(property);
+
+  return (it != properties.end()) ? (*it).second : cMetadata::Property::Empty;
 }
+
+string cMetadata::ToString() {
+  stringstream ss;
+
+  cMetadata::PropertyRange properties = GetAllProperties();
+
+  for(PropertyMap::iterator it = properties.first; it != properties.second; ++it){
+    ss << "'" << (*it).first << "' ('" << (*it).second.GetKey() << "') = '" << (*it).second.GetString() << "'" << endl;
+  }
+
+  return ss.str();
+}
+
+cMetadata::Property cMetadata::Property::Empty;
 
 cMetadata::Property::Property(string key, bool val)
 : key(key)
@@ -222,7 +241,7 @@ bool cUPnPResourceProvider::GetMetadata(const string& uri, cMetadata& metadata){
   metadata.SetObjectIDByUri(uri);
   metadata.SetParentIDByUri(uri.substr(0,uri.find_last_of("/")));
   metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, uri.substr(uri.find_last_of("/")+1)));
-  metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, "object.container"));
+  metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.container")));
   metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
   return true;
@@ -252,7 +271,11 @@ bool cUPnPResourceProvider::Seek(size_t offset, int origin){
 void cUPnPResourceProvider::Close(){
 }
 
+void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long int cUID, const string& target){
+  cMediaServer::GetInstance()->GetManager().OnContainerUpdate(uri, cUID, target);
+}
 
+void cUPnPResourceProvider::Action(){}
 
 upnp::cPluginManager::cPluginManager()
 {}
@@ -263,13 +286,17 @@ const cPluginManager::ProfilerList& upnp::cPluginManager::GetProfilers() const {
   return profilers;
 }
 
+const cPluginManager::ProviderList& upnp::cPluginManager::GetProviders() const {
+  return providers;
+}
+
 int upnp::cPluginManager::Count() const {
   return dlls.size();
 }
 
 cUPnPResourceProvider* upnp::cPluginManager::CreateProvider(const string& schema) {
-  if(providers[schema])
-    return providers[schema]();
+  if(providerFactory[schema])
+    return providerFactory[schema]();
   else
     return NULL;
 }
@@ -300,7 +327,9 @@ bool upnp::cPluginManager::LoadPlugins(const string& directory){
 
           if(dll->IsProvider()){
             boost::shared_ptr<cUPnPResourceProvider> provider((cUPnPResourceProvider*)(dll->GetFunc()()));
-            providers[provider->ProvidesSchema()] = (ResourceProviderFuncPtr)dll->GetFunc();
+            providerFactory[provider->ProvidesSchema()] = (ResourceProviderFuncPtr)dll->GetFunc();
+            providers.push_back( provider );
+            provider->Start();
           } else {
             boost::shared_ptr<cMediaProfiler> profiler((cMediaProfiler*)(dll->GetFunc()()));
             profilers.push_back( profiler );

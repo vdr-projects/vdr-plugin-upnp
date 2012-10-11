@@ -15,14 +15,15 @@
 #include <list>
 #include <string>
 #include <stdint.h>
-#include <tntdb/connection.h>
 #include <tntdb/connect.h>
+#include <tntdb/connection.h>
 
 namespace upnp {
 
 class cResourceStreamer;
 
 class cMediaManager : public cThread {
+  friend void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long updateID, const string& target = string());
 private:
 
   struct MediaRequest {
@@ -81,13 +82,18 @@ private:
 
   int CreateResponse(MediaRequest&, const string&, const string&);
 
-  void OnContainerUpdate(string uri, long updateID);
+  void OnContainerUpdate(const string& uri, long updateID, const string& target);
+  bool UpdateContainerUpdateId(const string& objectID, long updateID);
+
+  bool ScanURI(const string& uri, cUPnPResourceProvider* provider);
+
+  bool RefreshObject(const cMetadata& metadata);
 
   cUPnPResourceProvider* CreateResourceProvider(const std::string& uri);
 
   uint32_t          systemUpdateID;
   IdList            eventedContainerUpdateIDs;
-  StringList        scanDirectories;
+  StringList        scanTargets;
   string            databaseFile;
   string            pluginDirectory;
   tntdb::Connection connection;

@@ -124,15 +124,61 @@ IdList cMediaManager::GetContainerUpdateIDs(bool unevented){
   return list;
 }
 
-void cMediaManager::OnContainerUpdate(string uri, long updateID){
-  ++systemUpdateID;
+void cMediaManager::OnContainerUpdate(const string& uri, long updateID, const string& target){
+  systemUpdateID = time(NULL);
 
-  eventedContainerUpdateIDs[tools::GenerateUUIDFromURL(uri)] = updateID;
+  string objectID = tools::GenerateUUIDFromURL(uri);
 
-  scanDirectories.push_back(uri);
+  eventedContainerUpdateIDs[objectID] = updateID;
+
+  // If we cannot update the containerUpdateID, we do not know, it is very likely, that this container
+  // does not exist. Therefore, we cannot scan this directory successfully.
+  if(!UpdateContainerUpdateId(objectID, updateID)) return;
+
+  stringstream ss;
+
+  ss << uri;
+
+  if(!target.empty()){
+    ss << target;
+  }
+
+  scanTargets.push_back(ss.str());
 
   // Start scanning for changed files.
   Start();
+}
+
+bool cMediaManager::UpdateContainerUpdateId(const string& objectID, long int updateID){
+  stringstream update;
+
+  update << "UPDATE " << db::Metadata << " SET "
+         << " `" << property::object::KEY_OBJECT_UPDATE_ID << "`=" << updateID
+         << " WHERE `" << property::object::KEY_OBJECTID << "`"
+         << " = :objectID";
+
+  try {
+    tntdb::Statement stmt = connection.prepare(update.str());
+
+    stmt.setString("objectID", objectID);
+
+    if(stmt.execute() == 0){
+      isyslog("UPnP\tContainer with ID '%s' not found. Cannot update it.", objectID.c_str());
+      return false;
+    }
+
+    dsyslog("UPnP\tUpdated container with ID '%s': %ld", objectID.c_str(), updateID);
+
+    return true;
+
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tException occurred while updating container with ID '%s': %s", objectID.c_str(), e.what());
+
+    return false;
+  }
+
+  return false;
+
 }
 
 StringList cMediaManager::GetSearchCapabilities() const {
@@ -391,15 +437,6 @@ cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(const std::string& browseF
 
 bool cMediaManager::Initialise(){
 
-  pluginManager = new upnp::cPluginManager();
-
-  if(!pluginManager->LoadPlugins(pluginDirectory)){
-    esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory.c_str());
-    return false;
-  } else {
-    dsyslog("UPnP\tFound %d plugins", pluginManager->Count());
-  }
-
   try {
     stringstream ss;
     ss << "sqlite:" << databaseFile;
@@ -408,103 +445,101 @@ bool cMediaManager::Initialise(){
 
     dsyslog("UPNP\tPreparing database structure...");
 
-    if(CheckIntegrity()) return true;
+    if(!CheckIntegrity()){
+      connection.beginTransaction();
 
-    connection.beginTransaction();
+      ss.str(string());
 
-    ss.str(string());
+      ss << "CREATE TABLE " << db::Metadata
+         << "("
+         << "`" << property::object::KEY_OBJECTID          << "` TEXT    PRIMARY KEY,"
+         << "`" << property::object::KEY_PARENTID          << "` TEXT    NOT NULL,"
+         << "`" << property::object::KEY_TITLE             << "` TEXT    NOT NULL,"
+         << "`" << property::object::KEY_CLASS             << "` TEXT    NOT NULL,"
+         << "`" << property::object::KEY_RESTRICTED        << "` INTEGER NOT NULL,"
+         << "`" << property::object::KEY_CREATOR           << "` TEXT,"
+         << "`" << property::object::KEY_DESCRIPTION       << "` TEXT,"
+         << "`" << property::object::KEY_LONG_DESCRIPTION  << "` TEXT,"
+         << "`" << property::object::KEY_DATE              << "` TEXT,"
+         << "`" << property::object::KEY_LANGUAGE          << "` TEXT,"
+         << "`" << property::object::KEY_CHANNEL_NR        << "` INTEGER,"
+         << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
+         << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
+         << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT"
+         << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
+         << ")";
 
-    ss << "CREATE TABLE " << db::Metadata
-       << "("
-       << "`" << property::object::KEY_OBJECTID          << "` TEXT    PRIMARY KEY,"
-       << "`" << property::object::KEY_PARENTID          << "` TEXT    NOT NULL,"
-       << "`" << property::object::KEY_TITLE             << "` TEXT    NOT NULL,"
-       << "`" << property::object::KEY_CLASS             << "` TEXT    NOT NULL,"
-       << "`" << property::object::KEY_RESTRICTED        << "` INTEGER NOT NULL,"
-       << "`" << property::object::KEY_CREATOR           << "` TEXT,"
-       << "`" << property::object::KEY_DESCRIPTION       << "` TEXT,"
-       << "`" << property::object::KEY_LONG_DESCRIPTION  << "` TEXT,"
-       << "`" << property::object::KEY_DATE              << "` TEXT,"
-       << "`" << property::object::KEY_LANGUAGE          << "` TEXT,"
-       << "`" << property::object::KEY_CHANNEL_NR        << "` INTEGER,"
-       << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
-       << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
-       << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT"
-       << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
-       << ")";
+      tntdb::Statement objectTable = connection.prepare(ss.str());
 
-    tntdb::Statement objectTable = connection.prepare(ss.str());
+      objectTable.execute();
 
-    objectTable.execute();
+      ss.str(string());
 
-    ss.str(string());
+      ss << "CREATE TABLE " << db::Details
+         << "("
+         << "  `propertyID` INTEGER PRIMARY KEY,"
+         << "  `" << property::object::KEY_OBJECTID << "` TEXT "
+         << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+         << "  `property`   TEXT,"
+         << "  `value`      TEXT"
+         << ")";
 
-    ss << "CREATE TABLE " << db::Details
-       << "("
-       << "  `propertyID` INTEGER PRIMARY KEY,"
-       << "  `" << property::object::KEY_OBJECTID << "` TEXT "
-       << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
-       << "  `property`   TEXT,"
-       << "  `value`      TEXT"
-       << ")";
+      tntdb::Statement detailsTable = connection.prepare(ss.str());
 
-    tntdb::Statement detailsTable = connection.prepare(ss.str());
+      detailsTable.execute();
 
-    detailsTable.execute();
+      ss.str(string());
 
-    ss.str(string());
+      ss << "CREATE TABLE " << db::Resources
+         << "("
+         << "  resourceID        INTEGER PRIMARY KEY,"
+         << "  `" << property::object::KEY_OBJECTID << "` TEXT "
+         << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+         << "`" << property::resource::KEY_RESOURCE           << "` TEXT    NOT NULL,"
+         << "`" << property::resource::KEY_PROTOCOL_INFO      << "` TEXT    NOT NULL,"
+         << "`" << property::resource::KEY_SIZE               << "` INTEGER,"
+         << "`" << property::resource::KEY_DURATION           << "` TEXT,"
+         << "`" << property::resource::KEY_RESOLUTION         << "` TEXT,"
+         << "`" << property::resource::KEY_BITRATE            << "` INTEGER,"
+         << "`" << property::resource::KEY_SAMPLE_FREQUENCY   << "` INTEGER,"
+         << "`" << property::resource::KEY_BITS_PER_SAMPLE    << "` INTEGER,"
+         << "`" << property::resource::KEY_NR_AUDIO_CHANNELS  << "` INTEGER,"
+         << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER"
+         << ")";
 
-    ss << "CREATE TABLE " << db::Resources
-       << "("
-       << "  resourceID        INTEGER PRIMARY KEY,"
-       << "  `" << property::object::KEY_OBJECTID << "` TEXT "
-       << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
-       << "`" << property::resource::KEY_RESOURCE           << "` TEXT    NOT NULL,"
-       << "`" << property::resource::KEY_PROTOCOL_INFO      << "` TEXT    NOT NULL,"
-       << "`" << property::resource::KEY_SIZE               << "` INTEGER,"
-       << "`" << property::resource::KEY_DURATION           << "` TEXT,"
-       << "`" << property::resource::KEY_RESOLUTION         << "` TEXT,"
-       << "`" << property::resource::KEY_BITRATE            << "` INTEGER,"
-       << "`" << property::resource::KEY_SAMPLE_FREQUENCY   << "` INTEGER,"
-       << "`" << property::resource::KEY_BITS_PER_SAMPLE    << "` INTEGER,"
-       << "`" << property::resource::KEY_NR_AUDIO_CHANNELS  << "` INTEGER,"
-       << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER"
-       << ")";
+      tntdb::Statement resourcesTable = connection.prepare(ss.str());
 
-    tntdb::Statement resourcesTable = connection.prepare(ss.str());
+      resourcesTable.execute();
 
-    resourcesTable.execute();
+      ss.str(string());
 
-    ss.str(string());
+      ss << "INSERT INTO " << db::Metadata << " ("
+         << "`" << property::object::KEY_OBJECTID          << "`, "
+         << "`" << property::object::KEY_PARENTID          << "`, "
+         << "`" << property::object::KEY_TITLE             << "`, "
+         << "`" << property::object::KEY_CLASS             << "`, "
+         << "`" << property::object::KEY_RESTRICTED        << "`, "
+         << "`" << property::object::KEY_CREATOR           << "`, "
+         << "`" << property::object::KEY_DESCRIPTION       << "`, "
+         << "`" << property::object::KEY_LONG_DESCRIPTION  << "`) "
+         << " VALUES (:objectID, :parentID, :title, :class, :restricted, :creator, :description, :longDescription)";
 
-    ss << "INSERT INTO " << db::Metadata << " ("
-       << "`" << property::object::KEY_OBJECTID          << "`, "
-       << "`" << property::object::KEY_PARENTID          << "`, "
-       << "`" << property::object::KEY_TITLE             << "`, "
-       << "`" << property::object::KEY_CLASS             << "`, "
-       << "`" << property::object::KEY_RESTRICTED        << "`, "
-       << "`" << property::object::KEY_CREATOR           << "`, "
-       << "`" << property::object::KEY_DESCRIPTION       << "`, "
-       << "`" << property::object::KEY_LONG_DESCRIPTION  << "`) "
-       << " VALUES (:objectID, :parentID, :title, :class, :restricted, :creator, :description, :longDescription)";
+      tntdb::Statement rootContainer = connection.prepare(ss.str());
 
-    tntdb::Statement rootContainer = connection.prepare(ss.str());
+      const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
 
-    const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
+      rootContainer.setString("objectID", "0")
+                   .setString("parentID", "-1")
+                   .setString("title", desc.friendlyName)
+                   .setString("creator", desc.manufacturer)
+                   .setString("class", "object.container")
+                   .setBool("restricted", true)
+                   .setString("description", desc.modelName)
+                   .setString("longDescription", desc.modelDescription)
+                   .execute();
 
-    rootContainer.setString("objectID", "0")
-                 .setString("parentID", "-1")
-                 .setString("title", desc.friendlyName)
-                 .setString("creator", desc.manufacturer)
-                 .setString("class", "object.container")
-                 .setBool("restricted", true)
-                 .setString("description", desc.modelName)
-                 .setString("longDescription", desc.modelDescription)
-                 .execute();
-
-    connection.commitTransaction();
-
-    return true;
+      connection.commitTransaction();
+    }
 
   } catch (const std::exception& e) {
     esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
@@ -514,7 +549,25 @@ bool cMediaManager::Initialise(){
     return false;
   }
 
-  return false;
+  dsyslog("UPNP\tLoading Plugins...");
+  pluginManager = new upnp::cPluginManager();
+
+  if(!pluginManager->LoadPlugins(pluginDirectory)){
+    esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory.c_str());
+    return false;
+  } else {
+    dsyslog("UPnP\tFound %d plugins", pluginManager->Count());
+  }
+
+  dsyslog("UPNP\tScanning directories...");
+  // Do an full initial scan on startup.
+  upnp::cPluginManager::ProviderList providers = pluginManager->GetProviders();
+  for(upnp::cPluginManager::ProviderList::iterator it = providers.begin(); it != providers.end(); ++it){
+    scanTargets.push_back((*it)->GetRootContainer());
+  }
+  Start();
+
+  return true;
 }
 
 bool cMediaManager::CheckIntegrity(){
@@ -622,7 +675,69 @@ void cMediaManager::SetPluginDirectory(const string& directory){
 }
 
 void cMediaManager::Action(){
+  string uri;
+  while(!scanTargets.empty()){
+    uri = scanTargets.front();
+    boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(uri));
+    if(!ScanURI(uri, provider.get())){
+      isyslog("UPnP\tAn error occured while scanning '%s'!", uri.c_str());
+    }
+    scanTargets.pop_front();
+  }
+}
 
+bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
+  if (provider == NULL) return false;
+
+  cMetadata metadata;
+
+  if(!provider->IsContainer(uri)){
+
+
+    if(!RefreshObject(metadata)){
+      isyslog("UPnP\tUnable to save the metadata of '%s'", uri.c_str());
+      return false;
+    }
+  } else {
+    if(!provider->GetMetadata(uri, metadata)){
+      isyslog("UPnP\tUnable to get the metadata of '%s'", uri.c_str());
+      return false;
+    }
+
+    if(!RefreshObject(metadata)){
+      isyslog("UPnP\tUnable to save the metadata of '%s'", uri.c_str());
+      return false;
+    }
+
+    StringList entries = provider->GetContainerEntries(uri);
+    stringstream ss, uristrm;
+
+    ss << "DELETE FROM " << db::Metadata << " WHERE "
+       << " `" << property::object::KEY_PARENTID << "`"
+       << " = '" << tools::GenerateUUIDFromURL(uri) << "'";
+
+    for(StringList::iterator it = entries.begin(); it != entries.end(); ++it){
+      uristrm.str(string());
+      uristrm << uri << *it;
+      ss << " AND"
+         << " `" << property::object::KEY_OBJECTID << "`"
+         << " != '" << tools::GenerateUUIDFromURL(uristrm.str()) << "'";
+    }
+
+    cout << ss.str() << endl;
+
+    for(StringList::iterator it = entries.begin(); it != entries.end(); ++it){
+      uristrm.str(string());
+      uristrm << uri << *it;
+      ScanURI(uristrm.str(), provider);
+    }
+  }
+
+  return true;
+}
+
+bool cMediaManager::RefreshObject(const cMetadata& metadata){
+  return true;
 }
 
 }  // namespace upnp

@@ -20,6 +20,7 @@ class cPluginManager {
 public:
 
   typedef std::list< boost::shared_ptr<cMediaProfiler> > ProfilerList;
+  typedef std::list< boost::shared_ptr<cUPnPResourceProvider> > ProviderList;
 
   cPluginManager();
   virtual ~cPluginManager();
@@ -29,6 +30,7 @@ public:
   int Count() const;
 
   const ProfilerList& GetProfilers() const;
+  const ProviderList& GetProviders() const;
   cUPnPResourceProvider* CreateProvider(const string& schema);
 
 private:
@@ -59,8 +61,9 @@ private:
   typedef std::map<string, ResourceProviderFuncPtr > ProviderMap;
 
   DLLList       dlls;
-  ProviderMap   providers;
+  ProviderMap   providerFactory;
   ProfilerList  profilers;
+  ProviderList  providers;
 
 };
 
