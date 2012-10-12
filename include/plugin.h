@@ -164,6 +164,18 @@ public:
     uint32_t  GetNrAudioChannels() const { return nrAudioChannels; }
     uint32_t  GetColorDepth() const { return colorDepth; }
 
+    /**
+     * Compares a resource with another resource
+     *
+     * This returns true if and only if the resource uri of the
+     * compared two resources are equal.
+     *
+     * It is illegal to have two distinct resources with the
+     * same resource uri even if one of them is a converted or
+     * transcoded version of the other one.
+     */
+    bool operator==(const Resource& rhs);
+
   private:
     string    resourceUri;
     string    protocolInfo;

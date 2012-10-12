@@ -20,7 +20,7 @@ CXX      ?= g++
 CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses -fPIC
 
 UPNPDIR ?= ../../..
-VDRLIBDIR = $(UPNPDIR)/../../lib
+VDRLIBDIR ?= $(UPNPDIR)/../../lib
 
 APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' $(UPNPDIR)/include/plugin.h)
 
@@ -48,7 +48,7 @@ $(DEPFILE): Makefile
 
 -include $(DEPFILE)
 
-libupnp-$(PROFILE)-provider.so: $(OBJS)
+libupnp-$(PROFILE)-profiler.so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
 	@cp --remove-destination $@ $@.$(APIVERSION)
 	

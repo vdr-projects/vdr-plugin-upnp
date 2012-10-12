@@ -9,16 +9,18 @@
 #define SERVER_H_
 
 #include <string>
+#include <map>
+#include <list>
 #include <upnp/upnp.h>
 #include "../include/config.h"
-#include "../include/service.h"
-#include "../include/webserver.h"
 
 using namespace std;
 
 namespace upnp {
 
 class cMediaManager;
+class cWebserver;
+class cUPnPService;
 
 class cMediaServer {
 public:

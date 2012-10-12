@@ -15,6 +15,8 @@
 #include <tools.h>
 #include <vdr/thread.h>
 #include <iostream>
+#include <pwd.h>
+#include <unistd.h>
 
 using namespace std;
 
@@ -93,6 +95,16 @@ public:
     metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Live-TV")));
     metadata.SetProperty(cMetadata::Property("dlna:containerType", string("Tuner_1_0")));
 
+    struct passwd *pw;
+    if((pw = getpwuid(getuid())) == NULL){
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, string("Klaus Schmidinger")));
+    } else {
+      string name(pw->pw_gecos); name = name.substr(0,name.find(",,,",0));
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, name));
+    }
+
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string("Watch Live-TV")));
+
     return true;
   }
 
@@ -115,8 +127,6 @@ public:
   }
 
   virtual void Action(){
-
-    dsyslog("VdrProvider\tStarting vdrProvider thread");
 
     const cSchedules* Schedules;
     long now = 0;
@@ -151,7 +161,6 @@ public:
       sleep(2);
     }
 
-    dsyslog("VdrProvider\tStopping vdrProvider thread");
   }
 
 };

@@ -8,7 +8,6 @@
 #ifndef MEDIAMANAGER_H_
 #define MEDIAMANAGER_H_
 
-#include "../../include/pluginManager.h"
 #include "../../include/plugin.h"
 #include "../../include/tools.h"
 #include <vdr/thread.h>
@@ -21,6 +20,7 @@
 namespace upnp {
 
 class cResourceStreamer;
+class cPluginManager;
 
 class cMediaManager : public cThread {
   friend void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long updateID, const string& target = string());

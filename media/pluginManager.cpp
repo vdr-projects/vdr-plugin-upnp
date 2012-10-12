@@ -6,8 +6,8 @@
  */
 
 #include "../include/server.h"
-#include "../include/media/mediaManager.h"
 #include "../include/pluginManager.h"
+#include "../include/media/mediaManager.h"
 #include "../include/tools/string.h"
 #include "../include/tools/uuid.h"
 #include <string>
@@ -120,6 +120,18 @@ cMetadata::Property& cMetadata::GetPropertyByKey(const string& property) {
   return (it != properties.end()) ? (*it).second : cMetadata::Property::Empty;
 }
 
+cMetadata::ResourceList& cMetadata::GetResources(){
+  return resources;
+}
+
+void cMetadata::AddResource(const Resource& resource){
+  resources.push_back(resource);
+}
+
+void cMetadata::RemoveResource(const Resource& resource){
+  resources.remove(resource);
+}
+
 string cMetadata::ToString() {
   stringstream ss;
 
@@ -216,6 +228,10 @@ bool cMetadata::Resource::SetNrAudioChannels(uint32_t nrAudioChannels){
 bool cMetadata::Resource::SetColorDepth(uint32_t colorDepth){
   this->colorDepth = colorDepth;
   return true;
+}
+
+bool cMetadata::Resource::operator ==(const Resource& rhs){
+  return (GetResourceUri().compare(rhs.GetResourceUri()) == 0);
 }
 
 class ClassValidator : public PropertyValidator {

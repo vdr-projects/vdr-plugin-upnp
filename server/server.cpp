@@ -10,6 +10,7 @@
 #include <sstream>
 #include "../include/server.h"
 #include "../include/service.h"
+#include "../include/webserver.h"
 #include "../include/tools.h"
 #include "../include/media/mediaManager.h"
 #include "../upnp.h"

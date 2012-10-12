@@ -6,6 +6,7 @@
  */
 
 #include "../include/media/mediaManager.h"
+#include "../include/pluginManager.h"
 #include "../include/server.h"
 #include "../include/parser.h"
 #include <upnp/upnp.h>
@@ -14,6 +15,7 @@
 #include <upnp/ixml.h>
 #include <memory>
 #include <tntdb/statement.h>
+#include <tntdb/transaction.h>
 
 namespace upnp {
 
@@ -108,6 +110,13 @@ cMediaManager::cMediaManager()
 }
 
 cMediaManager::~cMediaManager(){
+  try {
+    tntdb::Statement stmt = connection.prepare("VACUUM");
+    stmt.execute();
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tFailed to vacuum database '%s': '%s'", databaseFile.c_str(), e.what());
+  }
+
   delete pluginManager;
 }
 
@@ -218,16 +227,21 @@ StringList cMediaManager::GetSupportedProtocolInfos() const {
 
   ss << "SELECT DISTINCT `" << property::resource::KEY_PROTOCOL_INFO << "` FROM " << db::Resources;
 
-  tntdb::Statement stmt = conn.prepare(ss.str());
-
   StringList list;
 
-  for(tntdb::Statement::const_iterator it = stmt.begin(); it != stmt.end(); ++it){
-    tntdb::Row row = (*it);
+  try {
+    tntdb::Statement stmt = conn.prepare(ss.str());
 
-    cout << row.getString(property::resource::KEY_PROTOCOL_INFO) << endl;
+    for(tntdb::Statement::const_iterator it = stmt.begin(); it != stmt.end(); ++it){
+      tntdb::Row row = (*it);
 
-    list.push_back(row.getString(property::resource::KEY_PROTOCOL_INFO));
+      cout << row.getString(property::resource::KEY_PROTOCOL_INFO) << endl;
+
+      list.push_back(row.getString(property::resource::KEY_PROTOCOL_INFO));
+    }
+
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tException occurred while getting protocol infos: %s", e.what());
   }
 
   return list;
@@ -244,114 +258,120 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
             << "`" << property::object::KEY_OBJECTID << "` = "
             << ":objectID";
 
-  tntdb::Statement select1 = connection.prepare(select);
-  tntdb::Result result = connection.select(count);
-  tntdb::Statement select2 = connection.prepare(resources.str());
-  tntdb::Statement select3 = connection.prepare(details.str());
-
-  StringList filterList = cFilterCriteria::parse(request.filter);
-
-  request.numberReturned = 0;
-  request.updateID = 0;
-  request.totalMatches = result.getRow(0).getInt32("totalMatches");
-
   IXML_Document* DIDLDoc = NULL;
-  if(ixmlParseBufferEx(DIDLFragment, &DIDLDoc)==IXML_SUCCESS){
 
-    IXML_Node* root = ixmlNode_getFirstChild((IXML_Node*) DIDLDoc);
+  try {
+    tntdb::Statement select1 = connection.prepare(select);
+    tntdb::Result result = connection.select(count);
+    tntdb::Statement select2 = connection.prepare(resources.str());
+    tntdb::Statement select3 = connection.prepare(details.str());
 
-    tntdb::Row row, row2, row3;
+    StringList filterList = cFilterCriteria::parse(request.filter);
 
-    for(tntdb::Statement::const_iterator it = select1.begin(); it != select1.end(); ++it){
+    request.numberReturned = 0;
+    request.updateID = 0;
+    request.totalMatches = result.getRow(0).getInt32("totalMatches");
 
-      row = (*it);
+    if(ixmlParseBufferEx(DIDLFragment, &DIDLDoc)==IXML_SUCCESS){
 
-      IXML_Element* object;
-      string upnpClass = row.getString(property::object::KEY_CLASS);
+      IXML_Node* root = ixmlNode_getFirstChild((IXML_Node*) DIDLDoc);
 
-      bool isContainer;
+      tntdb::Row row, row2, row3;
 
+      for(tntdb::Statement::const_iterator it = select1.begin(); it != select1.end(); ++it){
 
-      if(upnpClass.find("object.item",0) == 0){
-        object = ixmlDocument_createElement(DIDLDoc, "item");
-        isContainer = false;
-      } else if(upnpClass.find("object.container",0) == 0) {
-        object = ixmlDocument_createElement(DIDLDoc, "container");
-        isContainer = true;
-      } else {
-        goto error;
-      }
-      ixmlNode_appendChild(root, (IXML_Node*)object);
+        row = (*it);
 
-      string objectID = row.getString(property::object::KEY_OBJECTID);
+        IXML_Element* object;
+        string upnpClass = row.getString(property::object::KEY_CLASS);
 
-      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, objectID);
-      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_PARENTID, row.getString(property::object::KEY_PARENTID));
-      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_RESTRICTED, row.getString(property::object::KEY_RESTRICTED));
-      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_TITLE, row.getString(property::object::KEY_TITLE).substr(0, MAX_METADATA_LENGTH_S));
-      ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_CLASS, row.getString(property::object::KEY_CLASS).substr(0, MAX_METADATA_LENGTH_S));
-
-      if(isContainer){
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHILD_COUNT, row.getString(property::object::KEY_CHILD_COUNT));
-      }
-      else {
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NR, row.getString(property::object::KEY_CHANNEL_NR));
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, row.getString(property::object::KEY_CHANNEL_NAME));
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_START, row.getString(property::object::KEY_SCHEDULED_START));
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_END, row.getString(property::object::KEY_SCHEDULED_END));
-      }
-
-      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CREATOR, row.getString(property::object::KEY_CREATOR));
-      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DESCRIPTION, row.getString(property::object::KEY_DESCRIPTION));
-      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LONG_DESCRIPTION, row.getString(property::object::KEY_LONG_DESCRIPTION));
-      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DATE, row.getString(property::object::KEY_DATE));
-      ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LANGUAGE, row.getString(property::object::KEY_LANGUAGE));
+        bool isContainer;
 
 
-      select2.setString("objectID", objectID);
+        if(upnpClass.find("object.item",0) == 0){
+          object = ixmlDocument_createElement(DIDLDoc, "item");
+          isContainer = false;
+        } else if(upnpClass.find("object.container",0) == 0) {
+          object = ixmlDocument_createElement(DIDLDoc, "container");
+          isContainer = true;
+        } else {
+          goto error;
+        }
+        ixmlNode_appendChild(root, (IXML_Node*)object);
 
-      for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
-          row2 = (*it2);
+        string objectID = row.getString(property::object::KEY_OBJECTID);
 
-          boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
+        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, objectID);
+        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_PARENTID, row.getString(property::object::KEY_PARENTID));
+        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_RESTRICTED, row.getString(property::object::KEY_RESTRICTED));
+        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_TITLE, row.getString(property::object::KEY_TITLE).substr(0, MAX_METADATA_LENGTH_S));
+        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_CLASS, row.getString(property::object::KEY_CLASS).substr(0, MAX_METADATA_LENGTH_S));
 
-          if(provider.get()){
-            string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE), cMediaServer::GetInstance()->GetServerIPAddress());
+        if(isContainer){
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHILD_COUNT, row.getString(property::object::KEY_CHILD_COUNT));
+        }
+        else {
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NR, row.getString(property::object::KEY_CHANNEL_NR));
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, row.getString(property::object::KEY_CHANNEL_NAME));
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_START, row.getString(property::object::KEY_SCHEDULED_START));
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_END, row.getString(property::object::KEY_SCHEDULED_END));
+        }
 
-            IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CREATOR, row.getString(property::object::KEY_CREATOR));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DESCRIPTION, row.getString(property::object::KEY_DESCRIPTION));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LONG_DESCRIPTION, row.getString(property::object::KEY_LONG_DESCRIPTION));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DATE, row.getString(property::object::KEY_DATE));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LANGUAGE, row.getString(property::object::KEY_LANGUAGE));
 
-            if(resource){
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
-              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
+
+        select2.setString("objectID", objectID);
+
+        for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
+            row2 = (*it2);
+
+            boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
+
+            if(provider.get()){
+              string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE), cMediaServer::GetInstance()->GetServerIPAddress());
+
+              IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
+
+              if(resource){
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
+                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
+              }
             }
-          }
 
+        }
+
+        select3.setString("objectID", objectID);
+
+        for(tntdb::Statement::const_iterator it3 = select3.begin(); it3 != select2.end(); ++it3){
+          row3 = (*it3);
+
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, row3.getString("property"), row3.getString("value"));
+        }
+
+        ++request.numberReturned;
       }
 
-      select3.setString("objectID", objectID);
+      request.result = ixmlDocumenttoString(DIDLDoc);
 
-      for(tntdb::Statement::const_iterator it3 = select3.begin(); it3 != select2.end(); ++it3){
-        row3 = (*it3);
+      cout << request.result << endl;
 
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, row3.getString("property"), row3.getString("value"));
-      }
-
-      ++request.numberReturned;
+      ixmlDocument_free(DIDLDoc);
+      return UPNP_E_SUCCESS;
     }
-
-    request.result = ixmlDocumenttoString(DIDLDoc);
-
-    cout << request.result << endl;
-
-    ixmlDocument_free(DIDLDoc);
-    return UPNP_E_SUCCESS;
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tException occurred while creating response for object '%s': %s",
+       request.objectID.c_str(), e.what());
   }
 
   error:
@@ -572,6 +592,10 @@ bool cMediaManager::Initialise(){
 
 bool cMediaManager::CheckIntegrity(){
 
+  tntdb::Statement enableForeignKeys = connection.prepare("PRAGMA foreign_keys = ON");
+
+  enableForeignKeys.execute();
+
   tntdb::Statement checkTable = connection.prepare(
           "SELECT name FROM sqlite_master WHERE type='table' AND name=:table;"
           );
@@ -680,7 +704,7 @@ void cMediaManager::Action(){
     uri = scanTargets.front();
     boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(uri));
     if(!ScanURI(uri, provider.get())){
-      isyslog("UPnP\tAn error occured while scanning '%s'!", uri.c_str());
+      //isyslog("UPnP\tAn error occured while scanning '%s'!", uri.c_str());
     }
     scanTargets.pop_front();
   }
@@ -706,7 +730,6 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
       }
     }
 
-    isyslog("UPnP\tCannot find a profiler for schema '%s'", schema.c_str());
     return false;
 
   } else {
@@ -735,7 +758,16 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
          << " != '" << tools::GenerateUUIDFromURL(uristrm.str()) << "'";
     }
 
-    cout << ss.str() << endl;
+    try {
+      tntdb::Statement objects = connection.prepare(ss.str());
+
+      objects.execute();
+    } catch (const std::exception& e) {
+      esyslog("UPnP\tException occurred while removing old object in '%s' from database '%s': %s",
+          tools::GenerateUUIDFromURL(uri).c_str(), databaseFile.c_str(), e.what());
+
+      return false;
+    }
 
     for(StringList::iterator it = entries.begin(); it != entries.end(); ++it){
       uristrm.str(string());
@@ -749,6 +781,8 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
 
 bool cMediaManager::RefreshObject(cMetadata& metadata){
   stringstream ss;
+
+  string objectID = metadata.GetPropertyByKey(property::object::KEY_OBJECTID).GetString();
 
   try {
 
@@ -779,8 +813,6 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
 
     const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
 
-    string objectID = metadata.GetPropertyByKey(property::object::KEY_OBJECTID).GetString();
-
     object.setString("objectID", objectID)
           .setString("parentID", metadata.GetPropertyByKey(property::object::KEY_PARENTID).GetString())
           .setString("title",    metadata.GetPropertyByKey(property::object::KEY_TITLE).GetString())
@@ -808,7 +840,7 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
     object.setNull("language");
 
     (!metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NR).IsEmpty()) ?
-    object.setInteger("channelNr", metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NR).GetString()) :
+    object.setInt("channelNr", metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NR).GetInteger()) :
     object.setNull("channelNr");
 
     (!metadata.GetPropertyByKey(property::object::KEY_CHANNEL_NAME).IsEmpty()) ?
@@ -852,7 +884,7 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
                 << "`" << property::resource::KEY_COLOR_DEPTH       << "`"
                 << ") VALUES ( "
                 << ":objectID, :resource, :protocolInfo, :size,"
-                << ":duration, :resolution, :bitrate, :sampleFreq, :bpSample"
+                << ":duration, :resolution, :bitrate, :sampleFreq, :bpSample,"
                 << ":nrChannels, :colorDepth"
                 << ")";
 
@@ -862,7 +894,7 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
     for(cMetadata::ResourceList::iterator it = resources.begin(); it != resources.end(); ++it){
       resourcestmt2.setString("objectID", objectID)
                    .setString("resource", (*it).GetResourceUri())
-                   .setString("protocolInfo", (*it).GetProtocolInfo())
+                   .setString("protocolInfo", (*it).GetProtocolInfo());
 
       ((*it).GetSize()) ?
             resourcestmt2.setInt("size",(*it).GetSize()) :
@@ -905,7 +937,7 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
               << "`" << property::object::KEY_OBJECTID << "`"
               << " = :objectID";
 
-    tntdb::Statement detailstmt = connection.prepare(resourcestr.str());
+    tntdb::Statement detailstmt = connection.prepare(detailstr.str());
 
     detailstmt.setString("objectID", objectID)
               .execute();
@@ -920,17 +952,36 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
               << ":objectID, :property, :value"
               << ")";
 
-    tntdb::Statement detailstmt2 = connection.prepare(resourcestr.str());
+    tntdb::Statement detailstmt2 = connection.prepare(detailstr.str());
 
     cMetadata::PropertyRange properties = metadata.GetAllProperties();
     for(cMetadata::PropertyMap::iterator it = properties.first; it != properties.second; ++it){
-      // TODO
+      if((*it).first.compare(property::object::KEY_OBJECTID) == 0 ||
+         (*it).first.compare(property::object::KEY_PARENTID) == 0 ||
+         (*it).first.compare(property::object::KEY_TITLE) == 0 ||
+         (*it).first.compare(property::object::KEY_CLASS) == 0 ||
+         (*it).first.compare(property::object::KEY_RESTRICTED) == 0 ||
+         (*it).first.compare(property::object::KEY_CREATOR) == 0 ||
+         (*it).first.compare(property::object::KEY_DESCRIPTION) == 0 ||
+         (*it).first.compare(property::object::KEY_LONG_DESCRIPTION) == 0 ||
+         (*it).first.compare(property::object::KEY_DATE) == 0 ||
+         (*it).first.compare(property::object::KEY_LANGUAGE) == 0 ||
+         (*it).first.compare(property::object::KEY_CHANNEL_NR) == 0 ||
+         (*it).first.compare(property::object::KEY_CHANNEL_NAME) == 0 ||
+         (*it).first.compare(property::object::KEY_SCHEDULED_START) == 0 ||
+         (*it).first.compare(property::object::KEY_SCHEDULED_END) == 0) continue;
+
+      detailstmt2.setString("objectID", objectID)
+                 .setString("property", (*it).second.GetKey())
+                 .setString("value", (*it).second.GetString())
+                 .execute();
     }
 
     connection.commitTransaction();
 
   } catch (const std::exception& e) {
-    esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
+    esyslog("UPnP\tException occurred while storing object '%s' to database '%s': %s",
+        objectID.c_str(), databaseFile.c_str(), e.what());
 
     connection.rollbackTransaction();
 
