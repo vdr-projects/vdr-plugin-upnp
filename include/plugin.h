@@ -142,6 +142,8 @@ public:
   class Resource {
   public:
 
+    Resource();
+
     bool SetResourceUri(string resourceUri);
     bool SetProtocolInfo(string protocolInfo);
     bool SetDuration(string duration);

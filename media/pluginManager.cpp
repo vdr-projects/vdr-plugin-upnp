@@ -180,6 +180,20 @@ string cMetadata::Property::GetKey() const {
   return key;
 }
 
+cMetadata::Resource::Resource()
+: resourceUri(string())
+, protocolInfo(string())
+, duration(string())
+, resolution(string())
+, bitrate(0)
+, size(0)
+, sampleFrequency(0)
+, bitsPerSample(0)
+, nrAudioChannels(0)
+, colorDepth(0)
+{
+}
+
 bool cMetadata::Resource::SetResourceUri(string resourceUri){
   this->resourceUri = resourceUri;
   return true;
