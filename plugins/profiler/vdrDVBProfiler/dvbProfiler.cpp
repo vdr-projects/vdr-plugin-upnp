@@ -5,6 +5,8 @@
  *      Author: savop
  */
 
+#include <server.h>
+#include <webserver.h>
 #include <vdr/channels.h>
 #include <vdr/epg.h>
 #include <vdr/tools.h>
@@ -13,6 +15,8 @@
 #include <string>
 #include <sstream>
 #include <media/profile.h>
+#include <boost/date_time/gregorian/gregorian.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 
@@ -65,42 +69,85 @@ private:
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NR, (long int)channel->Number()));
 
 	  // Now, we try to get the present event of the schedule
-	  metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(channel->Name())));
+	  {
+	    cSchedulesLock lock;
+	    const cSchedules* schedules = cSchedules::Schedules(lock);
+	    const cSchedule* schedule = (schedules) ? schedules->GetSchedule(channelID) : NULL;
+	    const cEvent* event = (schedule) ? schedule->GetPresentEvent() : NULL;
 
-	  cMetadata::Resource resource;
+	    if(event){
+	      stringstream title;
+	      title << channel->Name() << ": " << event->Title();
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, title.str()));
 
-	  stringstream protocolInfo;
+	      boost::posix_time::ptime startTime, endTime;
+	      startTime = boost::posix_time::from_time_t(event->StartTime());
+	      endTime = boost::posix_time::from_time_t(event->EndTime());
 
-	  protocolInfo << "http-get:*:video/mpeg:";
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(startTime.date())));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_START, boost::posix_time::to_iso_extended_string(startTime)));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_END, boost::posix_time::to_iso_extended_string(endTime)));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(event->ShortText())));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(event->Description())));
+	    } else {
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(channel->Name())));
+	    }
 
-    DLNA4thField fourthfield;
+      cMetadata::Resource resource;
 
-	  switch (channel->Vtype()) {
-      case 0x02:
-        fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_NONE,
-                                   DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
-                                   DLNA_FLAG_STREAMING_TRANSFER |
-                                   DLNA_FLAG_SN_INCREASE |
-                                   DLNA_FLAG_VERSION_1_5 );
-        break;
-      case 0x1B:
-        fourthfield = DLNA4thField("AVC_TS_HD_EU_ISO", DLNA_OPERATION_NONE,
-                                   DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
-                                   DLNA_FLAG_STREAMING_TRANSFER |
-                                   DLNA_FLAG_SN_INCREASE |
-                                   DLNA_FLAG_VERSION_1_5 );
-        break;
-      default:
-        return false;
-        break;
+      DLNA4thField fourthfield;
+      switch (channel->Vtype()) {
+        case 0x02:
+          fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_NONE,
+                                     DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                     DLNA_FLAG_STREAMING_TRANSFER |
+                                     DLNA_FLAG_SN_INCREASE |
+                                     DLNA_FLAG_VERSION_1_5 );
+          break;
+        case 0x1B:
+          fourthfield = DLNA4thField("AVC_TS_HD_EU_ISO", DLNA_OPERATION_NONE,
+                                     DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                     DLNA_FLAG_STREAMING_TRANSFER |
+                                     DLNA_FLAG_SN_INCREASE |
+                                     DLNA_FLAG_VERSION_1_5 );
+          break;
+        default:
+          return false;
+          break;
+      }
+
+      resource.SetResourceUri(uri);
+      resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
+
+      if(event){
+        boost::posix_time::time_duration duration = boost::posix_time::seconds(event->Duration());
+        resource.SetDuration(boost::posix_time::to_simple_string(duration));
+      }
+
+      metadata.AddResource(resource);
+
     }
 
-	  protocolInfo << fourthfield.ToString();
+	  stringstream ss;
+	  cMetadata::Resource thumbnail;
+	  ss.str(string());
+	  ss << "channelIcons/" << channel->Name() << ".jpg";
 
-	  resource.SetResourceUri(uri);
-	  resource.SetProtocolInfo(protocolInfo.str());
+	  stringstream filename, uriStrm;
+	  filename << cMediaServer::GetInstance()->GetWebserver().GetThumbnailDir() << ss.str();
+	  uriStrm << "thumb://" << ss.str();
 
-	  metadata.AddResource(resource);
+	  struct stat fileStat;
+
+	  dsyslog("DVBProvider\tTry to get thumbnail for %s in %s", channel->Name(), filename.str().c_str());
+	  if(stat(filename.str().c_str(), &fileStat) == 0){
+	    thumbnail.SetResourceUri(uriStrm.str());
+	    thumbnail.SetProtocolInfo(ProtocolInfo("image/jpeg", DLNA4thField("JPEG_TN")).ToString());
+	    thumbnail.SetSize(fileStat.st_size);
+	    metadata.AddResource(thumbnail);
+	  } else {
+	    dsyslog("DVBProvider\tFailed to stat %s", filename.str().c_str());
+	  }
 
     return true;
   }

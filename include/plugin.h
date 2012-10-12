@@ -374,7 +374,7 @@ public:
    * The implementor of a resource provider MUST either implement
    * this function or the file access methods below.
    */
-  virtual string GetHTTPUri(const string& uri, const string& currentIP);
+  virtual string GetHTTPUri(const string& uri, const string& currentIP, const string& protocolInfo);
 
   virtual bool Seekable() const;
 

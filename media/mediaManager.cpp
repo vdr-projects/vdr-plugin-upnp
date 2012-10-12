@@ -5,6 +5,7 @@
  *      Author: savop
  */
 
+#include "../include/webserver.h"
 #include "../include/media/mediaManager.h"
 #include "../include/pluginManager.h"
 #include "../include/server.h"
@@ -326,27 +327,40 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
 
         select2.setString("objectID", objectID);
 
+        int i=0;
+        string resourceFile;
+        string resourceURI;
+        stringstream tntnet;
         for(tntdb::Statement::const_iterator it2 = select2.begin(); it2 != select2.end(); ++it2){
             row2 = (*it2);
 
-            boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(row2.getString(property::resource::KEY_RESOURCE)));
+            string resourceFile = row2.getString(property::resource::KEY_RESOURCE);
+            boost::shared_ptr<cUPnPResourceProvider> provider(CreateResourceProvider(resourceFile));
 
+            tntnet.str(string());
             if(provider.get()){
-              string resourceURI = provider->GetHTTPUri(row2.getString(property::resource::KEY_RESOURCE), cMediaServer::GetInstance()->GetServerIPAddress());
-
-              IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
-
-              if(resource){
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
-                ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
+              resourceURI = provider->GetHTTPUri(resourceFile, cMediaServer::GetInstance()->GetServerIPAddress(), row2.getString(property::resource::KEY_PROTOCOL_INFO));
+              if(resourceURI.empty()){
+                tntnet << cMediaServer::GetInstance()->GetWebserver().GetBaseUrl() << "getStream?objectID=" << objectID << "&resourceID=" << i++;
+                resourceURI = tntnet.str();
               }
+            } else if(resourceFile.find("thumb://",0) == 0 && !resourceFile.substr(8).empty()) {
+              tntnet << cMediaServer::GetInstance()->GetWebserver().GetBaseUrl() << "thumbs/" << resourceFile.substr(8);
+              resourceURI = tntnet.str();
+            }
+
+            IXML_Element* resource = ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::resource::KEY_RESOURCE, resourceURI);
+
+            if(resource){
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_PROTOCOL_INFO, row2.getString(property::resource::KEY_PROTOCOL_INFO));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_BITRATE, row2.getString(property::resource::KEY_BITRATE));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_BITS_PER_SAMPLE, row2.getString(property::resource::KEY_BITS_PER_SAMPLE));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_COLOR_DEPTH, row2.getString(property::resource::KEY_COLOR_DEPTH));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_DURATION, row2.getString(property::resource::KEY_DURATION));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_NR_AUDIO_CHANNELS, row2.getString(property::resource::KEY_NR_AUDIO_CHANNELS));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_RESOLUTION, row2.getString(property::resource::KEY_RESOLUTION));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_SAMPLE_FREQUENCY, row2.getString(property::resource::KEY_SAMPLE_FREQUENCY));
+              ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, resource, property::resource::KEY_SIZE, tools::ToString(row2.getInt64(property::resource::KEY_SIZE)));
             }
 
         }

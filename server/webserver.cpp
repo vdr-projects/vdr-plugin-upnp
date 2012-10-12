@@ -66,6 +66,15 @@ bool cWebserver::Initialise(){
 
     mApplication.mapUrl(ss1.str(), ss2.str(), "static@tntnet");
 
+    // Map static contents
+    ss1.clear(); ss1.str(string());
+    ss1 << "^/thumbs/([^.]+.jpg)$";
+
+    ss2.clear(); ss2.str(string());
+    ss2 << mWebserverRootDir << "/images/thumbs/$1";
+
+    mApplication.mapUrl(ss1.str(), ss2.str(), "static@tntnet");
+
     mApplication.mapUrl("^/getStream", "resourceStreamer");
 
     isyslog("UPnP\tUsing %s for static content delivery.", mWebserverRootDir.c_str());
@@ -125,6 +134,10 @@ const std::string cWebserver::GetPresentationUrl() const {
 
 const std::string cWebserver::GetStaticContentUrl() const {
   return GetBaseUrl() + mStaticContentUrl;
+}
+
+const std::string cWebserver::GetThumbnailDir() const {
+  return mWebserverRootDir + "images/thumbs/";
 }
 
 cWebserver::cWSThread::cWSThread(cWebserver& webServer)

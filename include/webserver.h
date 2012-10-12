@@ -38,6 +38,8 @@ namespace upnp {
     const std::string GetStaticContentUrl() const;
     const std::string GetPresentationUrl() const;
 
+    const std::string GetThumbnailDir() const;
+
     std::string GetListenerAddress() const { return mListenerAddress; }
     uint16_t GetListenerPort() const { return mListenerPort; }
 

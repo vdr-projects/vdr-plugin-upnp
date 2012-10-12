@@ -9,12 +9,10 @@
 #include <vdr/epg.h>
 #include <vdr/channels.h>
 #include <vdr/tools.h>
-#include <vdr/config.h>
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <tools.h>
-#include <vdr/thread.h>
-#include <iostream>
 #include <pwd.h>
 #include <unistd.h>
 
@@ -108,18 +106,22 @@ public:
     return true;
   }
 
-  virtual string GetHTTPUri(const string& uri, const string& currentIP){
+  virtual string GetHTTPUri(const string& uri, const string& currentIP, const string& pInfo){
     if(!IsRootContainer(uri)) return string();
 
     int port = 3000;
 
     stringstream ss;
 
+    string protocolInfo = pInfo.substr(pInfo.find_last_of(':'));
+
+    std::replace(protocolInfo.begin(), protocolInfo.end(), ';','+');
+
     ss << "http://" << currentIP << ":" << port
        << "/"
        << "EXT;"
        << "PROG=cat;"
-       << "DLNA_contentFeatures=DLNA.ORG_PN=MPEG_TS_SD_EU_ISO+DLNA.ORG_OP=00+DLNA.ORG_CI=0+DLNA.ORG_FLAGS=ED100000000000000000000000000000"
+       << "DLNA_contentFeatures=" << protocolInfo
        << "/"
        << uri.substr(6);
 

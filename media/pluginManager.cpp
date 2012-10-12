@@ -278,7 +278,7 @@ bool cUPnPResourceProvider::GetMetadata(const string& uri, cMetadata& metadata){
 
 }
 
-string cUPnPResourceProvider::GetHTTPUri(const string&, const string&){
+string cUPnPResourceProvider::GetHTTPUri(const string&, const string&, const string&){
   return string();
 }
 
@@ -393,16 +393,12 @@ bool upnp::cPluginManager::DLL::Load(){
     if (!(error = dlerror())){
       isProvider = true;
       return true;
-    } else {
-      cerr << error << endl;
     }
 
     function = (FuncPtr)dlsym(handle, "UPnPCreateMediaProfiler");
     if (!(error = dlerror())){
       isProvider = false;
       return true;
-    } else {
-      cerr << error << endl;
     }
   } else {
     cerr << "Error while opening plugin: " << error << endl;

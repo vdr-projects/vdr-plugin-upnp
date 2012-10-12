@@ -58,6 +58,22 @@ struct DLNA4thField {
   string ToString();
 };
 
+struct ProtocolInfo {
+  enum StreamType {
+    DLNA_STREAM_HTTP,
+    DLNA_STREAM_RTP
+  };
+
+  ProtocolInfo();
+  ProtocolInfo(string contentType, DLNA4thField fourthField, StreamType type = DLNA_STREAM_HTTP);
+
+  StreamType    streamType;
+  string        contentType;
+  DLNA4thField  fourthField;
+
+  string ToString();
+};
+
 namespace video {
 
 }
