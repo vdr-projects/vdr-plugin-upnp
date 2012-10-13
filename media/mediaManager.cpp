@@ -593,7 +593,7 @@ bool cMediaManager::Initialise(){
     dsyslog("UPnP\tFound %d plugins", pluginManager->Count());
   }
 
-  dsyslog("UPNP\tScanning directories...");
+  dsyslog("UPnP\tScanning directories...");
   // Do an full initial scan on startup.
   upnp::cPluginManager::ProviderList providers = pluginManager->GetProviders();
   for(upnp::cPluginManager::ProviderList::iterator it = providers.begin(); it != providers.end(); ++it){

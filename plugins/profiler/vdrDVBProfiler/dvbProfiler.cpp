@@ -5,8 +5,10 @@
  *      Author: savop
  */
 
+#include <tools/codec.h>
 #include <server.h>
 #include <webserver.h>
+#include <vdr/recording.h>
 #include <vdr/channels.h>
 #include <vdr/epg.h>
 #include <vdr/tools.h>
@@ -17,6 +19,8 @@
 #include <media/profile.h>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
+#include <libavformat/avformat.h>
+#include <libavcodec/avcodec.h>
 
 using namespace std;
 
@@ -45,8 +49,37 @@ public:
 private:
 
   virtual bool GetRecordingMetadata(const string& uri, cMetadata& metadata){
-    //TODO
-    return false;
+    cRecording* recording = Recordings.GetByName(uri.substr(6).c_str());
+
+    if(!recording) return false;
+
+    string parentUri = recording->FileName();
+
+    const cRecordingInfo* info = recording->Info();
+
+    metadata.SetObjectIDByUri(uri);
+    metadata.SetParentIDByUri(parentUri);
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.item.videoItem.videoBroadcast")));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
+
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(info->Title())));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(info->ShortText())));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(info->Description())));
+
+    boost::posix_time::ptime date = boost::posix_time::from_time_t(info->GetEvent()->StartTime());
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(date.date())));
+
+//    cMetadata::Resource resource;
+//
+//    codec::cFormatContext formatContext;
+//
+//    if(formatContext.Open(recording->FileName())){
+//
+//    }
+//
+//    metadata.AddResource(resource);
+
+    return true;
   }
 
   virtual bool GetChannelMetadata(const string& uri, cMetadata& metadata){
@@ -63,6 +96,8 @@ private:
 
 	  metadata.SetObjectIDByUri(uri);
 	  metadata.SetParentIDByUri(parentUri);
+
+	  // TODO: implement check for radio stations (this is ...audioItem.audioBroadcast)
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.item.videoItem.videoBroadcast")));
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NAME, string(channel->Name())));
@@ -87,14 +122,17 @@ private:
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(startTime.date())));
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_START, boost::posix_time::to_iso_extended_string(startTime)));
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_END, boost::posix_time::to_iso_extended_string(endTime)));
-	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(event->ShortText())));
-	      metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(event->Description())));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(event->ShortText()?event->ShortText():"")));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(event->Description()?event->Description():"")));
 	    } else {
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(channel->Name())));
 	    }
 
       cMetadata::Resource resource;
 
+      resource.SetResourceUri(uri);
+
+      // TODO: implement check for radio stations
       DLNA4thField fourthfield;
       switch (channel->Vtype()) {
         case 0x02:
@@ -116,7 +154,6 @@ private:
           break;
       }
 
-      resource.SetResourceUri(uri);
       resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
 
       if(event){
@@ -139,14 +176,11 @@ private:
 
 	  struct stat fileStat;
 
-	  dsyslog("DVBProvider\tTry to get thumbnail for %s in %s", channel->Name(), filename.str().c_str());
 	  if(stat(filename.str().c_str(), &fileStat) == 0){
 	    thumbnail.SetResourceUri(uriStrm.str());
 	    thumbnail.SetProtocolInfo(ProtocolInfo("image/jpeg", DLNA4thField("JPEG_TN")).ToString());
 	    thumbnail.SetSize(fileStat.st_size);
 	    metadata.AddResource(thumbnail);
-	  } else {
-	    dsyslog("DVBProvider\tFailed to stat %s", filename.str().c_str());
 	  }
 
     return true;

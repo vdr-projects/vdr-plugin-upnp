@@ -74,14 +74,6 @@ struct ProtocolInfo {
   string ToString();
 };
 
-namespace video {
-
-}
-
-namespace audio {
-
-}
-
 namespace image {
 
 struct cIcon {
