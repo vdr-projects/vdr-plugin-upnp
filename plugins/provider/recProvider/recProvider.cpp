@@ -45,9 +45,55 @@ private:
     return false;
   }
 
+  FILE* fileFD;
+  int currentFileNumber;
+  int lastFileNumber;
+  string filename;
+  vector<size_t> offsets;
+
+  void CloseFile(){
+    fclose(fileFD);
+    fileFD = NULL;
+  }
+
+  bool OpenFile(int i = 1){
+    static int fileNumber = i;
+
+    if(fileNumber != i && fileFD){
+      CloseFile();
+    }
+
+    char fileBuf[1024]; strncpy(fileBuf, filename.c_str(), 1024);
+    char* pFileNumber = fileBuf + strlen(fileBuf);
+    sprintf(pFileNumber, "/%05d.ts", fileNumber);
+
+    fileFD = fopen(fileBuf, "r");
+    if(!fileFD) return false;
+
+    currentFileNumber = i;
+    return true;
+  }
+
+  bool OpenNext(){
+    return OpenFile(++currentFileNumber);
+  }
+
+  bool ScanFiles(){
+    if(!OpenFile(1)) return false;
+    do {
+      fseek(fileFD, 0, SEEK_END);
+      offsets[currentFileNumber-1] = ftell(fileFD);
+    } while(OpenNext());
+    lastFileNumber = currentFileNumber;
+    return OpenFile(1);
+  }
+
 public:
 
   RecProvider()
+  : fileFD(NULL)
+  , currentFileNumber(1)
+  , offsets(65536)
   {
   }
 
@@ -65,13 +111,14 @@ public:
     if(!IsRootContainer(u)) return StringList();
 
     StringList list;
-    string videoDir(VideoDirectory); string fs, uri = u.substr(6);
-    int pos, vl = videoDir.length(), ul = uri.length(), vul = vl + ul + 1;
+    string videoDir(VideoDirectory), fs, uri = u.substr(6);
+    int pos = 0, vl = videoDir.length(), ul = uri.length(), vul = vl + ul + 1;
 
     for(cRecording* rec = Recordings.First(); rec; rec = Recordings.Next(rec)){
       char* file = strdup(rec->Name());
       file = ExchangeChars(file, true);
       fs = file;
+      free(file);
       if(fs.find(uri) != string::npos){
         fs = fs.substr(ul);
         if((pos = fs.find_first_of('/')) != string::npos){
@@ -81,7 +128,6 @@ public:
         }
         list.push_back(fs);
       }
-      free(file);
     }
 
     return list;
@@ -93,8 +139,12 @@ public:
     stringstream filename;
     filename << VideoDirectory << "/" << uri.substr(6);
 
-    if(!Recordings.GetByName(filename.str().c_str())) return true;
-    else return false;
+    if(!Recordings.GetByName(filename.str().c_str())){
+      return true;
+    }
+    else {
+      return false;
+    }
   }
 
   virtual bool IsLink(const string& uri, string& target){
@@ -137,6 +187,67 @@ public:
     }
 
     return true;
+  }
+
+  virtual bool Open(const string& uri){
+    filename = uri.substr(6);
+    currentFileNumber = 1;
+    return ScanFiles();
+  }
+
+  virtual size_t Read(char* buf, size_t bufLen){
+    if(!fileFD) return -1;
+
+    char secondBuf[bufLen];
+
+    size_t bytesRead = 0;
+
+    bytesRead += fread(secondBuf, 1, bufLen, fileFD);
+    if(bytesRead != bufLen && OpenNext()){
+      bytesRead += fread(secondBuf + bytesRead, 1, bufLen - bytesRead, fileFD);
+    }
+
+    return bytesRead;
+  }
+
+  virtual bool Seek(size_t offset, int origin){
+    if(!fileFD) return false;
+
+    off_t curpos = fseek(fileFD, 0, SEEK_CUR); // this should not change anything
+    switch(origin){
+    case SEEK_END:
+        offset = offsets[lastFileNumber] + offset;
+        break;
+    case SEEK_CUR:
+        offset = offsets[currentFileNumber-1] + curpos +  offset;
+        break;
+    case SEEK_SET:
+        // Nothing to change
+        break;
+    default:
+      return false;
+    }
+
+    if(!OpenFile(1)) return false;
+    size_t size = 0;
+    while(true){
+      fseek(fileFD, 0, SEEK_END);
+      size = ftell(fileFD);
+      if(offset < size){
+        return fseek(fileFD, offset, SEEK_SET) == 0;
+      } else {
+        offset -= size;
+        if(OpenNext()) return false;
+      }
+    }
+
+    return false;
+
+  }
+
+  virtual void Close(){
+    currentFileNumber = 1;
+    CloseFile();
   }
 
   virtual void Action(){

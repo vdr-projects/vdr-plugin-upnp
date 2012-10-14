@@ -906,7 +906,7 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
                    .setString("protocolInfo", (*it).GetProtocolInfo());
 
       ((*it).GetSize()) ?
-            resourcestmt2.setInt("size",(*it).GetSize()) :
+            resourcestmt2.setLong("size",(*it).GetSize()) :
             resourcestmt2.setNull("size");
 
       (!(*it).GetDuration().empty()) ?

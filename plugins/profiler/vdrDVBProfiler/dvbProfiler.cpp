@@ -8,10 +8,12 @@
 #include <tools/codec.h>
 #include <server.h>
 #include <webserver.h>
+#include <vdr/videodir.h>
 #include <vdr/recording.h>
 #include <vdr/channels.h>
 #include <vdr/epg.h>
 #include <vdr/tools.h>
+#include <vdr/remux.h>
 #include <plugin.h>
 #include <tools.h>
 #include <string>
@@ -48,41 +50,107 @@ public:
 
 private:
 
-  virtual bool GetRecordingMetadata(const string& uri, cMetadata& metadata){
-    cRecording* recording = Recordings.GetByName(uri.substr(6).c_str());
+  bool GetRecordingMetadata(const string& u, cMetadata& metadata){
+    string videoDir = string(VideoDirectory), uri = u.substr(6), recStr = videoDir + "/" + uri;
+    cRecording* recording = Recordings.GetByName(recStr.c_str());
 
     if(!recording) return false;
 
-    string parentUri = recording->FileName();
+    char* fileBuf = strdup(recording->Name());
+    fileBuf = ExchangeChars(fileBuf, true);
+    string fs = fileBuf;
+    free(fileBuf);
+
+    int pos = 0;
+    if((pos = fs.find_last_of('/')) != string::npos){
+      fs = fs.substr(0,pos+1);
+    } else {
+      fs = "";
+    }
+    fs = u.substr(0,6) + fs;
 
     const cRecordingInfo* info = recording->Info();
 
     metadata.SetObjectIDByUri(uri);
-    metadata.SetParentIDByUri(parentUri);
+    metadata.SetParentIDByUri(fs);
     metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.item.videoItem.videoBroadcast")));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(info->Title())));
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(info->ShortText())));
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(info->Description())));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(info->Title()?info->Title():recording->Title())));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(info->ShortText()?info->ShortText():"")));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(info->Description()?info->Description():"")));
 
     boost::posix_time::ptime date = boost::posix_time::from_time_t(info->GetEvent()->StartTime());
     metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(date.date())));
 
-//    cMetadata::Resource resource;
-//
-//    codec::cFormatContext formatContext;
-//
-//    if(formatContext.Open(recording->FileName())){
-//
-//    }
-//
-//    metadata.AddResource(resource);
+    cMetadata::Resource resource;
+
+    char filename[1024]; strncpy(filename, recording->FileName(), 1024);
+    char* pFileNumber = filename + strlen(filename);
+    sprintf(pFileNumber, "/%05d.ts", 1);
+    FILE *fd = fopen(filename, "r");
+    if(!fd) return false;
+
+    int pmtV, patV, pid;
+    unsigned char buf[TS_SIZE];
+    cPatPmtParser parser;
+    while(fread(buf, 1, TS_SIZE, fd) == TS_SIZE){
+      if(buf[0] == TS_SYNC_BYTE){
+        pid = TsPid(buf);
+        if(pid == 0){
+          parser.ParsePat(buf, TS_SIZE);
+        } else if (pid == parser.PmtPid()) {
+          parser.ParsePmt(buf, TS_SIZE);
+          if(parser.GetVersions(patV, pmtV))
+            break;
+        }
+      }
+    }
+    fclose(fd);
+
+    int i = 1;
+    uint32_t size = 0;
+
+    sprintf(pFileNumber, "/%05d.ts", i);
+    while(access(filename, F_OK) == 0){
+      fd = fopen(filename, "r");
+      fseek(fd, 0, SEEK_END);
+      size += ftell(fd);
+      sprintf(pFileNumber, "/%05d.ts", ++i);
+      fclose(fd);
+    }
+
+    // TODO: implement check for radio stations
+    DLNA4thField fourthfield;
+    switch (parser.Vtype()) {
+      case 0x02:
+        fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_RANGE,
+                                   DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                   DLNA_FLAG_STREAMING_TRANSFER |
+                                   DLNA_FLAG_BYTE_BASED_SEEK |
+                                   DLNA_FLAG_VERSION_1_5 );
+        break;
+      case 0x1B:
+        fourthfield = DLNA4thField("AVC_TS_HD_EU_ISO", DLNA_OPERATION_RANGE,
+                                   DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                   DLNA_FLAG_STREAMING_TRANSFER |
+                                   DLNA_FLAG_BYTE_BASED_SEEK |
+                                   DLNA_FLAG_VERSION_1_5 );
+        break;
+      default:
+        return false;
+    }
+
+    resource.SetSize(size);
+    resource.SetResourceUri(u);
+    resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
+
+    metadata.AddResource(resource);
 
     return true;
   }
 
-  virtual bool GetChannelMetadata(const string& uri, cMetadata& metadata){
+  bool GetChannelMetadata(const string& uri, cMetadata& metadata){
 
 	  tChannelID channelID = tChannelID::FromString(uri.substr(6).c_str());
 	  if(!channelID.Valid()) return false;
@@ -151,7 +219,6 @@ private:
           break;
         default:
           return false;
-          break;
       }
 
       resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
