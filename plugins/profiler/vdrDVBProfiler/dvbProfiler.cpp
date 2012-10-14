@@ -5,7 +5,6 @@
  *      Author: savop
  */
 
-#include <tools/codec.h>
 #include <server.h>
 #include <webserver.h>
 #include <vdr/videodir.h>
@@ -21,8 +20,6 @@
 #include <media/profile.h>
 #include <boost/date_time/gregorian/gregorian.hpp>
 #include <boost/date_time/posix_time/posix_time.hpp>
-#include <libavformat/avformat.h>
-#include <libavcodec/avcodec.h>
 
 using namespace std;
 
