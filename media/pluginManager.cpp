@@ -269,7 +269,11 @@ public:
 bool cUPnPResourceProvider::GetMetadata(const string& uri, cMetadata& metadata){
 
   metadata.SetObjectIDByUri(uri);
-  metadata.SetParentIDByUri(uri.substr(0,uri.find_last_of("/")));
+  if(uri.compare(GetRootContainer()) == 0){
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_PARENTID, string("0")));
+  } else {
+    metadata.SetParentIDByUri(uri.substr(0,uri.find_last_of("/", uri.length()-2)+1));
+  }
   metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, uri.substr(uri.find_last_of("/")+1)));
   metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.container")));
   metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));

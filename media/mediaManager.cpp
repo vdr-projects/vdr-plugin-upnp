@@ -235,9 +235,6 @@ StringList cMediaManager::GetSupportedProtocolInfos() const {
 
     for(tntdb::Statement::const_iterator it = stmt.begin(); it != stmt.end(); ++it){
       tntdb::Row row = (*it);
-
-      cout << row.getString(property::resource::KEY_PROTOCOL_INFO) << endl;
-
       list.push_back(row.getString(property::resource::KEY_PROTOCOL_INFO));
     }
 
@@ -377,8 +374,6 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
       }
 
       request.result = ixmlDocumenttoString(DIDLDoc);
-
-      cout << request.result << endl;
 
       ixmlDocument_free(DIDLDoc);
       return UPNP_E_SUCCESS;

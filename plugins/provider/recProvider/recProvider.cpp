@@ -48,7 +48,8 @@ private:
 public:
 
   RecProvider()
-  {}
+  {
+  }
 
   virtual ~RecProvider(){
     Cancel(2);
@@ -60,24 +61,27 @@ public:
     return ProvidesSchema() + "://";
   }
 
-  virtual StringList GetContainerEntries(const string& uri){
-    cerr << "Getting container entries for recordings in " << uri << endl;
-
-    if(!IsRootContainer(uri)) return StringList();
+  virtual StringList GetContainerEntries(const string& u){
+    if(!IsRootContainer(u)) return StringList();
 
     StringList list;
+    string videoDir(VideoDirectory); string fs, uri = u.substr(6);
+    int pos, vl = videoDir.length(), ul = uri.length(), vul = vl + ul + 1;
 
-    stringstream filename; string recFilename, p;
-    filename << VideoDirectory << "/" << uri.substr(6);
     for(cRecording* rec = Recordings.First(); rec; rec = Recordings.Next(rec)){
-      recFilename = rec->FileName();
-      if(recFilename.find(filename.str()) == 0){
-        p = recFilename.substr(filename.str().length());
-        if(p.find_first_of('/')){
-          p = p.substr(0, p.find_first_of('/'));
-          list.push_back(p);
+      char* file = strdup(rec->Name());
+      file = ExchangeChars(file, true);
+      fs = file;
+      if(fs.find(uri) != string::npos){
+        fs = fs.substr(ul);
+        if((pos = fs.find_first_of('/')) != string::npos){
+          fs = fs.substr(0, pos+1);
+        } else {
+          fs = string(rec->FileName()).substr(vul);
         }
+        list.push_back(fs);
       }
+      free(file);
     }
 
     return list;
@@ -86,7 +90,10 @@ public:
   virtual bool IsContainer(const string& uri){
     if(GetRootContainer().compare(uri) == 0) return true;
 
-    if(!Recordings.GetByName(uri.substr(6).c_str())) return true;
+    stringstream filename;
+    filename << VideoDirectory << "/" << uri.substr(6);
+
+    if(!Recordings.GetByName(filename.str().c_str())) return true;
     else return false;
   }
 
@@ -96,7 +103,7 @@ public:
 
   virtual long GetContainerUpdateId(const string& uri){
     struct stat fileStat;
-    if(GetFileStat(uri.substr(0,uri.find_last_of('/')), fileStat)){
+    if(GetFileStat(uri.substr(0,uri.find_last_of('/')+1), fileStat)){
       return std::max<time_t>(fileStat.st_ctim.tv_sec, fileStat.st_mtim.tv_sec);
     }
 
@@ -104,25 +111,32 @@ public:
   }
 
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
+    if(!IsRootContainer(uri)) return false;
+
+    if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
+
     if(GetRootContainer().compare(uri) == 0){
-      if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
-      metadata.SetProperty(cMetadata::Property(property::object::KEY_PARENTID, string("0")));
       metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Recordings")));
-
-      struct passwd *pw;
-      if((pw = getpwuid(getuid())) == NULL){
-        metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, string("Klaus Schmidinger")));
-      } else {
-        string name(pw->pw_gecos); name = name.substr(0,name.find(",,,",0));
-        metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, name));
-      }
-
       metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string("Watch TV recordings")));
 
-      return true;
+    } else {
+      int ul = uri.length();
+      string folder = uri.substr(uri.find_last_of('/', ul-2)+1, ul - 7);
+      char * str = strdup(folder.c_str());
+      str = ExchangeChars(str, false);
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(str)));
+      free(str);
     }
 
-    return false;
+    struct passwd *pw;
+    if((pw = getpwuid(getuid())) == NULL){
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, string("Klaus Schmidinger")));
+    } else {
+      string name(pw->pw_gecos); name = name.substr(0,name.find(",,,",0));
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, name));
+    }
+
+    return true;
   }
 
   virtual void Action(){
@@ -131,7 +145,7 @@ public:
       if(Recordings.NeedsUpdate() || Recordings.StateChanged(state)){
         OnContainerUpdate(GetRootContainer(), GetContainerUpdateId(GetRootContainer()));
       }
-      sleep(5);
+      sleep(10);
     }
   }
 

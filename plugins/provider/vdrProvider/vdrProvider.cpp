@@ -89,7 +89,6 @@ public:
 
     if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
 
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_PARENTID, string("0")));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Live-TV")));
     metadata.SetProperty(cMetadata::Property("dlna:containerType", string("Tuner_1_0")));
 
