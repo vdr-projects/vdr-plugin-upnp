@@ -57,25 +57,23 @@ private:
   }
 
   bool OpenFile(int i = 1){
-    static int fileNumber = i;
-
-    if(fileNumber != i && fileFD){
+    if(currentFileNumber != i && fileFD){
       CloseFile();
     }
 
     char fileBuf[1024]; strncpy(fileBuf, filename.c_str(), 1024);
     char* pFileNumber = fileBuf + strlen(fileBuf);
-    sprintf(pFileNumber, "/%05d.ts", fileNumber);
+    sprintf(pFileNumber, "/%05d.ts", i);
 
     fileFD = fopen(fileBuf, "r");
     if(!fileFD) return false;
-
     currentFileNumber = i;
+
     return true;
   }
 
   bool OpenNext(){
-    return OpenFile(++currentFileNumber);
+    return OpenFile(currentFileNumber+1);
   }
 
   bool ScanFiles(){
@@ -93,6 +91,7 @@ public:
   RecProvider()
   : fileFD(NULL)
   , currentFileNumber(1)
+  , lastFileNumber(1)
   , offsets(65536)
   {
   }
@@ -189,8 +188,12 @@ public:
     return true;
   }
 
+  virtual bool Seekable() const {
+    return true;
+  }
+
   virtual bool Open(const string& uri){
-    filename = uri.substr(6);
+    filename = string(VideoDirectory) + "/" + uri.substr(6);
     currentFileNumber = 1;
     return ScanFiles();
   }
@@ -198,13 +201,11 @@ public:
   virtual size_t Read(char* buf, size_t bufLen){
     if(!fileFD) return -1;
 
-    char secondBuf[bufLen];
-
     size_t bytesRead = 0;
 
-    bytesRead += fread(secondBuf, 1, bufLen, fileFD);
+    bytesRead += fread(buf, 1, bufLen, fileFD);
     if(bytesRead != bufLen && OpenNext()){
-      bytesRead += fread(secondBuf + bytesRead, 1, bufLen - bytesRead, fileFD);
+      bytesRead += fread(buf + bytesRead, 1, bufLen - bytesRead, fileFD);
     }
 
     return bytesRead;
