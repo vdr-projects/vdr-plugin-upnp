@@ -64,11 +64,11 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
             length = to - from;
             hasRange = true;
 
-            if(request.isMethodHEAD()){
-              std::stringstream contentRangeHeader;
-              contentRangeHeader << "bytes " << from << "-" << to << "/" << contentLength;
-              reply.setHeader("Content-Range  ", contentRangeHeader.str());
-            }
+            std::stringstream contentRangeHeader;
+            contentRangeHeader << "bytes " << from << "-" << to << "/" << contentLength;
+            reply.setHeader("Content-Range  ", contentRangeHeader.str());
+            reply.setContentLengthHeader(length);
+
           }
         }
       }
@@ -76,46 +76,28 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
   }
 
   if(!request.isMethodHEAD()){
-
     if(!streamer->Open()){
       code = HTTP_INTERNAL_SERVER_ERROR;
       goto ret;
     }
 
-    ssize_t bytesRead = 0;
-
     if(hasRange && streamer->Seekable() && contentLength > 0){
-
       if(!streamer->Seek(from, SEEK_SET)){
         code = HTTP_INTERNAL_SERVER_ERROR;
         goto close;
       }
+      code = HTTP_PARTIAL_CONTENT;
+    }
 
-      if(length > MB(1)) length = MB(1);
+    reply.setDirectMode(code);
 
-      char buffer[length];
-      if((bytesRead = streamer->Read(buffer, length)) > 0){
-        std::stringstream ss;
-        ss << "bytes " << from << "-" << from + bytesRead << "/" << contentLength;
-        reply.setHeader("Content-Range  ", ss.str());
-        reply.setContentLengthHeader(bytesRead);
-        code = HTTP_PARTIAL_CONTENT;
-        reply.out().write(buffer, bytesRead);
-        if (!reply.out()) {
-          code = HTTP_GONE;
-          goto close;
-        }
-      }
-      
-    } else {
-      reply.setDirectMode();
-      char buffer[KB(20)];
-      while ((bytesRead = streamer->Read(buffer, KB(20))) > 0) {
-        reply.out().write(buffer, bytesRead);
-        if (!reply.out()) {
-          code = HTTP_GONE;
-          goto close;
-        }
+    ssize_t bytesRead = 0;
+    char buffer[KB(20)];
+    while ((bytesRead = streamer->Read(buffer, KB(20))) > 0) {
+      reply.out().write(buffer, bytesRead);
+      if (!reply.out()) {
+        code = HTTP_GONE;
+        goto close;
       }
     }
   } else {

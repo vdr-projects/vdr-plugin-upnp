@@ -257,7 +257,7 @@ public:
       if(Recordings.NeedsUpdate() || Recordings.StateChanged(state)){
         OnContainerUpdate(GetRootContainer(), GetContainerUpdateId(GetRootContainer()));
       }
-      sleep(10);
+      sleep(100);
     }
   }
 

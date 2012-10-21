@@ -797,26 +797,45 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
 
     connection.beginTransaction();
 
-    ss << "INSERT OR REPLACE INTO " << db::Metadata << " ("
+    ss << "INSERT OR IGNORE INTO " << db::Metadata << " ("
        << "`" << property::object::KEY_OBJECTID          << "`,"
        << "`" << property::object::KEY_PARENTID          << "`,"
        << "`" << property::object::KEY_TITLE             << "`,"
        << "`" << property::object::KEY_CLASS             << "`,"
-       << "`" << property::object::KEY_RESTRICTED        << "`,"
-       << "`" << property::object::KEY_CREATOR           << "`,"
-       << "`" << property::object::KEY_DESCRIPTION       << "`,"
-       << "`" << property::object::KEY_LONG_DESCRIPTION  << "`,"
-       << "`" << property::object::KEY_DATE              << "`,"
-       << "`" << property::object::KEY_LANGUAGE          << "`,"
-       << "`" << property::object::KEY_CHANNEL_NR        << "`,"
-       << "`" << property::object::KEY_CHANNEL_NAME      << "`,"
-       << "`" << property::object::KEY_SCHEDULED_START   << "`,"
-       << "`" << property::object::KEY_SCHEDULED_END     << "`"
+       << "`" << property::object::KEY_RESTRICTED        << "`"
        << ") VALUES ("
-       << ":objectID, :parentID, :title, :class, :restricted,"
-       << ":creator, :description, :longDescription, :date,"
-       << ":language, :channelNr, :channelName, :start, :end"
-       << ")";
+       << ":objectID, :parentID, :title, :class, :restricted"
+       << "); ";
+
+    tntdb::Statement insert = connection.prepare(ss.str());
+
+    insert.setString("objectID", objectID)
+          .setString("parentID", metadata.GetPropertyByKey(property::object::KEY_PARENTID).GetString())
+          .setString("title",    metadata.GetPropertyByKey(property::object::KEY_TITLE).GetString())
+          .setString("class",    metadata.GetPropertyByKey(property::object::KEY_CLASS).GetString())
+          .setBool  ("restricted", metadata.GetPropertyByKey(property::object::KEY_RESTRICTED).GetBoolean())
+          .execute();
+
+    ss.str(string());
+
+    ss << "UPDATE " << db::Metadata << " SET "
+       << "`" << property::object::KEY_OBJECTID          << "` = :objectID,"
+       << "`" << property::object::KEY_PARENTID          << "` = :parentID,"
+       << "`" << property::object::KEY_TITLE             << "` = :title,"
+       << "`" << property::object::KEY_CLASS             << "` = :class,"
+       << "`" << property::object::KEY_RESTRICTED        << "` = :restricted,"
+       << "`" << property::object::KEY_CREATOR           << "` = :creator,"
+       << "`" << property::object::KEY_DESCRIPTION       << "` = :description,"
+       << "`" << property::object::KEY_LONG_DESCRIPTION  << "` = :longDescription,"
+       << "`" << property::object::KEY_DATE              << "` = :date,"
+       << "`" << property::object::KEY_LANGUAGE          << "` = :language,"
+       << "`" << property::object::KEY_CHANNEL_NR        << "` = :channelNr,"
+       << "`" << property::object::KEY_CHANNEL_NAME      << "` = :channelName,"
+       << "`" << property::object::KEY_SCHEDULED_START   << "` = :start,"
+       << "`" << property::object::KEY_SCHEDULED_END     << "` = :end"
+       << " WHERE "
+       << "`" << property::object::KEY_OBJECTID          << "` = :objectID"
+       << ";";
 
     tntdb::Statement object = connection.prepare(ss.str());
 
