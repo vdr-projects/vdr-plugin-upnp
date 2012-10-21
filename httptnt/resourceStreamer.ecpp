@@ -43,9 +43,36 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
   reply.setHeader("contentFeatures.dlna.org  ", streamer->GetContentFeatures());
   reply.setHeader("transferMode.dlna.org  ", streamer->GetTransferMode(reply.getHeader("transferMode.dlna.org")));
 
-  if(streamer->GetContentLength() > 0){
-    reply.setContentLengthHeader(streamer->GetContentLength());
+  unsigned long from = 0, to = 0, contentLength = streamer->GetContentLength(), length = contentLength;
+  bool hasRange = false;
+
+  if(contentLength > 0){
+    reply.setContentLengthHeader(contentLength);
     if(streamer->Seekable()) reply.setHeader("Accept-Ranges  ", "bytes");
+
+    if(request.hasHeader("Range:")){
+      std::string rangeRequest = request.getHeader("Range:");
+      if(rangeRequest.find("bytes=",0) == 0){
+        unsigned int minus = rangeRequest.find_first_of('-',6);
+        if(minus != std::string::npos){
+          from  = atoi(rangeRequest.substr(6, minus - 6).c_str());
+          to = atoi(rangeRequest.substr(minus + 1).c_str());
+          if(from){
+            // If range is off the road, reset it to correct values.
+            if(from <= 0 || from > contentLength) from = 0;
+            if(to <= 0 || to > contentLength) to = contentLength;
+            length = to - from;
+            hasRange = true;
+
+            if(request.isMethodHEAD()){
+              std::stringstream contentRangeHeader;
+              contentRangeHeader << "bytes " << from << "-" << to << "/" << contentLength;
+              reply.setHeader("Content-Range  ", contentRangeHeader.str());
+            }
+          }
+        }
+      }
+    }
   }
 
   if(!request.isMethodHEAD()){
@@ -55,39 +82,21 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
       goto ret;
     }
 
-    unsigned long offset = 0, length = streamer->GetContentLength();
     ssize_t bytesRead = 0;
-    bool hasRange = false;
 
-    if(request.hasHeader("Range:")){
-      std::string rangeRequest = request.getHeader("Range:");
-      if(rangeRequest.find("bytes=",0) == 0){
-        unsigned int minus = rangeRequest.find_first_of('-',6);
-        if(minus != std::string::npos){
-          offset  = atoi(rangeRequest.substr(6, minus - 6).c_str());
-          length = atoi(rangeRequest.substr(minus + 1).c_str()) - offset;
-          if(length == 0){
-            length = streamer->GetContentLength() - offset;
-          } else {
-            if(length > MB(1))
-              length = MB(1);
-            hasRange = true;
-          }
-        }
-      }
-    }
+    if(hasRange && streamer->Seekable() && contentLength > 0){
 
-    if(hasRange && streamer->Seekable() && streamer->GetContentLength() > 0){
-
-      if(!streamer->Seek(offset, SEEK_SET)){
+      if(!streamer->Seek(from, SEEK_SET)){
         code = HTTP_INTERNAL_SERVER_ERROR;
         goto close;
       }
 
+      if(length > MB(1)) length = MB(1);
+
       char buffer[length];
       if((bytesRead = streamer->Read(buffer, length)) > 0){
         std::stringstream ss;
-        ss << "bytes " << offset << "-" << offset + bytesRead << "/" << streamer->GetContentLength();
+        ss << "bytes " << from << "-" << from + bytesRead << "/" << contentLength;
         reply.setHeader("Content-Range  ", ss.str());
         reply.setContentLengthHeader(bytesRead);
         code = HTTP_PARTIAL_CONTENT;
