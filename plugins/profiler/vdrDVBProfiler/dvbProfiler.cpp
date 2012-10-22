@@ -53,6 +53,9 @@ private:
 
     if(!recording) return false;
 
+    // Sorry, currently unsupported.
+    if(recording->IsPesRecording()) return false;
+
     char* fileBuf = strdup(recording->Name());
     fileBuf = ExchangeChars(fileBuf, true);
     string fs = fileBuf;
