@@ -573,9 +573,13 @@ bool cMediaManager::Initialise(){
     }
 
   } catch (const std::exception& e) {
-    esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
 
-    connection.rollbackTransaction();
+    if(!connection){
+      esyslog("UPnP\tException occurred while connecting to database '%s': %s", databaseFile.c_str(), e.what());
+    } else {
+      esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
+      connection.rollbackTransaction();
+    }
 
     return false;
   }
