@@ -8,137 +8,12 @@ It contains the service description for the connection manager of the media serv
 #>
 <{ reply.setContentType("application/xml"); }>
 <scpd xmlns="urn:schemas-upnp-org:service-1-0">
-  <serviceStateTable>
-    <stateVariable> <Optional/>
-      <name>TransferIDs</name>
-      <sendEventsAttribute>yes</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_ObjectID</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_Result</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_SearchCriteria</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_BrowseFlag</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-      <allowedValueList>
-        <allowedValue>BrowseMetadata</allowedValue>
-        <allowedValue>BrowseDirectChildren</allowedValue>
-      </allowedValueList>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_Filter</name>
-      <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_SortCriteria</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_Index</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>ui4</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_Count</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>ui4</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>A_ARG_TYPE_UpdateID</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>ui4</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_TransferID</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>ui4</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_TransferStatus</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-      <allowedValueList>
-        <allowedValue>COMPLETED</allowedValue>
-        <allowedValue>ERROR</allowedValue>
-        <allowedValue>IN_PROGRESS</allowedValue>
-        <allowedValue>STOPPED</allowedValue>
-      </allowedValueList>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_TransferLength</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_TransferTotal</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_TagValueList</name> <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>A_ARG_TYPE_URI</name>
-      <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>uri</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>SearchCapabilities</name>
-      <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>SortCapabilities</name>
-      <sendEventsAttribute>no</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-    <stateVariable>
-      <name>SystemUpdateID</name>
-      <sendEventsAttribute>yes</sendEventsAttribute>
-      <dataType>ui4</dataType>
-    </stateVariable>
-    <stateVariable> <Optional/>
-      <name>ContainerUpdateIDs</name>
-<sendEventsAttribute>yes</sendEventsAttribute>
-      <dataType>string</dataType>
-    </stateVariable>
-  </serviceStateTable>
-  <actionList>
-    <action>
-    <name>GetSearchCapabilities</name>
-      <argumentList>
-        <argument>
-          <name>SearchCaps</name>
-          <direction>out</direction>
-          <relatedStateVariable>SearchCapabilities </relatedStateVariable>
-        </argument>
-      </argumentList>
-    </action>
-    <action>
-    <name>GetSortCapabilities</name>
-      <argumentList>
-        <argument>
-          <name>SortCaps</name>
-          <direction>out</direction>
-          <relatedStateVariable>SortCapabilities</relatedStateVariable>
-        </argument>
-      </argumentList>
-    </action>
-    <action>
-    <name>GetSystemUpdateID</name>
-      <argumentList>
-        <argument>
-          <name>Id</name>
-          <direction>out</direction>
-          <relatedStateVariable>SystemUpdateID</relatedStateVariable>
-        </argument>
-      </argumentList>
-    </action>
-    <action>
+   <specVersion>
+      <major>1</major>
+      <minor>0</minor>
+   </specVersion>
+   <actionList>
+<action>
     <name>Browse</name>
       <argumentList>
         <argument>
@@ -190,6 +65,36 @@ It contains the service description for the connection manager of the media serv
           <name>UpdateID</name>
           <direction>out</direction>
           <relatedStateVariable>A_ARG_TYPE_UpdateID</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+      <action>
+      <name>GetSearchCapabilities</name>
+         <argumentList>
+            <argument>
+               <name>SearchCaps</name>
+               <direction>out</direction>
+               <relatedStateVariable>SearchCapabilities</relatedStateVariable>
+            </argument>
+         </argumentList>
+      </action>
+      <action>
+    <name>GetSortCapabilities</name>
+      <argumentList>
+        <argument>
+          <name>SortCaps</name>
+          <direction>out</direction>
+          <relatedStateVariable>SortCapabilities</relatedStateVariable>
+        </argument>
+      </argumentList>
+    </action>
+    <action>
+    <name>GetSystemUpdateID</name>
+      <argumentList>
+        <argument>
+          <name>Id</name>
+          <direction>out</direction>
+          <relatedStateVariable>SystemUpdateID</relatedStateVariable>
         </argument>
       </argumentList>
     </action>
@@ -249,4 +154,116 @@ It contains the service description for the connection manager of the media serv
       </argumentList>
     </action>
   </actionList>
+  <serviceStateTable>
+    <stateVariable>
+      <name>TransferIDs</name>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_ObjectID</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_Result</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_SearchCriteria</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_BrowseFlag</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+      <allowedValueList>
+        <allowedValue>BrowseMetadata</allowedValue>
+        <allowedValue>BrowseDirectChildren</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_Filter</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_SortCriteria</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_Index</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_Count</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_UpdateID</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_TransferID</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_TransferStatus</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+      <allowedValueList>
+        <allowedValue>COMPLETED</allowedValue>
+        <allowedValue>ERROR</allowedValue>
+        <allowedValue>IN_PROGRESS</allowedValue>
+        <allowedValue>STOPPED</allowedValue>
+      </allowedValueList>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_TransferLength</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_TransferTotal</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_TagValueList</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>A_ARG_TYPE_URI</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>uri</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>SearchCapabilities</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>SortCapabilities</name>
+      <sendEventsAttribute>no</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>SystemUpdateID</name>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+      <dataType>ui4</dataType>
+    </stateVariable>
+    <stateVariable>
+      <name>ContainerUpdateIDs</name>
+      <sendEventsAttribute>yes</sendEventsAttribute>
+      <dataType>string</dataType>
+    </stateVariable>
+  </serviceStateTable>
 </scpd>

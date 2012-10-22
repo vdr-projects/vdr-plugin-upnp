@@ -71,7 +71,7 @@ public:
 
   const Description& GetServerDescription() const { return mServerDescription; }
   const iconList& GetServerIcons() const { return mServerIcons; }
-  const serviceMap& GetServices() const { return mServices; }
+  static serviceMap& GetServices();
 
   static void RegisterService(cUPnPService* service);
 
@@ -94,8 +94,6 @@ private:
 
 	cWebserver*         mWebserver;
 	cMediaManager*      mMediaManager;
-
-  static serviceMap   mServices;
 
 };
 

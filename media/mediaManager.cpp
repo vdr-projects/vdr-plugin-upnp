@@ -5,8 +5,8 @@
  *      Author: savop
  */
 
-#include "../include/webserver.h"
 #include "../include/media/mediaManager.h"
+#include "../include/webserver.h"
 #include "../include/pluginManager.h"
 #include "../include/server.h"
 #include "../include/parser.h"
@@ -196,14 +196,14 @@ bool cMediaManager::UpdateContainerUpdateId(const string& objectID, long int upd
 StringList cMediaManager::GetSearchCapabilities() const {
   StringList list;
 
-  list.push_back(property::object::KEY_TITLE);
-  list.push_back(property::object::KEY_CREATOR);
-  list.push_back(property::object::KEY_DESCRIPTION);
-  list.push_back(property::object::KEY_LONG_DESCRIPTION);
-  list.push_back(property::object::KEY_CLASS);
-  list.push_back(property::object::KEY_DATE);
-  list.push_back(property::object::KEY_LANGUAGE);
-  list.push_back(property::resource::KEY_PROTOCOL_INFO);
+//  list.push_back(property::object::KEY_TITLE);
+//  list.push_back(property::object::KEY_CREATOR);
+//  list.push_back(property::object::KEY_DESCRIPTION);
+//  list.push_back(property::object::KEY_LONG_DESCRIPTION);
+//  list.push_back(property::object::KEY_CLASS);
+//  list.push_back(property::object::KEY_DATE);
+//  list.push_back(property::object::KEY_LANGUAGE);
+//  list.push_back(property::resource::KEY_PROTOCOL_INFO);
 
   return list;
 }

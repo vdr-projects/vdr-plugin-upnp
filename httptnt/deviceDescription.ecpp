@@ -17,7 +17,7 @@ It contains the device and service descriptions of the media server.
 
 using namespace upnp;
 </%pre>
-<{
+<%cpp>
   upnp::cMediaServer* server = cMediaServer::GetInstance();
   const upnp::cWebserver& webserver = server->GetWebserver();
   
@@ -31,7 +31,7 @@ using namespace upnp;
   
   reply.setContentType("application/xml");
 
-}>
+</%cpp>
 <root xmlns="urn:schemas-upnp-org:device-1-0" xmlns:dlna="urn:schemas-dlna-org:device-1-0"> 
   <specVersion> 
     <major>1</major> 
@@ -51,13 +51,12 @@ using namespace upnp;
     <presentationURL><$ presentationUrl $></presentationURL> 
     <dlna:X_DLNADOC>DMS-1.50</dlna:X_DLNADOC> 
     <serviceList>
-<{
+<%cpp>
   const cMediaServer::serviceMap& services = server->GetServices();
   
   for(cMediaServer::serviceMap::const_iterator it = services.begin(); it != services.end(); ++it){
   	const cUPnPService::Description& serviceDescription = (*it).second->GetServiceDescription();
-}>
-
+</%cpp>
       <service>
         <serviceType><$ serviceDescription.serviceType $></serviceType>
         <serviceId><$ serviceDescription.serviceID $></serviceId>
@@ -65,14 +64,16 @@ using namespace upnp;
         <controlURL><$ controlUrl $><$ serviceDescription.controlDescriptor $></controlURL>
         <eventSubURL><$ controlUrl $><$ serviceDescription.eventSubscriberDescriptor $></eventSubURL>
       </service>
-%  };
+<%cpp>
+  };
+</%cpp>
     </serviceList>
     <iconList>
-<{
+<%cpp>
   const cMediaServer::iconList& icons = server->GetServerIcons();
   
   for(cMediaServer::iconList::const_iterator it = icons.begin(); it != icons.end(); ++it){
-}>
+</%cpp>
       <icon>
         <mimetype><$ (*it).profile.mime $></mimetype>
         <width><$ (*it).profile.width $></width>
@@ -80,7 +81,9 @@ using namespace upnp;
         <depth><$ (int)(*it).profile.bitDepth $></depth>
         <url><$ staticContentUrl $><$ (*it).filename $></url>
       </icon>
-%  };
+<%cpp>
+  };
+</%cpp>
     </iconList>
   </device> 
 </root>

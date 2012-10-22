@@ -27,7 +27,7 @@ APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p'
 VDRDIR ?= $(UPNPDIR)/../../..
 VDRAPIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
 
-INCLUDES += -I$(UPNPDIR)/include
+INCLUDES += -I$(UPNPDIR)/include -I$(VDRDIR)/include
 
 DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
 

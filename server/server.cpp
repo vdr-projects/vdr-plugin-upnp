@@ -23,8 +23,6 @@ cMediaServer* cMediaServer::GetInstance(){
 	return &server;
 }
 
-cMediaServer::serviceMap cMediaServer::mServices;
-
 cMediaServer::cMediaServer()
 : mServerDescription("VDR UPnP/DLNA MS", "Denis Loh", "http://upnp.vdr-developer.org",
                      DESCRIPTION, "VDR UPnP-DLNA MS", VERSION,
@@ -98,7 +96,8 @@ bool cMediaServer::Start(){
   }
 
   isyslog("UPnP\tInitialising services...");
-  for(serviceMap::iterator it = cMediaServer::mServices.begin(); it != cMediaServer::mServices.end(); ++it){
+  serviceMap&  services = cMediaServer::GetServices();
+  for(serviceMap::iterator it = services.begin(); it != services.end(); ++it){
     isyslog("UPnP\t...%s", (*it).second->GetServiceDescription().serviceType.c_str());
     (*it).second->Init(this, mDeviceHandle);
   }
@@ -119,7 +118,8 @@ bool cMediaServer::Stop(){
   int ret = 0;
 
   isyslog("UPnP\tStopping services...");
-  for(serviceMap::iterator it = cMediaServer::mServices.begin(); it != cMediaServer::mServices.end(); ++it){
+  serviceMap&  services = cMediaServer::GetServices();
+  for(serviceMap::iterator it = services.begin(); it != services.end(); ++it){
     isyslog("UPnP\t...%s", (*it).second->GetServiceDescription().serviceType.c_str());
     (*it).second->Stop();
   }
@@ -263,10 +263,15 @@ string cMediaServer::GetDeviceDescriptionUrl() const {
   return mWebserver->GetServiceUrl() + mServerDescription.descriptionFile;
 }
 
+cMediaServer::serviceMap& cMediaServer::GetServices(){
+  static serviceMap services;
+  return services;
+}
+
 void cMediaServer::RegisterService(cUPnPService* service){
   if(service != NULL){
     cout << "Registered service: " << service->GetServiceDescription().serviceType << endl;
-    mServices[service->GetServiceDescription().serviceID] = service;
+    GetServices()[service->GetServiceDescription().serviceID] = service;
   }
 }
 
@@ -295,7 +300,7 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
       return UPNP_E_BAD_REQUEST;
     }
 
-    service = cMediaServer::mServices[actionRequest->ServiceID];
+    service = cMediaServer::GetServices()[actionRequest->ServiceID];
 
     if(service == NULL){
       esyslog("UPnP\tCallback - unsupported service called for control");
@@ -314,7 +319,7 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
       return UPNP_E_BAD_REQUEST;
     }
 
-    service = cMediaServer::mServices[eventRequest->ServiceId];
+    service = cMediaServer::GetServices()[eventRequest->ServiceId];
 
     if(service == NULL){
       esyslog("UPnP\tCallback - unsupported service called for eventing");
