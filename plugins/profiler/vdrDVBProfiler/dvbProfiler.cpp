@@ -124,14 +124,12 @@ private:
         fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_RANGE,
                                    DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
                                    DLNA_FLAG_STREAMING_TRANSFER |
-                                   DLNA_FLAG_BYTE_BASED_SEEK |
                                    DLNA_FLAG_VERSION_1_5 );
         break;
       case 0x1B:
         fourthfield = DLNA4thField("AVC_TS_HD_EU_ISO", DLNA_OPERATION_RANGE,
                                    DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
                                    DLNA_FLAG_STREAMING_TRANSFER |
-                                   DLNA_FLAG_BYTE_BASED_SEEK |
                                    DLNA_FLAG_VERSION_1_5 );
         break;
       default:
