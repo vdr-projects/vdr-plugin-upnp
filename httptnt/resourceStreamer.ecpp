@@ -43,7 +43,7 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
   reply.setHeader("contentFeatures.dlna.org  ", streamer->GetContentFeatures());
   reply.setHeader("transferMode.dlna.org  ", streamer->GetTransferMode(reply.getHeader("transferMode.dlna.org")));
 
-  unsigned long from = 0, to = 0, contentLength = streamer->GetContentLength(), length = contentLength;
+  size_t from = 0, to = 0, contentLength = streamer->GetContentLength(), length = contentLength;
   bool hasRange = false;
 
   if(contentLength > 0){
@@ -77,36 +77,30 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
 
   if(!request.isMethodHEAD()){
     if(!streamer->Open()){
-      code = HTTP_INTERNAL_SERVER_ERROR;
-      goto ret;
+      return HTTP_INTERNAL_SERVER_ERROR;
     }
 
     if(hasRange && streamer->Seekable() && contentLength > 0){
       if(!streamer->Seek(from, SEEK_SET)){
-        code = HTTP_INTERNAL_SERVER_ERROR;
-        goto close;
+        return HTTP_INTERNAL_SERVER_ERROR;
       }
       code = HTTP_PARTIAL_CONTENT;
     }
 
     reply.setDirectMode(code);
 
-    ssize_t bytesRead = 0;
-    char buffer[KB(20)];
-    while ((bytesRead = streamer->Read(buffer, KB(20))) > 0) {
+    size_t bytesRead = 0;
+    char buffer[KB(16)];
+    while ((bytesRead = streamer->Read(buffer, KB(16))) > 0 && length) {
       reply.out().write(buffer, bytesRead);
+      length -= bytesRead;
       if (!reply.out()) {
         code = HTTP_GONE;
-        goto close;
+        break;
       }
     }
-  } else {
-    goto ret;
   }
 
-  close:
-  streamer->Close();
-  ret:
   reply.out() << std::flush;
   return code;
 </%cpp>

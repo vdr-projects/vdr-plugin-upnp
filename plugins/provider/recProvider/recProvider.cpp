@@ -52,8 +52,10 @@ private:
   vector<size_t> offsets;
 
   void CloseFile(){
-    fclose(fileFD);
-    fileFD = NULL;
+    if(fileFD){
+      fclose(fileFD);
+      fileFD = NULL;
+    }
   }
 
   bool OpenFile(int i = 1){

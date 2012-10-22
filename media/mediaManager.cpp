@@ -46,6 +46,8 @@ cResourceStreamer::cResourceStreamer(cMediaManager* manager, cUPnPResourceProvid
 }
 
 cResourceStreamer::~cResourceStreamer(){
+  if(provider)
+    provider->Close();
   delete resource;
   delete provider;
 }
@@ -679,7 +681,7 @@ cResourceStreamer* cMediaManager::GetResourceStreamer(const string& objectID, in
   if(!row.isNull(property::resource::KEY_SAMPLE_FREQUENCY))
     ret = resource->SetSampleFrequency(row.getInt32(property::resource::KEY_SAMPLE_FREQUENCY));
   if(!row.isNull(property::resource::KEY_SIZE))
-    ret = resource->SetSize(row.getInt32(property::resource::KEY_SIZE));
+    ret = resource->SetSize(row.getInt64(property::resource::KEY_SIZE));
 
   if(!ret) {
     delete resource;
