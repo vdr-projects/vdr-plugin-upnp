@@ -3,7 +3,7 @@ VDR Plugin 'upnp' Revision History
 
  - New: plugin makefile now links against the full file of the upnp plugin
         so-file. This makes symbolic link against the .so obsolete.
-        Thanks to mini73
+        Thanks to Lars Hanisch
 
 2012-10-24: Version 1.0.0
 
