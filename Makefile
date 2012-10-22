@@ -73,13 +73,12 @@ OBJS = 	$(PLUGIN).o \
 		common/parser.o \
 		common/setup.o \
 		common/ixml.o \
-		common/codec.o \
 		media/profile.o \
 		media/mediaManager.o \
 		media/pluginManager.o \
 		$(TNTOBJ)
 		
-LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl -lavformat -lavcodec
+LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl
 
 ### The main target:
 

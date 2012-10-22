@@ -74,7 +74,17 @@ string DLNA4thField::ToString(){
   if(primaryFlags){
     ss << ";";
 
-    ss << "DLNA.ORG_OP=" << bitset<2>(operations) << ";";
+#ifdef DLNA_STRICT
+    // If the any of the flags lop-npt, lop-bytes or lop-cleartextbytes are set
+    // the OP param must be omitted.
+    if( !(primaryFlags & DLNA_FLAG_BYTE_BASED_SEEK) &&
+        !(primaryFlags & DLNA_FLAG_TIME_BASED_SEEK) &&
+        !(primaryFlags & DLNA_FLAG_CLEARTEXT_LIMITED_SEEK)){
+#endif
+      ss << "DLNA.ORG_OP=" << bitset<2>(operations) << ";";
+#ifdef DLNA_STRICT
+    }
+#endif
 
     ss << "DLNA.ORG_CI=" << bitset<1>(conversionIndicator) << ";";
 
