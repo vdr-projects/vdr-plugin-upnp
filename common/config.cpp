@@ -25,7 +25,6 @@ upnp::cConfig::cConfig()
 , bindToAddress(true)
 , address("0.0.0.0")
 , port(0)
-, databaseFile("metadata.db")
 {
 }
 

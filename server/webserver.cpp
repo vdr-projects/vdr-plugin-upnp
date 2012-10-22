@@ -97,7 +97,11 @@ void cWebserver::SetWebserverRootDir(std::string rootDirectory){
   if(mWebserverThread.Active()) return;
 
   if(rootDirectory.empty())
+#if APIVERSNUM > 10729
+    mWebserverRootDir = std::string(cPluginUpnp::ResourceDirectory(PLUGIN_NAME_I18N)) + "/httpdocs/";
+#else
     mWebserverRootDir = std::string(cPluginUpnp::ConfigDirectory(PLUGIN_NAME_I18N)) + "/httpdocs/";
+#endif
   else
     mWebserverRootDir = rootDirectory;
 }

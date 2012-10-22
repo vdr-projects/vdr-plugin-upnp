@@ -106,10 +106,10 @@ void cResourceStreamer::Close(){
 
 cMediaManager::cMediaManager()
 : systemUpdateID(0)
-, databaseFile("metadata.db")
 , pluginDirectory(DEFAULTPLUGINDIR)
 , pluginManager(NULL)
 {
+  SetDatabaseFile(string());
 }
 
 cMediaManager::~cMediaManager(){
@@ -704,7 +704,12 @@ cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
 }
 
 void cMediaManager::SetDatabaseFile(const string& file){
-  if(file.empty()) databaseFile = "metadata.db";
+  if(file.empty())
+#if APIVERSNUM > 10729
+    databaseFile = string(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N)) + "metadata.db";
+#else
+    databaseFile = string(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N)) + "metadata.db";
+#endif
   else databaseFile = file;
 }
 
