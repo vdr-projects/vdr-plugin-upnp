@@ -13,7 +13,7 @@
 
 using namespace upnp;
 
-static const char *VERSION        = "1.0.0";
+static const char *VERSION        = "0.0.1";
 static const char *DESCRIPTION    = "UPnP/DLNA compliant Media Server functionality for VDR";
 
 class cPluginUpnp : public cPlugin {

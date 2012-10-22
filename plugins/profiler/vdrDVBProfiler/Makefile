@@ -53,7 +53,7 @@ $(DEPFILE): Makefile
 
 libupnp-$(PROFILE)-profiler.so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared $(OBJS) $(LIBS) -o $@
-	@cp --remove-destination $@ $(VDRLIBDIR)/$@.$(APIVERSION)
+	@cp --remove-destination $@ $@.$(APIVERSION)
 	
 clean:
 	@-rm -f $(OBJS) $(DEPFILE) *.so *.so.$(APIVERSION) core* *~

@@ -16,8 +16,13 @@ VERSION = $(shell grep 'static const char \*VERSION *=' $(SCHEMA)Provider.cpp | 
 
 ### The C++ compiler and options:
 
+CXX      ?= g++
+CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses -fPIC
+
 UPNPDIR ?= ../../..
 VDRLIBDIR ?= $(UPNPDIR)/../../lib
+
+APIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' $(UPNPDIR)/include/plugin.h)
 
 VDRDIR ?= $(UPNPDIR)/../../..
 VDRAPIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)

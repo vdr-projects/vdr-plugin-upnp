@@ -15,7 +15,17 @@ PLUGIN = upnp
 
 VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ print $$6 }' | sed -e 's/[";]//g')
 
-include common.mk
+### The C++ compiler and options:
+
+CXX      ?= g++
+ECPPC	 ?= ecppc
+CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses
+
+### The directory environment:
+
+VDRDIR ?= ../../..
+LIBDIR ?= ../../lib
+TMPDIR ?= /tmp
 
 PLUGINDIR= ./PLUGINS
 PLUGINLIBDIR= /usr/lib/vdr/plugins/upnp
@@ -27,6 +37,10 @@ include $(VDRDIR)/Make.global
 ### Allow user defined options to overwrite defaults:
 
 -include $(VDRDIR)/Make.config
+
+### The version number of VDR's plugin API (taken from VDR's "config.h"):
+
+APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
 
 ### The name of the distribution archive:
 
@@ -69,6 +83,14 @@ LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl
 ### The main target:
 
 all: libvdr-$(PLUGIN).so i18n
+
+### Implicit rules:
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $(DEFINES) $(INCLUDES) -o $@ $<
+
+%.cpp: %.ecpp
+	$(ECPPC) $(ECPPFLAGS) $(ECPPFLAGS_CPP) $<
 
 ### Dependencies:
 
