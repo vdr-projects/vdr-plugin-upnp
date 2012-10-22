@@ -17,6 +17,7 @@
 #include <memory>
 #include <tntdb/statement.h>
 #include <tntdb/transaction.h>
+#include <vdr/plugin.h>
 
 namespace upnp {
 
@@ -706,9 +707,9 @@ cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
 void cMediaManager::SetDatabaseFile(const string& file){
   if(file.empty())
 #if APIVERSNUM > 10729
-    databaseFile = string(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N)) + "metadata.db";
+    databaseFile = string(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N)) + "/metadata.db";
 #else
-    databaseFile = string(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N)) + "metadata.db";
+    databaseFile = string(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N)) + "/metadata.db";
 #endif
   else databaseFile = file;
 }
