@@ -149,7 +149,7 @@ private:
     resource.SetResourceUri(u);
     resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
 
-    if(recording->LengthInSeconds()){
+    if(recording->LengthInSeconds() > 0){
       boost::posix_time::time_duration duration = boost::posix_time::seconds(recording->LengthInSeconds());
       resource.SetDuration(boost::posix_time::to_simple_string(duration));
     }
