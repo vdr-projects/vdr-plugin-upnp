@@ -128,7 +128,7 @@ const std::string cWebserver::GetServiceUrl() const {
 
 const std::string cWebserver::GetControlUrl() const {
   stringstream s;
-  s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/" << "services/";
+  s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/services/";
   return s.str();
 }
 

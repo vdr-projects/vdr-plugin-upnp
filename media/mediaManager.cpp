@@ -656,7 +656,7 @@ cResourceStreamer* cMediaManager::GetResourceStreamer(const string& objectID, in
   resourceSQL << "SELECT * FROM " << db::Resources << " WHERE "
               << "`" << property::object::KEY_OBJECTID << "` = "
               << ":objectID"
-              << " ORDER BY resourceID ASC LIMIT " << resourceID << ",1";
+              << " ORDER BY ROWID ASC LIMIT " << resourceID << ",1";
 
   tntdb::Statement select = connection.prepare(resourceSQL.str());
 

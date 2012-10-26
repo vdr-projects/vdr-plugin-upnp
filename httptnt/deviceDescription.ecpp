@@ -29,7 +29,7 @@ using namespace upnp;
   std::string serviceUrl = webserver.GetServiceUrl();
   std::string controlUrl = webserver.GetControlUrl();
   
-  reply.setContentType("application/xml");
+  reply.setContentType("text/xml");
 
 </%cpp>
 <root xmlns="urn:schemas-upnp-org:device-1-0" xmlns:dlna="urn:schemas-dlna-org:device-1-0"> 

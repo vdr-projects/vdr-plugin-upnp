@@ -6,7 +6,7 @@ This is the Connection Manager Service Description File
 It contains the service description for the connection manager of the media server.
 
 #>
-<{ reply.setContentType("application/xml"); }>
+<{ reply.setContentType("text/xml"); }>
 <scpd xmlns="urn:schemas-upnp-org:service-1-0">
     <specVersion>
          <major>1</major>
