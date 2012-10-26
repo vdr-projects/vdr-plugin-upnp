@@ -524,10 +524,9 @@ bool cMediaManager::Initialise(){
 
       ss << "CREATE TABLE " << db::Resources
          << "("
-         << "  resourceID        INTEGER PRIMARY KEY,"
-         << "  `" << property::object::KEY_OBJECTID << "` TEXT "
-         << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
-         << "`" << property::resource::KEY_RESOURCE           << "` TEXT    NOT NULL,"
+         << "`" << property::object::KEY_OBJECTID << "` TEXT "
+         << "REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+         << "`" << property::resource::KEY_RESOURCE           << "` TEXT,"
          << "`" << property::resource::KEY_PROTOCOL_INFO      << "` TEXT    NOT NULL,"
          << "`" << property::resource::KEY_SIZE               << "` INTEGER,"
          << "`" << property::resource::KEY_DURATION           << "` TEXT,"
@@ -536,7 +535,11 @@ bool cMediaManager::Initialise(){
          << "`" << property::resource::KEY_SAMPLE_FREQUENCY   << "` INTEGER,"
          << "`" << property::resource::KEY_BITS_PER_SAMPLE    << "` INTEGER,"
          << "`" << property::resource::KEY_NR_AUDIO_CHANNELS  << "` INTEGER,"
-         << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER"
+         << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER,"
+         << "PRIMARY KEY ("
+         << "`" << property::object::KEY_OBJECTID             << "`,"
+         << "`" << property::resource::KEY_RESOURCE           << "`"
+         << ")"
          << ")";
 
       tntdb::Statement resourcesTable = connection.prepare(ss.str());
@@ -706,11 +709,7 @@ cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
 
 void cMediaManager::SetDatabaseFile(const string& file){
   if(file.empty())
-#if APIVERSNUM > 10729
-    databaseFile = string(cPlugin::ResourceDirectory(PLUGIN_NAME_I18N)) + "/metadata.db";
-#else
     databaseFile = string(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N)) + "/metadata.db";
-#endif
   else databaseFile = file;
 }
 
@@ -899,39 +898,59 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
 
     stringstream resourcestr;
 
-    resourcestr << "DELETE FROM " << db::Resources << " WHERE "
-                << "`" << property::object::KEY_OBJECTID << "`"
-                << " = :objectID";
+    resourcestr << "INSERT OR IGNORE INTO " << db::Resources << " ("
+                << "`" << property::object::KEY_OBJECTID            << "`, "
+                << "`" << property::resource::KEY_RESOURCE          << "`,"
+                << "`" << property::resource::KEY_PROTOCOL_INFO     << "`"
+                << ") VALUES ( "
+                << ":objectID, :resource, :protocolInfo"
+                << ")";
 
-    tntdb::Statement resourcestmt = connection.prepare(resourcestr.str());
-
-    resourcestmt.setString("objectID", objectID)
-                .execute();
+    tntdb::Statement resourcestmt1 = connection.prepare(resourcestr.str());
 
     resourcestr.str(string());
 
-    resourcestr << "INSERT INTO " << db::Resources << " ("
-                << "`" << property::object::KEY_OBJECTID            << "`, "
-                << "`" << property::resource::KEY_RESOURCE          << "`,"
-                << "`" << property::resource::KEY_PROTOCOL_INFO     << "`,"
-                << "`" << property::resource::KEY_SIZE              << "`,"
-                << "`" << property::resource::KEY_DURATION          << "`,"
-                << "`" << property::resource::KEY_RESOLUTION        << "`,"
-                << "`" << property::resource::KEY_BITRATE           << "`,"
-                << "`" << property::resource::KEY_SAMPLE_FREQUENCY  << "`,"
-                << "`" << property::resource::KEY_BITS_PER_SAMPLE   << "`,"
-                << "`" << property::resource::KEY_NR_AUDIO_CHANNELS << "`,"
-                << "`" << property::resource::KEY_COLOR_DEPTH       << "`"
-                << ") VALUES ( "
-                << ":objectID, :resource, :protocolInfo, :size,"
-                << ":duration, :resolution, :bitrate, :sampleFreq, :bpSample,"
-                << ":nrChannels, :colorDepth"
-                << ")";
+    resourcestr << "UPDATE " << db::Resources << " SET "
+                << "`" << property::object::KEY_OBJECTID            << "` = :objectID, "
+                << "`" << property::resource::KEY_RESOURCE          << "` = :resource,"
+                << "`" << property::resource::KEY_PROTOCOL_INFO     << "` = :protocolInfo,"
+                << "`" << property::resource::KEY_SIZE              << "` = :size,"
+                << "`" << property::resource::KEY_DURATION          << "` = :duration,"
+                << "`" << property::resource::KEY_RESOLUTION        << "` = :resolution,"
+                << "`" << property::resource::KEY_BITRATE           << "` = :bitrate,"
+                << "`" << property::resource::KEY_SAMPLE_FREQUENCY  << "` = :sampleFreq,"
+                << "`" << property::resource::KEY_BITS_PER_SAMPLE   << "` = :bpSample,"
+                << "`" << property::resource::KEY_NR_AUDIO_CHANNELS << "` = :nrChannels,"
+                << "`" << property::resource::KEY_COLOR_DEPTH       << "` = :colorDepth"
+                << " WHERE "
+                << "`" << property::object::KEY_OBJECTID            << "` = :objectID"
+                << " AND "
+                << "`" << property::resource::KEY_RESOURCE          << "` = :resource"
+                << ";";
 
     tntdb::Statement resourcestmt2 = connection.prepare(resourcestr.str());
 
+    resourcestr.str(string());
+
+    resourcestr << "DELETE FROM " << db::Resources << " WHERE "
+                << "`" << property::object::KEY_OBJECTID << "`"
+                << " = '" << objectID << "'";
+
     cMetadata::ResourceList resources = metadata.GetResources();
     for(cMetadata::ResourceList::iterator it = resources.begin(); it != resources.end(); ++it){
+
+      // This is appended to the delete statement and will delete all resources, which are not in the set.
+      // The resources are identified by their resource URI. Therefore: two resources with same URI refer
+      // to the same file or stream.
+      resourcestr << " AND"
+                  << " `" << property::resource::KEY_RESOURCE << "`"
+                  << " != \"" << (*it).GetResourceUri() << "\"";
+
+      resourcestmt1.setString("objectID", objectID)
+                   .setString("resource", (*it).GetResourceUri())
+                   .setString("protocolInfo", (*it).GetProtocolInfo())
+                   .execute();
+
       resourcestmt2.setString("objectID", objectID)
                    .setString("resource", (*it).GetResourceUri())
                    .setString("protocolInfo", (*it).GetProtocolInfo());
@@ -970,6 +989,9 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
 
       resourcestmt2.execute();
     }
+
+    tntdb::Statement delresourcestmt = connection.prepare(resourcestr.str());
+    delresourcestmt.execute();
 
     stringstream detailstr;
 

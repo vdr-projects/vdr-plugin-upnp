@@ -50,6 +50,7 @@ private:
   int lastFileNumber;
   string filename;
   vector<size_t> offsets;
+  bool initialScan;
 
   void CloseFile(){
     if(fileFD){
@@ -95,6 +96,7 @@ public:
   , currentFileNumber(1)
   , lastFileNumber(1)
   , offsets(65536)
+  , initialScan(false)
   {
   }
 
@@ -114,6 +116,11 @@ public:
     StringList list;
     string videoDir(VideoDirectory), fs, uri = u.substr(6);
     int pos = 0, vl = videoDir.length(), ul = uri.length(), vul = vl + ul + 1;
+
+    if(!initialScan){
+      if(!Recordings.Update(true)) return list;
+      initialScan = true;
+    }
 
     for(cRecording* rec = Recordings.First(); rec; rec = Recordings.Next(rec)){
       char* file = strdup(rec->Name());
