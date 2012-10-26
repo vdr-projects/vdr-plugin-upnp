@@ -128,6 +128,8 @@ private:
                                    DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
                                    DLNA_FLAG_STREAMING_TRANSFER |
                                    DLNA_FLAG_BYTE_BASED_SEEK |
+                                   DLNA_FLAG_BACKGROUND_TRANSFER |
+                                   DLNA_FLAG_CONNECTION_STALLING |
                                    DLNA_FLAG_VERSION_1_5 );
         break;
       case 0x1B:
@@ -135,6 +137,8 @@ private:
                                    DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
                                    DLNA_FLAG_STREAMING_TRANSFER |
                                    DLNA_FLAG_BYTE_BASED_SEEK |
+                                   DLNA_FLAG_BACKGROUND_TRANSFER |
+                                   DLNA_FLAG_CONNECTION_STALLING |
                                    DLNA_FLAG_VERSION_1_5 );
         break;
       default:
@@ -144,6 +148,11 @@ private:
     resource.SetSize(size);
     resource.SetResourceUri(u);
     resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
+
+    if(recording->LengthInSeconds()){
+      boost::posix_time::time_duration duration = boost::posix_time::seconds(recording->LengthInSeconds());
+      resource.SetDuration(boost::posix_time::to_simple_string(duration));
+    }
 
     metadata.AddResource(resource);
 

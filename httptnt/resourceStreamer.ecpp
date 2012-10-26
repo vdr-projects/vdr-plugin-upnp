@@ -17,6 +17,9 @@ int resourceID = 0;
 
 using namespace upnp;
 </%pre>
+<%request>
+  boost::shared_ptr<cResourceStreamer> streamer;
+</%request>
 <#
 int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string objectID, int resourceID) {
 #>
@@ -28,7 +31,7 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
 
   cMediaServer* server = cMediaServer::GetInstance();
   cMediaManager& manager = server->GetManager();
-  boost::shared_ptr<cResourceStreamer> streamer(manager.GetResourceStreamer(objectID, resourceID));
+  streamer = boost::shared_ptr<cResourceStreamer>(manager.GetResourceStreamer(objectID, resourceID));
 
   if(!streamer.get()){
     reply.out() << "Object ID not found or invalid";
@@ -55,8 +58,8 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
       if(rangeRequest.find("bytes=",0) == 0){
         unsigned int minus = rangeRequest.find_first_of('-',6);
         if(minus != std::string::npos){
-          from  = atoi(rangeRequest.substr(6, minus - 6).c_str());
-          to = atoi(rangeRequest.substr(minus + 1).c_str());
+          from  = atol(rangeRequest.substr(6, minus - 6).c_str());
+          to = atol(rangeRequest.substr(minus + 1).c_str());
           if(from){
             // If range is off the road, reset it to correct values.
             if(from <= 0 || from > contentLength) from = 0;

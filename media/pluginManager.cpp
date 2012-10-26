@@ -405,7 +405,7 @@ bool upnp::cPluginManager::DLL::Load(){
       return true;
     }
   } else {
-    cerr << "Error while opening plugin: " << error << endl;
+    esyslog("UPnP\tError while opening plugin: %s", error);
   }
 
   return false;
