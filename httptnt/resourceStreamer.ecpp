@@ -39,6 +39,7 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
   }
 
   int code = HTTP_OK;
+  string codeText = "OK";
 
   //reply.setKeepAliveHeader();
   reply.setContentType(streamer->GetContentType());
@@ -88,9 +89,10 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
         return HTTP_INTERNAL_SERVER_ERROR;
       }
       code = HTTP_PARTIAL_CONTENT;
+      codeText = "Partial Content";
     }
 
-    reply.setDirectMode(code);
+    reply.setDirectMode(code, codeText.c_str());
 
     size_t bytesRead = 0;
     char buffer[KB(16)];
