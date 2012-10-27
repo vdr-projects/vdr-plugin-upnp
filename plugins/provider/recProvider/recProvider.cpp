@@ -238,20 +238,17 @@ public:
       return false;
     }
 
-    if(!OpenFile(1)) return false;
-    size_t size = 0;
-    while(true){
-      fseek(fileFD, 0, SEEK_END);
-      size = ftell(fileFD);
-      if(offset < size){
-        return fseek(fileFD, offset, SEEK_SET) == 0;
-      } else {
-        offset -= size;
-        if(OpenNext()) return false;
-      }
+    unsigned int i = 0;
+    for(; i < offsets.size(); ++i){
+      if(offset < offsets[i])
+        break;
+      else
+        offset -= offsets[i];
     }
+    if(i >= offsets.size()) return false;
+    if(!OpenFile(i+1)) return false;
 
-    return false;
+    return fseek(fileFD, offset, SEEK_SET) == 0;
 
   }
 

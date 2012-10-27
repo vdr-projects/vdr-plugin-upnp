@@ -67,8 +67,6 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
             if(to <= 0 || to > contentLength) to = contentLength;
             length = to - from;
             hasRange = true;
-            
-            cerr << from << " - " << to << "/" << contentLength << endl;
 
             std::stringstream contentRangeHeader;
             contentRangeHeader << "bytes " << from << "-" << to << "/" << contentLength;
