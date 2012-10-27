@@ -109,7 +109,7 @@ private:
     fclose(fd);
 
     int i = 1;
-    uint32_t size = 0;
+    size_t size = 0;
 
     sprintf(pFileNumber, "/%05d.ts", i);
     while(access(filename, F_OK) == 0){

@@ -149,7 +149,7 @@ public:
     bool SetDuration(string duration);
     bool SetResolution(string resolution);
     bool SetBitrate(uint32_t bitrate);
-    bool SetSize(uint32_t size);
+    bool SetSize(size_t size);
     bool SetSampleFrequency(uint32_t sampleFrequency);
     bool SetBitsPerSample(uint32_t bitsPerSample);
     bool SetNrAudioChannels(uint32_t nrAudioChannels);
@@ -160,7 +160,7 @@ public:
     string    GetDuration() const { return duration; }
     string    GetResolution() const { return resolution; }
     uint32_t  GetBitrate() const { return bitrate; }
-    uint32_t  GetSize() const { return size; }
+    size_t    GetSize() const { return size; }
     uint32_t  GetSampleFrequency() const { return sampleFrequency; }
     uint32_t  GetBitsPerSample() const { return bitsPerSample; }
     uint32_t  GetNrAudioChannels() const { return nrAudioChannels; }
@@ -184,7 +184,7 @@ public:
     string    duration;
     string    resolution;
     uint32_t  bitrate;
-    uint32_t  size;
+    size_t    size;
     uint32_t  sampleFrequency;
     uint32_t  bitsPerSample;
     uint32_t  nrAudioChannels;

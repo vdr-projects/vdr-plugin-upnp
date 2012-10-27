@@ -219,7 +219,7 @@ bool cMetadata::Resource::SetBitrate(uint32_t bitrate){
   return true;
 }
 
-bool cMetadata::Resource::SetSize(uint32_t size){
+bool cMetadata::Resource::SetSize(size_t size){
   this->size = size;
   return true;
 }
