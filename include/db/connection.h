@@ -46,16 +46,20 @@ public:
     return Statement(m_connection, statement);
   }
 
+  int Execute(const std::string& stmt){
+    return Prepare(stmt).Execute();
+  }
+
   void BeginTransaction(){
-    Prepare("BEGIN TRANSACTION").execute();
+    Execute("BEGIN TRANSACTION");
   }
 
   void CommitTransaction(){
-    Prepare("COMMIT TRANSACTION").execute();
+    Execute("COMMIT TRANSACTION");
   }
 
   void RollbackTransaction(){
-    Prepare("ROLLBACK TRANSACTION").execute();
+    Execute("ROLLBACK TRANSACTION");
   }
 
 };

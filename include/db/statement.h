@@ -29,9 +29,56 @@ public:
 
   virtual ~Statement(){}
 
-  Statement& execute(){
-    if(sqlite3_step(m_statement.get()) != SQLITE_OK)
+  void Reset(){
+    if(sqlite3_reset(m_statement.get()) != SQLITE_OK)
       throw SQLiteException(sqlite3_errmsg(m_connection.get()));
+  }
+
+  int Execute(){
+    int ret = sqlite3_step(m_statement.get());
+
+    if(ret != SQLITE_OK && ret != SQLITE_DONE )
+      throw SQLiteException(sqlite3_errmsg(m_connection.get()));
+
+    int numChanges = sqlite3_changes(m_connection.get());
+
+    Reset();
+
+    return numChanges;
+  }
+
+  int GetBindIndex(const std::string& col){
+    int index = 0;
+
+    return index;
+  }
+
+  Statement& SetNull(const std::string& c){
+    int col = GetBindIndex(c);
+
+    return *this;
+  }
+
+  Statement& SetString(const std::string& c, const std::string& value){
+    int col = GetBindIndex(c);
+
+    return *this;
+  }
+
+  Statement& SetLong(const std::string& c, long value){
+    int col = GetBindIndex(c);
+
+    return *this;
+  }
+
+  Statement& SetDouble(const std::string& c, double value){
+    int col = GetBindIndex(c);
+
+    return *this;
+  }
+
+  Statement& SetBlob(const std::string& c, const char* buf, size_t bufLen){
+    int col = GetBindIndex(c);
 
     return *this;
   }
