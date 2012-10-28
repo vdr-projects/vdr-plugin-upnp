@@ -475,7 +475,7 @@ bool cMediaManager::Initialise(){
 
     connection = tntdb::connect(ss.str());
 
-    dsyslog("UPNP\tPreparing database structure...");
+    dsyslog("UPnP\tPreparing database structure...");
 
     if(!CheckIntegrity()){
       try {
@@ -592,7 +592,7 @@ bool cMediaManager::Initialise(){
     return false;
   }
 
-  dsyslog("UPNP\tLoading Plugins...");
+  dsyslog("UPnP\tLoading Plugins...");
   pluginManager = new upnp::cPluginManager();
 
   if(!pluginManager->LoadPlugins(pluginDirectory)){

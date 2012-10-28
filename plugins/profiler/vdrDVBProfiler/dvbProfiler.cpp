@@ -149,17 +149,21 @@ private:
     resource.SetResourceUri(u);
     resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
 
-    int duration = 0;
+    int seconds = 0;
     const cEvent* event = info->GetEvent();
     if(event && event->Duration() > 0){
-      duration = event->Duration();
+      seconds = event->Duration();
     }
 #if VDRVERSNUM > 10723
     else if(recording->LengthInSeconds() > 0){
-      boost::posix_time::time_duration duration = boost::posix_time::seconds(recording->LengthInSeconds());
-      resource.SetDuration(boost::posix_time::to_simple_string(duration));
+      seconds = recording->LengthInSeconds();
     }
 #endif
+
+    if(seconds){
+      boost::posix_time::time_duration duration = boost::posix_time::seconds(seconds);
+      resource.SetDuration(boost::posix_time::to_simple_string(duration));
+    }
 
     metadata.AddResource(resource);
 
