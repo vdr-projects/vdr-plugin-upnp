@@ -150,8 +150,8 @@ private:
     resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
 
     int duration = 0;
-    cEvent* event = NULL;
-    if((event = info->GetEvent()) && event->Duration() > 0){
+    const cEvent* event = info->GetEvent();
+    if(event && event->Duration() > 0){
       duration = event->Duration();
     }
 #if VDRVERSNUM > 10723
