@@ -270,7 +270,7 @@ cMediaServer::serviceMap& cMediaServer::GetServices(){
 
 void cMediaServer::RegisterService(cUPnPService* service){
   if(service != NULL){
-    cout << "Registered service: " << service->GetServiceDescription().serviceType << endl;
+    dsyslog("UPnP\tRegistered service: %s", service->GetServiceDescription().serviceType.c_str());
     GetServices()[service->GetServiceDescription().serviceID] = service;
   }
 }
