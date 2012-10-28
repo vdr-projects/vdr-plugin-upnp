@@ -1,0 +1,28 @@
+README Recording provider
+
+This is a sub-plug in for the VDR UPnP/DLNA media server plug in.
+
+Created on: 									28.10.2012
+Written by: 									Denis Loh
+
+Projekt homepage:							http://upnp.vdr-developer.org
+
+Latest version available at:	http://upnp.vdr-developer.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+Description:
+
+The recording provider provides access to VDR recordings. It scans
+the recording directories given by the VDRs internal structure and
+returns a list of recording resources.
+
+It provides the following URI scheme:   rec://
+
+Additionally, it is used to access the recording files for streaming.
+
+The provider implemented the seekable interface and therefore allows
+seeking in the recordings via byte based seeks.

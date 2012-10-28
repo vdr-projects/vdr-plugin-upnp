@@ -1,0 +1,29 @@
+README DVB profiler
+
+This is a sub-plug in for the VDR UPnP/DLNA media server plug in.
+
+Created on: 									28.10.2012
+Written by: 									Denis Loh
+
+Projekt homepage:							http://upnp.vdr-developer.org
+
+Latest version available at:	http://upnp.vdr-developer.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+Description:
+
+The DVB profiler sub-plug in profiles live-TV channels and VDR
+recordings and finds their specific DLNA profile.
+
+The following profiles are supported regarding the channel
+properties:
+
+SD channels and recordings: MPEG_TS_SD_EU_ISO
+HD channels and recordings: AVC_TS_HD_EU_ISO
+
+Radio channels and recordings as well as old PES recordings are
+currently not supported.

@@ -1,0 +1,27 @@
+README Live-tv channel provider
+
+This is a sub-plug in for the VDR UPnP/DLNA media server plug in.
+
+Created on:                   28.10.2012
+Written by:                   Denis Loh
+
+Projekt homepage:             http://upnp.vdr-developer.org
+
+Latest version available at:  http://upnp.vdr-developer.org
+
+This program is free software; you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation; either version 2 of the License, or
+(at your option) any later version.
+
+Description:
+
+The live TV provider provides access to VDR live-tv channels. It
+scans the channels given by the VDRs internal structure and returns
+a list of channel IDs
+
+It provides the following URI scheme:   vdr://
+
+The live TV provider has not implemented the file access interface.
+To access live tv channels, the streamdev server plugin and the
+appropriate externremux.sh must be installed on the system.
