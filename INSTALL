@@ -1,0 +1,14 @@
+- unpack as usually inside the PLUGINS dir of the VDR version against you want to build
+- building the subplugins requires the main plugin to be already installed on the target
+system, therefore you should execute the following sequence:
+
+make
+make install
+make subplugins
+make install-subplugins
+
+ - of course, executing the "install*" targets directly will build the binaries first...
+ - for building / installing just certain subplugins explicitely, just change to their
+ respective directories and execute 'make' / 'make install' there;
+ 
+ - further targets are remove & remove-subplugins

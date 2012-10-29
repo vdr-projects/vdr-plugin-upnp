@@ -1,0 +1,70 @@
+#
+# UPnP/DLNA subplugins Makefile
+#
+# This code is free software; you can redistribute it and/or
+# modify it under the terms of the GNU General Public License
+# as published by the Free Software Foundation; either version 2
+# of the License, or (at your option) any later version.
+#
+# This code is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with this program; if not, write to the Free Software
+# Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
+# Or, point your browser to http://www.gnu.org/copyleft/gpl.html
+
+### Includes and Defines
+
+SINCLUDES += -I../../../include
+SINCLUDES += $(shell echo "$(INCLUDES)" | sed -e 's+-I *+-I+g' | sed -e 's+-I\([^/]\)+-I../../\1+g')
+
+-include Makefile
+
+UPNPAPIVERSION = $(shell sed -ne '/define UPNPPLUGIN_VERSION/s/^.*"\(.*\)".*$$/\1/p' ../../../include/plugin.h)
+
+### The version number of the subplugin (taken from the main source file):
+SUBPLUGVERSION = $(shell grep 'static const char \*VERSION *=' $(SUBPLUGIN)$(CATEGORY).cpp | awk '{ print $$6 }' | sed -e 's/[";]//g')
+
+DEFINES  += -D_GNU_SOURCE -D_FILE_OFFSET_BITS=64 -D_LARGEFILE_SOURCE -D_LARGEFILE64_SOURCE
+
+LIBS     += -L$(LIBDIR) -Wl,-R$(LIBDIR) $(VDRPLUGINLIBDIR)/libvdr-upnp.so.$(APIVERSION)
+
+# Dependencies:
+
+MAKEDEP = g++ -MM -MG
+DEPFILE = .dependencies
+$(DEPFILE): $(OBJS:%.o=%.cpp) $(wildcard *.h)
+	@$(MAKEDEP) $(DEFINES) $(SHAREDDEFINES) $(SINCLUDES) $(OBJS:%.o=%.cpp) > $@
+
+-include $(DEPFILE)
+
+### Targets:
+
+LIBUPNP    = libupnp-$(shell echo $(TARGET) | awk '{print tolower($$0)}').so
+LIBUPNPVER = $(LIBUPNP).$(UPNPAPIVERSION)-$(APIVERSION)
+
+BUILDTARGETS = $(LIBDIR)/$(LIBUPNPVER)
+
+_all: $(BUILDTARGETS)
+.PHONY: clean dist
+
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $(DEFINES) $(SHAREDDEFINES) $(SINCLUDES) $<
+
+$(LIBUPNP): $(OBJS)
+	$(CXX) $(CXXFLAGS) -shared $(OBJS) $(LIBS) $(SHAREDLIBS) -o $@
+
+$(LIBDIR)/$(LIBUPNPVER): $(LIBUPNP)
+	@cp -p $< $@
+
+_clean:
+	@-rm -f $(OBJS) $(CLEAN_RM) $(DEPFILE) $(LIBUPNP) $(LIBDIR)/$(LIBUPNPVER) core* *~
+
+_install: all
+	install -m 755 -o root -g root $(PRESTRIP) $(LIBDIR)/$(LIBUPNPVER) $(VDRPLUGINLIBDIR)
+
+_uninstall:
+	rm $(VDRPLUGINLIBDIR)/$(LIBUPNPVER)
