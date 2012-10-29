@@ -104,9 +104,9 @@ struct cConfig {
   /**
    * The sqlite database file
    *
-   * This is the path to the database file.
+   * This is the path where the database file shall be located.
    */
-  string databaseFile;
+  string databaseDir;
 };
 
 }

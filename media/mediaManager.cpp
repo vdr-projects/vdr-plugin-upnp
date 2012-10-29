@@ -110,7 +110,7 @@ cMediaManager::cMediaManager()
 , pluginDirectory(DEFAULTPLUGINDIR)
 , pluginManager(NULL)
 {
-  SetDatabaseFile(string());
+  SetDatabaseDir(string());
 }
 
 cMediaManager::~cMediaManager(){
@@ -478,112 +478,116 @@ bool cMediaManager::Initialise(){
     dsyslog("UPNP\tPreparing database structure...");
 
     if(!CheckIntegrity()){
-      connection.beginTransaction();
+      try {
 
-      ss.str(string());
+        connection.beginTransaction();
 
-      ss << "CREATE TABLE " << db::Metadata
-         << "("
-         << "`" << property::object::KEY_OBJECTID          << "` TEXT    PRIMARY KEY,"
-         << "`" << property::object::KEY_PARENTID          << "` TEXT    NOT NULL,"
-         << "`" << property::object::KEY_TITLE             << "` TEXT    NOT NULL,"
-         << "`" << property::object::KEY_CLASS             << "` TEXT    NOT NULL,"
-         << "`" << property::object::KEY_RESTRICTED        << "` INTEGER NOT NULL,"
-         << "`" << property::object::KEY_CREATOR           << "` TEXT,"
-         << "`" << property::object::KEY_DESCRIPTION       << "` TEXT,"
-         << "`" << property::object::KEY_LONG_DESCRIPTION  << "` TEXT,"
-         << "`" << property::object::KEY_DATE              << "` TEXT,"
-         << "`" << property::object::KEY_LANGUAGE          << "` TEXT,"
-         << "`" << property::object::KEY_CHANNEL_NR        << "` INTEGER,"
-         << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
-         << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
-         << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT,"
-         << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
-         << ")";
+        ss.str(string());
 
-      tntdb::Statement objectTable = connection.prepare(ss.str());
+        ss << "CREATE TABLE " << db::Metadata
+           << "("
+           << "`" << property::object::KEY_OBJECTID          << "` TEXT    PRIMARY KEY,"
+           << "`" << property::object::KEY_PARENTID          << "` TEXT    NOT NULL,"
+           << "`" << property::object::KEY_TITLE             << "` TEXT    NOT NULL,"
+           << "`" << property::object::KEY_CLASS             << "` TEXT    NOT NULL,"
+           << "`" << property::object::KEY_RESTRICTED        << "` INTEGER NOT NULL,"
+           << "`" << property::object::KEY_CREATOR           << "` TEXT,"
+           << "`" << property::object::KEY_DESCRIPTION       << "` TEXT,"
+           << "`" << property::object::KEY_LONG_DESCRIPTION  << "` TEXT,"
+           << "`" << property::object::KEY_DATE              << "` TEXT,"
+           << "`" << property::object::KEY_LANGUAGE          << "` TEXT,"
+           << "`" << property::object::KEY_CHANNEL_NR        << "` INTEGER,"
+           << "`" << property::object::KEY_CHANNEL_NAME      << "` TEXT,"
+           << "`" << property::object::KEY_SCHEDULED_START   << "` TEXT,"
+           << "`" << property::object::KEY_SCHEDULED_END     << "` TEXT,"
+           << "`" << property::object::KEY_OBJECT_UPDATE_ID  << "` INTEGER"
+           << ")";
 
-      objectTable.execute();
+        tntdb::Statement objectTable = connection.prepare(ss.str());
 
-      ss.str(string());
+        objectTable.execute();
 
-      ss << "CREATE TABLE " << db::Details
-         << "("
-         << "  `propertyID` INTEGER PRIMARY KEY,"
-         << "  `" << property::object::KEY_OBJECTID << "` TEXT "
-         << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
-         << "  `property`   TEXT,"
-         << "  `value`      TEXT"
-         << ")";
+        ss.str(string());
 
-      tntdb::Statement detailsTable = connection.prepare(ss.str());
+        ss << "CREATE TABLE " << db::Details
+           << "("
+           << "  `propertyID` INTEGER PRIMARY KEY,"
+           << "  `" << property::object::KEY_OBJECTID << "` TEXT "
+           << "  REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+           << "  `property`   TEXT,"
+           << "  `value`      TEXT"
+           << ")";
 
-      detailsTable.execute();
+        tntdb::Statement detailsTable = connection.prepare(ss.str());
 
-      ss.str(string());
+        detailsTable.execute();
 
-      ss << "CREATE TABLE " << db::Resources
-         << "("
-         << "`" << property::object::KEY_OBJECTID << "` TEXT "
-         << "REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
-         << "`" << property::resource::KEY_RESOURCE           << "` TEXT,"
-         << "`" << property::resource::KEY_PROTOCOL_INFO      << "` TEXT    NOT NULL,"
-         << "`" << property::resource::KEY_SIZE               << "` INTEGER,"
-         << "`" << property::resource::KEY_DURATION           << "` TEXT,"
-         << "`" << property::resource::KEY_RESOLUTION         << "` TEXT,"
-         << "`" << property::resource::KEY_BITRATE            << "` INTEGER,"
-         << "`" << property::resource::KEY_SAMPLE_FREQUENCY   << "` INTEGER,"
-         << "`" << property::resource::KEY_BITS_PER_SAMPLE    << "` INTEGER,"
-         << "`" << property::resource::KEY_NR_AUDIO_CHANNELS  << "` INTEGER,"
-         << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER,"
-         << "PRIMARY KEY ("
-         << "`" << property::object::KEY_OBJECTID             << "`,"
-         << "`" << property::resource::KEY_RESOURCE           << "`"
-         << ")"
-         << ")";
+        ss.str(string());
 
-      tntdb::Statement resourcesTable = connection.prepare(ss.str());
+        ss << "CREATE TABLE " << db::Resources
+           << "("
+           << "`" << property::object::KEY_OBJECTID << "` TEXT "
+           << "REFERENCES metadata (`"<< property::object::KEY_OBJECTID <<"`) ON DELETE CASCADE ON UPDATE CASCADE,"
+           << "`" << property::resource::KEY_RESOURCE           << "` TEXT,"
+           << "`" << property::resource::KEY_PROTOCOL_INFO      << "` TEXT    NOT NULL,"
+           << "`" << property::resource::KEY_SIZE               << "` INTEGER,"
+           << "`" << property::resource::KEY_DURATION           << "` TEXT,"
+           << "`" << property::resource::KEY_RESOLUTION         << "` TEXT,"
+           << "`" << property::resource::KEY_BITRATE            << "` INTEGER,"
+           << "`" << property::resource::KEY_SAMPLE_FREQUENCY   << "` INTEGER,"
+           << "`" << property::resource::KEY_BITS_PER_SAMPLE    << "` INTEGER,"
+           << "`" << property::resource::KEY_NR_AUDIO_CHANNELS  << "` INTEGER,"
+           << "`" << property::resource::KEY_COLOR_DEPTH        << "` INTEGER,"
+           << "PRIMARY KEY ("
+           << "`" << property::object::KEY_OBJECTID             << "`,"
+           << "`" << property::resource::KEY_RESOURCE           << "`"
+           << ")"
+           << ")";
 
-      resourcesTable.execute();
+        tntdb::Statement resourcesTable = connection.prepare(ss.str());
 
-      ss.str(string());
+        resourcesTable.execute();
 
-      ss << "INSERT INTO " << db::Metadata << " ("
-         << "`" << property::object::KEY_OBJECTID          << "`, "
-         << "`" << property::object::KEY_PARENTID          << "`, "
-         << "`" << property::object::KEY_TITLE             << "`, "
-         << "`" << property::object::KEY_CLASS             << "`, "
-         << "`" << property::object::KEY_RESTRICTED        << "`, "
-         << "`" << property::object::KEY_CREATOR           << "`, "
-         << "`" << property::object::KEY_DESCRIPTION       << "`, "
-         << "`" << property::object::KEY_LONG_DESCRIPTION  << "`) "
-         << " VALUES (:objectID, :parentID, :title, :class, :restricted, :creator, :description, :longDescription)";
+        ss.str(string());
 
-      tntdb::Statement rootContainer = connection.prepare(ss.str());
+        ss << "INSERT INTO " << db::Metadata << " ("
+           << "`" << property::object::KEY_OBJECTID          << "`, "
+           << "`" << property::object::KEY_PARENTID          << "`, "
+           << "`" << property::object::KEY_TITLE             << "`, "
+           << "`" << property::object::KEY_CLASS             << "`, "
+           << "`" << property::object::KEY_RESTRICTED        << "`, "
+           << "`" << property::object::KEY_CREATOR           << "`, "
+           << "`" << property::object::KEY_DESCRIPTION       << "`, "
+           << "`" << property::object::KEY_LONG_DESCRIPTION  << "`) "
+           << " VALUES (:objectID, :parentID, :title, :class, :restricted, :creator, :description, :longDescription)";
 
-      const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
+        tntdb::Statement rootContainer = connection.prepare(ss.str());
 
-      rootContainer.setString("objectID", "0")
-                   .setString("parentID", "-1")
-                   .setString("title", desc.friendlyName)
-                   .setString("creator", desc.manufacturer)
-                   .setString("class", "object.container")
-                   .setBool("restricted", true)
-                   .setString("description", desc.modelName)
-                   .setString("longDescription", desc.modelDescription)
-                   .execute();
+        const cMediaServer::Description desc = cMediaServer::GetInstance()->GetServerDescription();
 
-      connection.commitTransaction();
+        rootContainer.setString("objectID", "0")
+                     .setString("parentID", "-1")
+                     .setString("title", desc.friendlyName)
+                     .setString("creator", desc.manufacturer)
+                     .setString("class", "object.container")
+                     .setBool("restricted", true)
+                     .setString("description", desc.modelName)
+                     .setString("longDescription", desc.modelDescription)
+                     .execute();
+
+        connection.commitTransaction();
+
+      } catch (const std::exception& e) {
+        esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
+        connection.rollbackTransaction();
+
+        return false;
+      }
+
     }
 
   } catch (const std::exception& e) {
-
-    if(!connection){
-      esyslog("UPnP\tException occurred while connecting to database '%s': %s", databaseFile.c_str(), e.what());
-    } else {
-      esyslog("UPnP\tException occurred while initializing database '%s': %s", databaseFile.c_str(), e.what());
-      connection.rollbackTransaction();
-    }
+    esyslog("UPnP\tException occurred while connecting to database '%s': %s", databaseFile.c_str(), e.what());
 
     return false;
   }
@@ -707,10 +711,12 @@ cUPnPResourceProvider* cMediaManager::CreateResourceProvider(const string& uri){
   return pluginManager->CreateProvider(uri.substr(0, uri.find_first_of(':',0)));
 }
 
-void cMediaManager::SetDatabaseFile(const string& file){
+void cMediaManager::SetDatabaseDir(const string& file){
   if(file.empty())
-    databaseFile = string(cPlugin::ConfigDirectory(PLUGIN_NAME_I18N)) + "/metadata.db";
+    databaseFile = cPlugin::ConfigDirectory(PLUGIN_NAME_I18N);
   else databaseFile = file;
+
+  databaseFile += "/metadata.db";
 }
 
 void cMediaManager::SetPluginDirectory(const string& directory){

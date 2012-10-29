@@ -6,7 +6,8 @@
  * $Id$
  */
 
-#include <iostream>
+#include <sstream>
+#include <getopt.h>
 #include "upnp.h"
 #include "include/setup.h"
 
@@ -26,12 +27,41 @@ cPluginUpnp::~cPluginUpnp()
 const char *cPluginUpnp::CommandLineHelp(void)
 {
   // Return a string that describes all known command line options.
-  return NULL;
+  std::stringstream ss;
+
+  ss  << "  The UPnP/DLNA server is designed to detect everything automatically.\n"
+      << "  Therefore the user is not required to change most of the settings.\n"
+      << "  \n"
+      << "  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
+      << "                                                where the the database\n"
+      << "                                                file shall be located.\n";
+
+  return ss.str().c_str();
 }
 
 bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
 {
-  // Implement command line argument processing here if applicable.
+  static struct option long_options[] = {
+    {"db-dir",   required_argument, NULL, 'd'},
+    {0, 0, 0, 0}
+  };
+
+  // Parse your own setup parameters and store their values.
+  upnp::cConfig config = mMediaServer->GetConfiguration();
+
+  int c = 0; int index = -1;
+  while((c = getopt_long(argc, argv, "d:",long_options, &index)) != -1){
+    switch(c){
+    case 'd':
+      if(!cMenuSetupUPnP::SetupParse("databaseDir", optarg, config)) return false;
+      break;
+    default:
+      return false;
+    }
+  }
+
+  mMediaServer->SetConfiguration(config);
+
   return true;
 }
 

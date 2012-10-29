@@ -71,7 +71,7 @@ void cMenuSetupUPnP::Update(){
     dbCat->SetSelectable(false);
     Add(dbCat);
 
-    Add(new cMenuEditStrItem(tr("Path to database file"), databaseFile, STRING_SIZE));
+    Add(new cMenuEditStrItem(tr("Path to database file"), databaseDir, STRING_SIZE));
   }
 
   SetCurrent(Get(current));
@@ -134,7 +134,7 @@ void cMenuSetupUPnP::Load(){
   strn0cpy(webserverRoot, config.webServerRoot.c_str(), STRING_SIZE);
   strn0cpy(address, config.address.c_str(), 16);
   strn0cpy(interface, config.interface.c_str(), 16);
-  strn0cpy(databaseFile, config.databaseFile.c_str(), STRING_SIZE);
+  strn0cpy(databaseDir, config.databaseDir.c_str(), STRING_SIZE);
   strn0cpy(presentationUrl, config.presentationURL.c_str(), STRING_SIZE);
   strn0cpy(deviceUUID, config.deviceUUID.c_str(), STRING_SIZE);
 }
@@ -145,7 +145,7 @@ void cMenuSetupUPnP::Store(){
   config.webServerRoot = webserverRoot;
   config.address = address;
   config.interface = interface;
-  config.databaseFile = databaseFile;
+  config.databaseDir = databaseDir;
   config.presentationURL = presentationUrl;
 
   config.bindToAddress = switchBindAddress?true:false;
@@ -171,11 +171,18 @@ void cMenuSetupUPnP::Store(){
   SetupStore("address", config.address.c_str());
   SetupStore("interface", config.interface.c_str());
   SetupStore("port", config.port);
-  SetupStore("databaseFile", config.databaseFile.c_str());
+  SetupStore("databaseDir", config.databaseDir.c_str());
 }
+
+std::string cMenuSetupUPnP::parsedArgs;
 
 bool cMenuSetupUPnP::SetupParse(const char *name, const char *value, upnp::cConfig& config)
 {
+
+  if(parsedArgs.find(name) != std::string::npos){
+    dsyslog("UPnP\tSkipping %s=%s, was overridden in command line.", name, value);
+    return true;
+  }
 
   if      (strcasecmp(name, "enabled")==0)                config.enabled = atoi(value)?true:false;
   else if (strcasecmp(name, "expertSettings")==0)         config.expertSettings = atoi(value)?true:false;
@@ -191,8 +198,10 @@ bool cMenuSetupUPnP::SetupParse(const char *name, const char *value, upnp::cConf
   else if (strcasecmp(name, "address")==0)                config.address = value;
   else if (strcasecmp(name, "interface")==0)              config.interface = value;
   else if (strcasecmp(name, "port")==0)                   config.port = (uint16_t)atoi(value);
-  else if (strcasecmp(name, "databaseFile")==0)           config.databaseFile = value;
+  else if (strcasecmp(name, "databaseDir")==0)            config.databaseDir = value;
   else return false;
+
+  parsedArgs += name;
 
   return true;
 }

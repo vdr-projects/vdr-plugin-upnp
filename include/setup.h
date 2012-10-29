@@ -92,7 +92,7 @@ private:
     char presentationUrl[STRING_SIZE];
     char address[16];
     char interface[16];
-    char databaseFile[STRING_SIZE];
+    char databaseDir[STRING_SIZE];
     char deviceUUID[STRING_SIZE];
 
     upnp::cConfig config;
@@ -104,6 +104,8 @@ private:
     int ifaceCount;
 
     upnp::StringVector ifaceVector;
+    static std::string parsedArgs;
+
 };
 
 #endif /* SETUP_H_ */

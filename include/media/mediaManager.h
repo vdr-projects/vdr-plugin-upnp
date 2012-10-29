@@ -58,7 +58,7 @@ public:
   virtual ~cMediaManager();
 
   void SetPluginDirectory(const string& directory);
-  void SetDatabaseFile(const string& file);
+  void SetDatabaseDir(const string& file);
 
   bool Initialise();
 

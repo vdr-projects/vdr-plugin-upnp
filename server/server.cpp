@@ -209,8 +209,8 @@ bool cMediaServer::Initialize(){
     if(mCurrentConfiguration.webServerPort)
       mWebserver->SetListenerPort(mCurrentConfiguration.webServerPort);
 
-    if(!mCurrentConfiguration.databaseFile.empty())
-      mMediaManager->SetDatabaseFile(mCurrentConfiguration.databaseFile);
+    if(!mCurrentConfiguration.databaseDir.empty())
+      mMediaManager->SetDatabaseDir(mCurrentConfiguration.databaseDir);
   }
 
   ret = UpnpSetMaxContentLength(GetMaxContentLength());
