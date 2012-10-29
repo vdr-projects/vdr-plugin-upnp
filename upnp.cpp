@@ -26,17 +26,12 @@ cPluginUpnp::~cPluginUpnp()
 
 const char *cPluginUpnp::CommandLineHelp(void)
 {
-  // Return a string that describes all known command line options.
-  std::stringstream ss;
-
-  ss  << "  The UPnP/DLNA server is designed to detect everything automatically.\n"
-      << "  Therefore the user is not required to change most of the settings.\n"
-      << "  \n"
-      << "  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
-      << "                                                where the the database\n"
-      << "                                                file shall be located.\n";
-
-  return ss.str().c_str();
+  return "  The UPnP/DLNA server is designed to detect everything automatically.\n"
+         "  Therefore the user is not required to change most of the settings.\n"
+         "  \n"
+         "  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
+         "                                                where the the database\n"
+         "                                                file shall be located.\n";
 }
 
 bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
