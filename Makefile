@@ -9,50 +9,25 @@
 # IMPORTANT: the presence of this macro is important for the Make.config
 # file. So it must be defined, even if it is not used here!
 #
-PLUGIN = upnp
 
-### The version number of this plugin (taken from the main source file):
+### our common config
 
-VERSION = $(shell grep 'static const char \*VERSION *=' $(PLUGIN).h | awk '{ print $$6 }' | sed -e 's/[";]//g')
-
-### The C++ compiler and options:
-
-CXX      ?= g++
-ECPPC	 ?= ecppc
-CXXFLAGS ?= -g -O3 -Wall -Werror=overloaded-virtual -Wno-parentheses
-
-### The directory environment:
-
-VDRDIR ?= ../../..
-LIBDIR ?= ../../lib
-TMPDIR ?= /tmp
-
-PLUGINDIR= ./PLUGINS
-PLUGINLIBDIR= /usr/lib/vdr/plugins/upnp
+-include Make.config
 
 ### Make sure that necessary options are included:
 
-include $(VDRDIR)/Make.global
+-include $(VDRDIR)/Make.global
 
-### Allow user defined options to overwrite defaults:
+### Allow user defined VDR options to overwrite defaults:
 
 -include $(VDRDIR)/Make.config
 
-### The version number of VDR's plugin API (taken from VDR's "config.h"):
-
-APIVERSION = $(shell sed -ne '/define APIVERSION/s/^.*"\(.*\)".*$$/\1/p' $(VDRDIR)/config.h)
+SUBPLUGDIR ?= ./plugins
 
 ### The name of the distribution archive:
 
 ARCHIVE = $(PLUGIN)-$(VERSION)
 PACKAGE = vdr-$(ARCHIVE)
-
-### Includes and Defines (add further entries here):
-
-INCLUDES += -I$(VDRDIR)/include
-
-DEFINES += -D_GNU_SOURCE -DPLUGIN_NAME_I18N='"$(PLUGIN)"'
-DEFINES += -DPLUGINDIR=\"$(PLUGINLIBDIR)\"
 
 ### The object files (add further files here):
 
@@ -79,6 +54,7 @@ OBJS = 	$(PLUGIN).o \
 		$(TNTOBJ)
 		
 LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl
+
 
 ### The main target:
 
@@ -132,13 +108,36 @@ libvdr-$(PLUGIN).so: $(OBJS)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -rdynamic -shared $(OBJS) $(LIBS) -o $@
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
+install: all
+	@mkdir -p $(VDRPLUGINLIBDIR)
+	@mkdir -p $(VDRCFGDIR)
+#	@mkdir -p $(VDRRESDIR)
+	install -m 755 -o root -g root $(PRESTRIP) $(LIBDIR)/libvdr-$(PLUGIN).so.$(APIVERSION) $(VDRPLUGINLIBDIR)
+	cp --remove-destination --recursive httpdocs $(VDRCFGDIR)
+
+uninstall:
+	rm --recursive $(VDRPLUGINLIBDIR)/libvdr-$(PLUGIN).so.$(APIVERSION)
+#	rm --recursive $(VDRCFGDIR)/httpdocs
+
 dist: $(I18Npo) clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@mkdir $(TMPDIR)/$(ARCHIVE)
 	@cp -a * $(TMPDIR)/$(ARCHIVE)
-	@tar czf $(PACKAGE).tgz -C $(TMPDIR) --exclude debian --exclude CVS --exclude .svn $(ARCHIVE)
+	@tar czf $(PACKAGE).tgz -C $(TMPDIR) --exclude debian --exclude CVS --exclude .svn --exclude .git --exclude .gitignore $(ARCHIVE)
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@echo Distribution package created as $(PACKAGE).tgz
 
 clean:
 	@-rm -f $(OBJS) $(DEPFILE) *.so *.so.$(APIVERSION) *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
+
+clean-subplugins:
+	@for i in `ls -A -I ".*" $(SUBPLUGDIR)`; do for j in `ls -A -I ".*" $(SUBPLUGDIR)/$$i`; do $(MAKE) -f ../../../Makefile.plugins -C "$(SUBPLUGDIR)/$$i/$$j" clean; done; done
+
+subplugins:
+	@for i in `ls -A -I ".*" $(SUBPLUGDIR)`; do for j in `ls -A -I ".*" $(SUBPLUGDIR)/$$i`; do $(MAKE) -f ../../../Makefile.plugins -C "$(SUBPLUGDIR)/$$i/$$j" all || exit 1; done; done
+
+install-subplugins:
+	@for i in `ls -A -I ".*" $(SUBPLUGDIR)`; do for j in `ls -A -I ".*" $(SUBPLUGDIR)/$$i`; do $(MAKE) -f ../../../Makefile.plugins -C "$(SUBPLUGDIR)/$$i/$$j" install || exit 1; done; done
+
+uninstall-subplugins:
+	@for i in `ls -A -I ".*" $(SUBPLUGDIR)`; do for j in `ls -A -I ".*" $(SUBPLUGDIR)/$$i`; do $(MAKE) -f ../../../Makefile.plugins -C "$(SUBPLUGDIR)/$$i/$$j" uninstall; done; done
