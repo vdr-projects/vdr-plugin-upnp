@@ -11,18 +11,11 @@ int resourceID = 0;
 #include "../include/media/mediaManager.h"
 #include "../include/server.h"
 
-#include <tnt/httpreply.h>
-#include <tnt/httprequest.h>
-#include <tnt/http.h>
-
 using namespace upnp;
 </%pre>
 <%request>
   boost::shared_ptr<cResourceStreamer> streamer;
 </%request>
-<#
-int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string objectID, int resourceID) {
-#>
 <%cpp>
   if(objectID.empty()){
     reply.out() << "Object ID missing";
@@ -92,6 +85,7 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
       codeText = "Partial Content";
     }
 
+    reply.setKeepAliveTimeout(60000);
     reply.setDirectMode(code, codeText.c_str());
 
     size_t bytesRead = 0;
@@ -109,6 +103,3 @@ int doRequest(tnt::HttpReply reply, tnt::HttpRequest request, std::string object
   reply.out() << std::flush;
   return code;
 </%cpp>
-<#
-}
-#>
