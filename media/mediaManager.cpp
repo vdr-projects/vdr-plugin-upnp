@@ -425,11 +425,11 @@ int cMediaManager::Browse(BrowseRequest& request){
 
   cSortCriteria::SortCriteriaList list = cSortCriteria::parse(request.sortCriteria);
   if(!list.empty()){
-    metadata << " ORDER BY ";
+    metadata << " ORDER BY `";
     upnp::cSortCriteria::SortCriteriaList::iterator it = list.begin();
-    metadata << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
+    metadata << (*it).property << "` " << ((*it).sortDescending ? "DESC" : "ASC");
     for(++it; it != list.end(); ++it){
-      metadata << ", " << (*it).property << " " << ((*it).sortDescending ? "DESC" : "ASC");
+      metadata << ", `" << (*it).property << "` " << ((*it).sortDescending ? "DESC" : "ASC");
     }
   }
 

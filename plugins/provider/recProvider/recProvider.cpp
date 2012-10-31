@@ -258,12 +258,30 @@ public:
   }
 
   virtual void Action(){
+    int state = 0;
+    time_t now;
+    bool update = false;
     while(Running()){
-      int state = 0;
-      if(Recordings.NeedsUpdate() || Recordings.StateChanged(state)){
+      update = false;
+
+      if(Recordings.NeedsUpdate()){
+        update = true;
+      } else if(Recordings.StateChanged(state)){
+        now = time(NULL);
+        for(cRecording* rec = Recordings.First(); rec; rec = Recordings.Next(rec)){
+          struct stat st;
+          if (lstat(rec->FileName(), &st) == 0) {
+            if(now < st.st_mtime){
+              update = true;
+            }
+          }
+        }
+      }
+
+      if(update){
         OnContainerUpdate(GetRootContainer(), GetContainerUpdateId(GetRootContainer()));
       }
-      sleep(100);
+      sleep(10);
     }
   }
 
