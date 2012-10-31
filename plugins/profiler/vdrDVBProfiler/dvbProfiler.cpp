@@ -73,7 +73,6 @@ private:
 
     metadata.SetObjectIDByUri(uri);
     metadata.SetParentIDByUri(fs);
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.item.videoItem.videoBroadcast")));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
     metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(info->Title()?info->Title():recording->Title())));
@@ -122,32 +121,75 @@ private:
 
     // TODO: implement check for radio stations
     DLNA4thField fourthfield;
-    switch (parser.Vtype()) {
-      case 0x02:
-        fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_RANGE,
-                                   DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
-                                   DLNA_FLAG_STREAMING_TRANSFER |
-                                   DLNA_FLAG_BYTE_BASED_SEEK |
-                                   DLNA_FLAG_BACKGROUND_TRANSFER |
-                                   DLNA_FLAG_CONNECTION_STALLING |
-                                   DLNA_FLAG_VERSION_1_5 );
-        break;
-      case 0x1B:
-        fourthfield = DLNA4thField("AVC_TS_HD_EU_ISO", DLNA_OPERATION_RANGE,
-                                   DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
-                                   DLNA_FLAG_STREAMING_TRANSFER |
-                                   DLNA_FLAG_BYTE_BASED_SEEK |
-                                   DLNA_FLAG_BACKGROUND_TRANSFER |
-                                   DLNA_FLAG_CONNECTION_STALLING |
-                                   DLNA_FLAG_VERSION_1_5 );
-        break;
-      default:
-        return false;
-    }
+    string contentType, upnpclass;
+    if(parser.Vtype() != 0){
+      switch (parser.Vtype()) {
+        case 0x02:
+          fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_RANGE,
+                                     DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                     DLNA_FLAG_STREAMING_TRANSFER |
+                                     DLNA_FLAG_BYTE_BASED_SEEK |
+                                     DLNA_FLAG_BACKGROUND_TRANSFER |
+                                     DLNA_FLAG_CONNECTION_STALLING |
+                                     DLNA_FLAG_VERSION_1_5 );
+          break;
+        case 0x1B:
+          fourthfield = DLNA4thField("AVC_TS_HD_EU_ISO", DLNA_OPERATION_RANGE,
+                                     DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                     DLNA_FLAG_STREAMING_TRANSFER |
+                                     DLNA_FLAG_BYTE_BASED_SEEK |
+                                     DLNA_FLAG_BACKGROUND_TRANSFER |
+                                     DLNA_FLAG_CONNECTION_STALLING |
+                                     DLNA_FLAG_VERSION_1_5 );
+          break;
+        default:
+          return false;
+      }
+      contentType = "video/mpeg";
+      upnpclass = "object.item.videoItem.videoBroadcast";
+    } else {
+      int Atype = 0;
+      for(int i = 0; (Atype = parser.Atype(i)) != 0; ++i){
+        switch(Atype){
+        case 0x03:
+        case 0x04:
+#ifdef DLNA_STRICT
+          fourthfield = DLNA4thField("MP2_MPS", DLNA_OPERATION_RANGE,
+                                     DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                     DLNA_FLAG_STREAMING_TRANSFER |
+                                     DLNA_FLAG_BYTE_BASED_SEEK |
+                                     DLNA_FLAG_BACKGROUND_TRANSFER |
+                                     DLNA_FLAG_CONNECTION_STALLING |
+                                     DLNA_FLAG_VERSION_1_5 );
+          contentType = "audio/mpeg";
+          upnpclass = "object.item.audioItem.audioBroadcast";
+#else
+          fourthfield = DLNA4thField("MPEG_TS_SD_EU_ISO", DLNA_OPERATION_RANGE,
+                                     DLNA_PLAYSPEEDS_NONE, DLNA_CONVERSION_NONE,
+                                     DLNA_FLAG_STREAMING_TRANSFER |
+                                     DLNA_FLAG_BYTE_BASED_SEEK |
+                                     DLNA_FLAG_BACKGROUND_TRANSFER |
+                                     DLNA_FLAG_CONNECTION_STALLING |
+                                     DLNA_FLAG_VERSION_1_5 );
+          contentType = "video/mpeg";
+          upnpclass = "object.item.videoItem.videoBroadcast";
+#endif
+          goto validProfile;
+        default:
+          break;
+        }
+      }
 
+      // No compatible audio codec found.
+      return false;
+    }
+    // Found a valid profile
+    validProfile:
+
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, upnpclass));
+    resource.SetProtocolInfo(ProtocolInfo(contentType, fourthfield).ToString());
     resource.SetSize(size);
     resource.SetResourceUri(u);
-    resource.SetProtocolInfo(ProtocolInfo("video/mpeg", fourthfield).ToString());
 
     int seconds = 0;
     const cEvent* event = info->GetEvent();

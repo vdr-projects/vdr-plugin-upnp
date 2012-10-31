@@ -747,15 +747,13 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
     string schema = uri.substr(0, uri.find_first_of(':',0));
     for(cPluginManager::ProfilerList::iterator it = profilers.begin(); it != profilers.end(); ++it){
       if((*it)->CanHandleSchema(schema)){
-        if(!(*it)->GetMetadata(uri, metadata) || !RefreshObject(metadata)){
-          isyslog("UPnP\tUnable to save the metadata of '%s'", uri.c_str());
-          return false;
-        } else {
+        if((*it)->GetMetadata(uri, metadata) && RefreshObject(metadata)){
           return true;
         }
       }
     }
 
+    isyslog("UPnP\tUnsupported resource: '%s' skipped.", uri.c_str());
     return false;
 
   } else {
