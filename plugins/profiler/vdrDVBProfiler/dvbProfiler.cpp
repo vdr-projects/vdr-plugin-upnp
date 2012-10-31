@@ -71,7 +71,7 @@ private:
 
     const cRecordingInfo* info = recording->Info();
 
-    metadata.SetObjectIDByUri(uri);
+    metadata.SetObjectIDByUri(u);
     metadata.SetParentIDByUri(fs);
     metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
