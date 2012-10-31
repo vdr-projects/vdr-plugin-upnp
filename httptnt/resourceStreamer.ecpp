@@ -85,6 +85,7 @@ using namespace upnp;
       codeText = "Partial Content";
     }
 
+    // DLNA requires KeepAlive timeout of 60s.
     reply.setKeepAliveTimeout(60000);
     reply.setDirectMode(code, codeText.c_str());
 

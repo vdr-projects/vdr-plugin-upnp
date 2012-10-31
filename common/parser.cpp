@@ -37,14 +37,14 @@ struct cProperties : sp::symbols<const char*> {
   //struct cProperties : symbols<> {
   cProperties(){
     add
-    (property::object::KEY_TITLE, "title")
-    (property::object::KEY_CREATOR, "creator")
-    (property::object::KEY_DESCRIPTION, "description")
-    (property::object::KEY_LONG_DESCRIPTION, "longDescription")
-    (property::object::KEY_CLASS, "class")
-    (property::object::KEY_DATE, "date")
-    (property::object::KEY_LANGUAGE, "language")
-    (property::resource::KEY_PROTOCOL_INFO, "protocolInfo")
+    (property::object::KEY_TITLE, property::object::KEY_TITLE)
+    (property::object::KEY_CREATOR, property::object::KEY_CREATOR)
+    (property::object::KEY_DESCRIPTION, property::object::KEY_DESCRIPTION)
+    (property::object::KEY_LONG_DESCRIPTION, property::object::KEY_LONG_DESCRIPTION)
+    (property::object::KEY_CLASS, property::object::KEY_CLASS)
+    (property::object::KEY_DATE, property::object::KEY_DATE)
+    (property::object::KEY_LANGUAGE, property::object::KEY_LANGUAGE)
+    (property::resource::KEY_PROTOCOL_INFO, property::resource::KEY_PROTOCOL_INFO)
     ;
   }
 } Properties;
