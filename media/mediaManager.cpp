@@ -305,22 +305,28 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
         ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, objectID);
         ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_PARENTID, row.getString(property::object::KEY_PARENTID));
         ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_RESTRICTED, row.getString(property::object::KEY_RESTRICTED));
-        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_TITLE, row.getString(property::object::KEY_TITLE).substr(0, MAX_METADATA_LENGTH_S));
+
+        string title = row.getString(property::object::KEY_TITLE).substr(0, MAX_METADATA_LENGTH_S);
+        ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_TITLE, ixml::XmlEscapeSpecialChars(title));
         ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_CLASS, row.getString(property::object::KEY_CLASS).substr(0, MAX_METADATA_LENGTH_S));
 
         if(isContainer){
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHILD_COUNT, row.getString(property::object::KEY_CHILD_COUNT));
         }
         else {
+          string channelName = row.getString(property::object::KEY_CHANNEL_NAME);
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NR, row.getString(property::object::KEY_CHANNEL_NR));
-          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, row.getString(property::object::KEY_CHANNEL_NAME));
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, ixml::XmlEscapeSpecialChars(channelName));
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_START, row.getString(property::object::KEY_SCHEDULED_START));
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_END, row.getString(property::object::KEY_SCHEDULED_END));
         }
 
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CREATOR, row.getString(property::object::KEY_CREATOR));
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DESCRIPTION, row.getString(property::object::KEY_DESCRIPTION));
-        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LONG_DESCRIPTION, row.getString(property::object::KEY_LONG_DESCRIPTION));
+        string creator = row.getString(property::object::KEY_CREATOR);
+        string description = row.getString(property::object::KEY_DESCRIPTION);
+        string longDescription = row.getString(property::object::KEY_LONG_DESCRIPTION);
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CREATOR, ixml::XmlEscapeSpecialChars(creator));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DESCRIPTION, ixml::XmlEscapeSpecialChars(description));
+        ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LONG_DESCRIPTION, ixml::XmlEscapeSpecialChars(longDescription));
         ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_DATE, row.getString(property::object::KEY_DATE));
         ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_LANGUAGE, row.getString(property::object::KEY_LANGUAGE));
 

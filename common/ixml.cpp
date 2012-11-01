@@ -11,7 +11,7 @@ namespace upnp {
 
 namespace ixml {
 
-void XmlEscapeSpecialChars(string& doc){
+string& XmlEscapeSpecialChars(string& doc){
     std::string buffer;
 
     buffer.reserve(doc.size()*1.1);
@@ -121,6 +121,8 @@ void XmlEscapeSpecialChars(string& doc){
     }
 
     doc.swap(buffer);
+
+    return doc;
 }
 
 //Function copied from Intel SDK

@@ -18,7 +18,7 @@ namespace upnp {
 
 namespace ixml {
 
-  void XmlEscapeSpecialChars(string& doc);
+  string& XmlEscapeSpecialChars(string& doc);
   /**
    * First occurance of item
    *
