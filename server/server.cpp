@@ -8,6 +8,8 @@
 #include <vdr/tools.h>
 #include <string>
 #include <sstream>
+#include <boost/algorithm/string.hpp>
+#include <unistd.h>
 #include "../include/server.h"
 #include "../include/service.h"
 #include "../include/webserver.h"
@@ -25,7 +27,7 @@ cMediaServer* cMediaServer::GetInstance(){
 
 cMediaServer::cMediaServer()
 : mServerDescription("VDR UPnP/DLNA MS", "Denis Loh", "http://upnp.vdr-developer.org",
-                     DESCRIPTION, "VDR UPnP-DLNA MS", VERSION,
+                     tr(DESCRIPTION), "VDR UPnP-DLNA MS", VERSION,
                      "http://projects.vdr-developer.org/projects/plg-upnp/files", VERSION,
                      "deviceDescription.xml")
 , mDeviceHandle(0)
@@ -34,6 +36,14 @@ cMediaServer::cMediaServer()
 , mWebserver(NULL)
 , mMediaManager(NULL)
 {
+  char tmp[255];
+
+  if (gethostname(tmp, sizeof(tmp)) == 0) {
+    string name = tmp;
+    boost::to_upper(name);
+    mServerDescription.friendlyName = name + ": " + mServerDescription.friendlyName;
+  }
+
   mServerIcons.push_back(ServerIcon(image::DLNA_ICON_PNG_SM_24A, "images/upnpIconSm.png"));
   mServerIcons.push_back(ServerIcon(image::DLNA_ICON_PNG_LRG_24A, "images/upnpIconLrg.png"));
   mServerIcons.push_back(ServerIcon(image::DLNA_ICON_JPEG_SM_24, "images/upnpIconSm.jpeg"));

@@ -14,7 +14,7 @@
 using namespace upnp;
 
 static const char *VERSION        = "1.0.0";
-static const char *DESCRIPTION    = "UPnP/DLNA compliant Media Server functionality for VDR";
+static const char *DESCRIPTION    = trNOOP("UPnP/DLNA compliant Media Server functionality for VDR");
 
 class cPluginUpnp : public cPlugin {
 private:
@@ -24,7 +24,7 @@ public:
   cPluginUpnp(void);
   virtual ~cPluginUpnp();
   virtual const char *Version(void) { return VERSION; }
-  virtual const char *Description(void) { return DESCRIPTION; }
+  virtual const char *Description(void) { return tr(DESCRIPTION); }
   virtual const char *CommandLineHelp(void);
   virtual bool ProcessArgs(int argc, char *argv[]);
   virtual bool Initialize(void);

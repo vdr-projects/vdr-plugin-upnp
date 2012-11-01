@@ -1,6 +1,15 @@
 VDR Plugin 'upnp' Revision History
 ----------------------------------
 
+ - New: Initial support for audio recordings, i.e. recordings from radio
+        stations. Live radio stations will follow very soon.
+ - Fix: SortCriteria should work now.
+ - New: Added some makefile tweaks.
+        Thanks to Rolf Ahrenberg
+ - New: Added Finnish translation.
+        Thanks to Rolf Ahrenberg
+ - New: Added hostname to friendlyName of the server.
+        Thanks to Rolf Ahrenberg
  - New: Makefiles reviewed and almost completely rewritten to avoid
         redundancies.
         Thanks to Lucian Muresan

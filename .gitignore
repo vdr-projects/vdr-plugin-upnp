@@ -18,6 +18,8 @@ libvdr-upnp.so*
 *.exe
 *.o
 *.so
+po/*.pot
+po/*.mo
 
 # Packages #
 ############

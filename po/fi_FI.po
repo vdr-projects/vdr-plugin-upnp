@@ -1,0 +1,212 @@
+# VDR plugin language source file.
+# Copyright (C) 2012
+# This file is distributed under the same license as the upnp package.
+# Rolf Ahrenberg, 2012
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: vdr-upnp 1.0.0\n"
+"Report-Msgid-Bugs-To: <see README>\n"
+"POT-Creation-Date: 2012-10-31 10:31+0200\n"
+"PO-Revision-Date: 2012-10-31 10:31+0200\n"
+"Last-Translator: Rolf Ahrenberg\n"
+"Language-Team: Finnish <vdr@linuxtv.org>\n"
+"Language: fi\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+msgid "UPnP/DLNA compliant Media Server functionality for VDR"
+msgstr "UPnP/DLNA-mediapalvelin VDR:lle"
+
+msgid "Invalid action"
+msgstr ""
+
+msgid "Invalid args"
+msgstr ""
+
+msgid "Invalid var"
+msgstr ""
+
+msgid "Action failed"
+msgstr ""
+
+msgid "Argument value invalid"
+msgstr ""
+
+msgid "Argument value out of range"
+msgstr ""
+
+msgid "Optional action not implemented"
+msgstr ""
+
+msgid "Out of memory"
+msgstr ""
+
+msgid "Human intervention required"
+msgstr ""
+
+msgid "String argument to long"
+msgstr ""
+
+msgid "Action not authorized"
+msgstr ""
+
+msgid "Signature failure"
+msgstr ""
+
+msgid "Signature missing"
+msgstr ""
+
+msgid "Not encrypted"
+msgstr ""
+
+msgid "Invalid sequence"
+msgstr ""
+
+msgid "Invalid control URL"
+msgstr ""
+
+msgid "No such session"
+msgstr ""
+
+msgid "Unknown error code. Contact the device manufacturer"
+msgstr ""
+
+msgid "Incompatible protocol info"
+msgstr ""
+
+msgid "Incompatible directions"
+msgstr ""
+
+msgid "Insufficient network resources"
+msgstr ""
+
+msgid "Local restrictions"
+msgstr ""
+
+msgid "Access denied"
+msgstr ""
+
+msgid "Invalid connection reference"
+msgstr ""
+
+msgid "Not in network"
+msgstr ""
+
+msgid "Bad metadata"
+msgstr ""
+
+msgid "Cannot process the request"
+msgstr ""
+
+msgid "Destination resource access denied"
+msgstr ""
+
+msgid "Invalid current tag"
+msgstr ""
+
+msgid "Invalid new tag"
+msgstr ""
+
+msgid "Invalid or unsupported search criteria"
+msgstr ""
+
+msgid "Invalid or unsupported sort criteria"
+msgstr ""
+
+msgid "No such container"
+msgstr ""
+
+msgid "No such destination resource"
+msgstr ""
+
+msgid "No such file transfer"
+msgstr ""
+
+msgid "No such objectID"
+msgstr ""
+
+msgid "No such source resource"
+msgstr ""
+
+msgid "Parameter mismatch"
+msgstr ""
+
+msgid "Read only tag"
+msgstr ""
+
+msgid "Required tag"
+msgstr ""
+
+msgid "Resource access denied"
+msgstr ""
+
+msgid "Restricted object"
+msgstr ""
+
+msgid "Restricted parent"
+msgstr ""
+
+msgid "Transfer busy"
+msgstr ""
+
+msgid "Enable UPnP server"
+msgstr "UPnP-palvelin"
+
+msgid "disabled"
+msgstr "ei käytössä"
+
+msgid "enabled"
+msgstr "käytössä"
+
+msgid "Use expert settings"
+msgstr "Näytä lisäasetukset"
+
+msgid "Webserver root directory"
+msgstr "Web-palvelimen juurihakemisto"
+
+msgid "Webserver port (0=auto)"
+msgstr "Web-palvelimen portti (0=auto)"
+
+msgid "Presentation URL"
+msgstr "Esitys-URL"
+
+msgid "Use \"live\" plugin for presentation"
+msgstr "Käytä \"live\"-laajennosta esityksiin"
+
+msgid "Live webserver port (0=auto)"
+msgstr "Live-laajennoksen portti (0=auto)"
+
+msgid "Generate new device UUID"
+msgstr "Luo uusi UUID laitteelle"
+
+msgid "Current device UUID"
+msgstr "Nykyinen laitteen UUID"
+
+msgid "Max. content length of SOAP Messages"
+msgstr "SOAP-viestien suurin pituus"
+
+msgid "Max. age of UPnP announcements"
+msgstr "UPnP-ilmoitusten suurin kestoaika"
+
+msgid "Bind UPnP server to "
+msgstr "Sido UPnP-palvelin"
+
+msgid "interface"
+msgstr "sovittimeen"
+
+msgid "address"
+msgstr "osoitteeseen"
+
+msgid "Set IP address"
+msgstr "Aseta IP-osoite"
+
+msgid "Set network interface"
+msgstr "Aseta verkkosovitin"
+
+msgid "UPnP server port (0=auto)"
+msgstr "UPnP-palvelimen portti (0=auto)"
+
+msgid "Path to database file"
+msgstr "Tiedostopolku tietokannalle"
