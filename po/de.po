@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-upnp 1.0.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-11-01 16:37+0100\n"
+"POT-Creation-Date: 2012-11-01 19:47+0200\n"
 "PO-Revision-Date: 2012-11-01 16:04+0100\n"
 "Last-Translator: Denis Loh <denis.loh@web.de>\n"
 "Language-Team: German\n"
@@ -181,6 +181,9 @@ msgstr "aktiv"
 msgid "Use expert settings"
 msgstr "Experteneinstellungen"
 
+msgid "Webserver settings"
+msgstr ""
+
 msgid "Webserver root directory"
 msgstr "Webserverwurzelverzeichnis"
 
@@ -195,6 +198,9 @@ msgstr "\"Live\"-Plugin als Webseite verwenden"
 
 msgid "Live webserver port (0=auto)"
 msgstr "Webserver port des Live-Plugins (0=auto)"
+
+msgid "UPnP server settings"
+msgstr ""
 
 msgid "Generate new device UUID"
 msgstr "Neue Geräte-UUID generieren"
@@ -225,6 +231,9 @@ msgstr "Netzwerkkarte einstellen"
 
 msgid "UPnP server port (0=auto)"
 msgstr "UPnP Serverport (0=auto)"
+
+msgid "Database settings"
+msgstr ""
 
 msgid "Path to database file"
 msgstr "Pfad zur Datenbankdatei"

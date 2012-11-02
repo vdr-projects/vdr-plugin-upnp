@@ -30,7 +30,7 @@ void cMenuSetupUPnP::Update(){
   Add(new cMenuEditBoolItem(tr("Use expert settings"),&switchExpertSettings));
   if(switchExpertSettings){
 
-    cOsdItem *wsCat = new cOsdItem("--- Webserver settings -------------------------------------------------------");
+    cOsdItem *wsCat = new cOsdItem(cString::sprintf("--- %s ---", tr("Webserver settings")));
     wsCat->SetSelectable(false);
     Add(wsCat);
 
@@ -45,7 +45,7 @@ void cMenuSetupUPnP::Update(){
       Add(new cMenuEditIntItem(tr("Live webserver port (0=auto)"), &lvport, 0, 65536));
     }
 
-    cOsdItem *usCat = new cOsdItem("--- UPnP server settings -----------------------------------------------------");
+    cOsdItem *usCat = new cOsdItem(cString::sprintf("--- %s ---", tr("UPnP server settings")));
     usCat->SetSelectable(false);
     Add(usCat);
 
@@ -67,7 +67,7 @@ void cMenuSetupUPnP::Update(){
     }
     Add(new cMenuEditIntItem(tr("UPnP server port (0=auto)"), &upnpport, 0, 65536));
 
-    cOsdItem *dbCat = new cOsdItem("--- Database settings --------------------------------------------------------");
+    cOsdItem *dbCat = new cOsdItem(cString::sprintf("--- %s ---", tr("Database settings")));
     dbCat->SetSelectable(false);
     Add(dbCat);
 

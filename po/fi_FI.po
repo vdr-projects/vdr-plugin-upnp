@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-upnp 1.0.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-10-31 10:31+0200\n"
+"POT-Creation-Date: 2012-11-01 19:47+0200\n"
 "PO-Revision-Date: 2012-10-31 10:31+0200\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: Finnish <vdr@linuxtv.org>\n"
@@ -18,6 +18,15 @@ msgstr ""
 
 msgid "UPnP/DLNA compliant Media Server functionality for VDR"
 msgstr "UPnP/DLNA-mediapalvelin VDR:lle"
+
+msgid ""
+"  The UPnP/DLNA server is designed to detect everything automatically.\n"
+"  Therefore the user is not required to change most of the settings.\n"
+"  \n"
+"  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
+"                                                where the the database\n"
+"                                                file shall be located.\n"
+msgstr ""
 
 msgid "Invalid action"
 msgstr ""
@@ -163,6 +172,9 @@ msgstr "käytössä"
 msgid "Use expert settings"
 msgstr "Näytä lisäasetukset"
 
+msgid "Webserver settings"
+msgstr "Web-palvelimen asetukset"
+
 msgid "Webserver root directory"
 msgstr "Web-palvelimen juurihakemisto"
 
@@ -177,6 +189,9 @@ msgstr "Käytä \"live\"-laajennosta esityksiin"
 
 msgid "Live webserver port (0=auto)"
 msgstr "Live-laajennoksen portti (0=auto)"
+
+msgid "UPnP server settings"
+msgstr "UPnP-palvelimen asetukset"
 
 msgid "Generate new device UUID"
 msgstr "Luo uusi UUID laitteelle"
@@ -207,6 +222,9 @@ msgstr "Aseta verkkosovitin"
 
 msgid "UPnP server port (0=auto)"
 msgstr "UPnP-palvelimen portti (0=auto)"
+
+msgid "Database settings"
+msgstr "Tietokanta-asetukset"
 
 msgid "Path to database file"
 msgstr "Tiedostopolku tietokannalle"

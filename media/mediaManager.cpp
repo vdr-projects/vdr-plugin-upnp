@@ -382,7 +382,7 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
         ++request.numberReturned;
       }
 
-      request.result = ixmlDocumenttoString(DIDLDoc);
+      request.result = ixmlNodetoString((IXML_Node*)DIDLDoc);
 
       ixmlDocument_free(DIDLDoc);
       return UPNP_E_SUCCESS;
