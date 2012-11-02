@@ -182,7 +182,7 @@ msgid "Use expert settings"
 msgstr "Experteneinstellungen"
 
 msgid "Webserver settings"
-msgstr ""
+msgstr "Webservereinstellungen"
 
 msgid "Webserver root directory"
 msgstr "Webserverwurzelverzeichnis"
@@ -200,7 +200,7 @@ msgid "Live webserver port (0=auto)"
 msgstr "Webserver port des Live-Plugins (0=auto)"
 
 msgid "UPnP server settings"
-msgstr ""
+msgstr "UPnP-Servereinstellungen"
 
 msgid "Generate new device UUID"
 msgstr "Neue Geräte-UUID generieren"
@@ -233,7 +233,7 @@ msgid "UPnP server port (0=auto)"
 msgstr "UPnP Serverport (0=auto)"
 
 msgid "Database settings"
-msgstr ""
+msgstr "Datenbankeinstellungen"
 
 msgid "Path to database file"
 msgstr "Pfad zur Datenbankdatei"
