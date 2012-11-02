@@ -119,7 +119,6 @@ private:
       fclose(fd);
     }
 
-    // TODO: implement check for radio stations
     DLNA4thField fourthfield;
     string contentType, upnpclass;
     if(parser.Vtype() != 0){

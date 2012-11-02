@@ -41,7 +41,7 @@ cMediaServer::cMediaServer()
   if (gethostname(tmp, sizeof(tmp)) == 0) {
     string name = tmp;
     boost::to_upper(name);
-    mServerDescription.friendlyName = name + ": " + mServerDescription.friendlyName;
+    mServerDescription.friendlyName = name + " - " + mServerDescription.friendlyName;
   }
 
   mServerIcons.push_back(ServerIcon(image::DLNA_ICON_PNG_SM_24A, "images/upnpIconSm.png"));
