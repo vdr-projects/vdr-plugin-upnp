@@ -776,31 +776,61 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
     }
 
     StringList entries = provider->GetContainerEntries(uri);
-    stringstream ss, uristrm;
+    stringstream ss;
 
-    ss << "DELETE FROM " << db::Metadata << " WHERE "
-       << " `" << property::object::KEY_PARENTID << "`"
-       << " = '" << tools::GenerateUUIDFromURL(uri) << "'";
+    ss << "SELECT `" << property::object::KEY_OBJECTID << "` FROM " << db::Metadata
+       << " WHERE `" << property::object::KEY_PARENTID << "` = :parentID";
 
-    for(StringList::iterator it = entries.begin(); it != entries.end(); ++it){
-      uristrm.str(string());
-      uristrm << uri << *it;
-      ss << " AND"
-         << " `" << property::object::KEY_OBJECTID << "`"
-         << " != '" << tools::GenerateUUIDFromURL(uristrm.str()) << "'";
-    }
+    StringList intersection;
 
     try {
       tntdb::Statement objects = connection.prepare(ss.str());
+      objects.setString("parentID", tools::GenerateUUIDFromURL(uri));
 
-      objects.execute();
+      StringList::iterator rit;
+      string deletableID, entryID;
+      for(tntdb::Statement::const_iterator dit = objects.begin(); dit != objects.end(); ++dit){
+        tntdb::Row row = (*dit);
+        deletableID = row.getString(property::object::KEY_OBJECTID);
+        for(rit = entries.begin(); rit != entries.end(); ++rit){
+          entryID = tools::GenerateUUIDFromURL(uri + (*rit));
+          if(entryID.compare(deletableID) == 0) break;
+        }
+        if(rit == entries.end())
+          intersection.push_back(deletableID);
+      }
+
     } catch (const std::exception& e) {
-      esyslog("UPnP\tException occurred while removing old object in '%s' from database '%s': %s",
+      esyslog("UPnP\tException occurred while getting objects from '%s' from database '%s': %s",
           tools::GenerateUUIDFromURL(uri).c_str(), databaseFile.c_str(), e.what());
 
       return false;
     }
 
+    if(intersection.size() > 0){
+      ss.str(string());
+      ss << "DELETE FROM " << db::Metadata << " WHERE "
+         << " `" << property::object::KEY_PARENTID << "`"
+         << " = '" << tools::GenerateUUIDFromURL(uri) << "'";
+
+      for(StringList::iterator it = intersection.begin(); it != intersection.end(); ++it){
+        ss << " AND"
+           << " `" << property::object::KEY_OBJECTID << "`"
+           << " == '" << *it << "'";
+      }
+
+      try {
+        tntdb::Statement objects = connection.prepare(ss.str());
+        objects.execute();
+      } catch (const std::exception& e) {
+        esyslog("UPnP\tException occurred while removing old object in '%s' from database '%s': %s",
+            tools::GenerateUUIDFromURL(uri).c_str(), databaseFile.c_str(), e.what());
+
+        return false;
+      }
+    }
+
+    stringstream uristrm;
     for(StringList::iterator it = entries.begin(); it != entries.end(); ++it){
       uristrm.str(string());
       uristrm << uri << *it;
