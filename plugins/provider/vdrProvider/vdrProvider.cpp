@@ -160,7 +160,7 @@ public:
        << "PROG=cat;"
        << "DLNA_contentFeatures=" << protocolInfo
        << "/"
-       << uri.substr(6);
+       << uri.substr(uri.find_last_of('/')+1);
 
     return ss.str();
   }
