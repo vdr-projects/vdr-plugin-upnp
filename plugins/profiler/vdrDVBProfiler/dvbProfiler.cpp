@@ -13,6 +13,8 @@
 #include <vdr/epg.h>
 #include <vdr/tools.h>
 #include <vdr/remux.h>
+#include <vdr/config.h>
+#include <vdr/plugin.h>
 #include <plugin.h>
 #include <tools.h>
 #include <string>
@@ -25,8 +27,70 @@ using namespace std;
 
 namespace upnp {
 
+class ChannelTitle : public cListObject {
+private:
+  int channelNo;
+  string channelName;
+  string title;
+  string pattern;
+
+  void replaceAll(std::string& str, const std::string& from, const std::string& to) {
+      if(from.empty())
+          return;
+      size_t start_pos = 0;
+      while((start_pos = str.find(from, start_pos)) != std::string::npos) {
+          str.replace(start_pos, from.length(), to);
+          start_pos += to.length(); // In case 'to' contains 'from', like replacing 'x' with 'yx'
+      }
+  }
+public:
+  ChannelTitle()
+  : channelNo(-1)
+  , pattern("%chan% - %title%")
+  {}
+  void Clear(){
+    channelNo = -1;
+    channelName = string();
+    title = string();
+  }
+  void SetChannelNumber(int no){ channelNo = no; }
+  void SetChannelName(const string& name){ channelName = name; }
+  void SetTitle(const string& t){ title = t; }
+  string ToString(){
+    string output = pattern;
+    if(channelNo > 0)
+      replaceAll(output, "%no%", tools::ToString(channelNo));
+    else
+      replaceAll(output, "%no%", "");
+    if(!channelName.empty())
+      replaceAll(output, "%chan%", channelName);
+    else
+      replaceAll(output, "%chan%", "");
+    if(!title.empty())
+      replaceAll(output, "%title%", title);
+    else
+      replaceAll(output, "%title%", "");
+
+    return output;
+  }
+  bool Parse(const char* str){
+    if(!str || strcmp(str, "") == 0){
+      pattern = "%chan% - %title%";
+    } else {
+      pattern = str;
+    }
+    return true;
+  }
+};
+
 class DVBProfiler : public cMediaProfiler {
 public:
+  DVBProfiler(){
+    stringstream file;
+    file << cPlugin::ConfigDirectory(PLUGIN_NAME_I18N) << "/channelTitle.conf";
+    channelTitleConfig.Load(file.str().c_str(), true);
+  }
+
   virtual bool CanHandleSchema(const string& schema){
     if(schema.find("vdr",0) == 0 || schema.find("rec",0) == 0){
       return true;
@@ -44,6 +108,8 @@ public:
       return false;
     }
   }
+
+  ::cConfig<ChannelTitle> channelTitleConfig;
 
 private:
 
@@ -240,10 +306,6 @@ private:
 	    const cEvent* event = (schedule) ? schedule->GetPresentEvent() : NULL;
 
 	    if(event){
-	      stringstream title;
-	      title << channel->Name() << ": " << event->Title();
-	      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, title.str()));
-
 	      boost::posix_time::ptime startTime, endTime;
 	      startTime = boost::posix_time::from_time_t(event->StartTime());
 	      endTime = boost::posix_time::from_time_t(event->EndTime());
@@ -253,9 +315,24 @@ private:
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_END, boost::posix_time::to_iso_extended_string(endTime)));
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(event->ShortText()?event->ShortText():"")));
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(event->Description()?event->Description():"")));
-	    } else {
-	      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(channel->Name())));
 	    }
+
+      ChannelTitle* titleConfig = channelTitleConfig.First();
+      if(titleConfig){
+        titleConfig->Clear();
+        if(event)
+          titleConfig->SetTitle(event->Title());
+        titleConfig->SetChannelName(channel->Name());
+        titleConfig->SetChannelNumber(channel->Number());
+
+        metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, titleConfig->ToString()));
+      } else {
+        stringstream ss;
+        ss << channel->Name();
+        if(event)
+          ss << " - " << event->Title();
+        metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, ss.str()));
+      }
 
       cMetadata::Resource resource;
 

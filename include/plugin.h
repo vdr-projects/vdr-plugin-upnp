@@ -434,7 +434,6 @@ public:
   virtual void Close();
 
 protected:
-
   /**
    * Called whenever a container was changed.
    *
@@ -546,7 +545,7 @@ public:
    * false, if not.
    */
   virtual bool GetMetadata(const string& uri, cMetadata& metadata) = 0;
-protected:
+
 };
 
 }  // namespace upnp

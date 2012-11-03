@@ -45,7 +45,14 @@ using namespace upnp;
 
   if(contentLength > 0){
     reply.setContentLengthHeader(contentLength);
-    if(streamer->Seekable()) reply.setHeader("Accept-Ranges  ", "bytes");
+    if(streamer->Seekable()){
+      reply.setHeader("Accept-Ranges  ", "bytes");
+      if(request.hasHeader("getAvailableSeekRange.dlna.org:")){
+        std::stringstream availableRangeHeader;
+        availableRangeHeader << "0 bytes=0-" << contentLength;
+        reply.setHeader("availableSeekRange.dlna.org  ", availableRangeHeader.str());
+      }
+    }
 
     if(request.hasHeader("Range:")){
       std::string rangeRequest = request.getHeader("Range:");

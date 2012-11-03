@@ -34,6 +34,7 @@ namespace upnp {
 
   typedef std::list<std::string> StringList;
   typedef std::vector<std::string> StringVector;
+  typedef std::map<std::string, std::string> StringMap;
   typedef std::map<std::string, uint32_t> IdList;
 
 }
