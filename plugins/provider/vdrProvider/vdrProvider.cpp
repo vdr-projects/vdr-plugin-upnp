@@ -33,6 +33,20 @@ private:
     }
   }
 
+  int GetGroupByName(string name)
+  {
+    if(name.empty()) return -1;
+    int Idx = -1;
+    cChannel *channel = Channels.Get(++Idx);
+    while (channel && !(channel->GroupSep() && name.compare(channel->Name()) == 0))
+      channel = Channels.Get(++Idx);
+    return channel ? Idx : -1;
+  }
+
+  string GetContainerName(string uri){
+    return uri.substr(6,uri.size()-7);
+  }
+
 public:
 
   VdrProvider()
@@ -53,13 +67,30 @@ public:
     if(!IsRootContainer(uri)) return StringList();
 
     StringList list;
-
-    // Check if this is the root:
-    if(uri.compare(GetRootContainer()) == 0){
-      cChannel* channel = NULL;
-      for(int index = 0; (channel = Channels.Get(index)); index = Channels.GetNextNormal(index)){
-        if(!channel->GroupSep()){
-          list.push_back(*channel->GetChannelID().ToString());
+    int index;
+    cChannel* channel = NULL;
+    // Check if this is the root and we have no groups in the channels.conf:
+    if(uri.compare(GetRootContainer()) == 0 && Channels.GetNextGroup(0) == -1){
+      for(index = Channels.GetNextNormal(-1); (channel = Channels.Get(index)); index = Channels.GetNextNormal(index)){
+        list.push_back(*channel->GetChannelID().ToString());
+      }
+    } else {
+      string u = GetContainerName(uri);
+      if((index = GetGroupByName(u)) != -1){
+        while((channel = Channels.Get(++index)) != NULL){
+          if(channel->GroupSep()){
+            // We reached the next group. So, stop here.
+            if(*channel->Name())
+              break;
+          } else {
+            list.push_back(*channel->GetChannelID().ToString());
+          }
+        }
+      } else {
+        for(index = Channels.GetNextGroup(-1); (channel = Channels.Get(index)); index = Channels.GetNextGroup(index)){
+          string group = string(channel->Name()) + '/';
+          cerr << group << endl;
+          list.push_back(group);
         }
       }
     }
@@ -68,7 +99,7 @@ public:
   }
 
   virtual bool IsContainer(const string& uri){
-    return uri.compare(GetRootContainer()) == 0;
+    return uri.compare(GetRootContainer()) == 0 || GetGroupByName(GetContainerName(uri)) != -1;
   }
 
   virtual bool IsLink(const string& uri, string& target){
@@ -77,10 +108,9 @@ public:
   }
 
   virtual long GetContainerUpdateId(const string& uri){
-    if(IsRootContainer(uri)) return 0;
+    if(!IsRootContainer(uri)) return 0;
 
-    // We have no containers. So just return the last modification date.
-    // Containers like groups are about to come soon.
+    // We now have containers. However, they do not support containerUpdateIDs separately.
     return (long)lastModified;
   }
 
@@ -89,9 +119,19 @@ public:
 
     if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
 
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Live-TV")));
-    metadata.SetProperty(cMetadata::Property("dlna:containerType", string("Tuner_1_0")));
+    int index = 0;
+    cChannel* channel;
+    if(uri.compare(GetRootContainer()) == 0){
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Live-TV")));
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string("Watch Live-TV")));
+    } else if((index = GetGroupByName(GetContainerName(uri))) != -1 && (channel = Channels.Get(index)) != NULL){
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(channel->Name())));
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(channel->Name())));
+    } else {
+      return false;
+    }
 
+    metadata.SetProperty(cMetadata::Property("dlna:containerType", string("Tuner_1_0")));
     struct passwd *pw;
     if((pw = getpwuid(getuid())) == NULL){
       metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, string("Klaus Schmidinger")));
@@ -99,8 +139,6 @@ public:
       string name(pw->pw_gecos); name = name.substr(0,name.find(",,,",0));
       metadata.SetProperty(cMetadata::Property(property::object::KEY_CREATOR, name));
     }
-
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string("Watch Live-TV")));
 
     return true;
   }

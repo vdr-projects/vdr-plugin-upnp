@@ -213,7 +213,7 @@ private:
 
   bool GetChannelMetadata(const string& uri, cMetadata& metadata){
 
-	  tChannelID channelID = tChannelID::FromString(uri.substr(6).c_str());
+	  tChannelID channelID = tChannelID::FromString(uri.substr(uri.find_last_of('/')+1).c_str());
 	  if(!channelID.Valid()) return false;
 
 	  cChannel* channel = Channels.GetByChannelID(channelID);
