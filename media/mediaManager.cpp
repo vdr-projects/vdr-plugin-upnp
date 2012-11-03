@@ -404,7 +404,9 @@ int cMediaManager::Browse(BrowseRequest& request){
   metadata << "SELECT *,(SELECT COUNT(1) FROM " << db::Metadata << " m WHERE "
       << "m.`" << property::object::KEY_PARENTID << "` = "
       << "p.`" << property::object::KEY_OBJECTID << "`) as "
-      << "`" << property::object::KEY_CHILD_COUNT << "` FROM " << db::Metadata << " p WHERE ";
+      << "`" << property::object::KEY_CHILD_COUNT << "`,"
+      << "r.`" << property::resource::KEY_PROTOCOL_INFO << "` FROM " << db::Metadata << " p "
+      << "LEFT JOIN " << db::Resources << " r USING (`" << property::object::KEY_OBJECTID << "`) WHERE ";
 
   count << "SELECT COUNT(1) as totalMatches FROM " << db::Metadata << " WHERE ";
 
