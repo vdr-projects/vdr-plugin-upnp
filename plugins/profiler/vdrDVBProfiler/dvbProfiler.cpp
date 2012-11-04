@@ -46,7 +46,7 @@ private:
 public:
   ChannelTitle()
   : channelNo(-1)
-  , pattern("%chan% - %title%")
+  , pattern("%chan% %- |title%")
   {}
   void Clear(){
     channelNo = -1;
@@ -57,21 +57,31 @@ public:
   void SetChannelName(const string& name){ channelName = name; }
   void SetTitle(const string& t){ title = t; }
   string ToString(){
-    string output = pattern;
-    if(channelNo > 0)
-      replaceAll(output, "%no%", tools::ToString(channelNo));
-    else
-      replaceAll(output, "%no%", "");
-    if(!channelName.empty())
-      replaceAll(output, "%chan%", channelName);
-    else
-      replaceAll(output, "%chan%", "");
-    if(!title.empty())
-      replaceAll(output, "%title%", title);
-    else
-      replaceAll(output, "%title%", "");
+    stringstream output;
 
-    return output;
+    size_t startPos = 0, endPos = 0, delim = 0;
+    string delimiter, var;
+    while((startPos = pattern.find_first_of('%', startPos)) != string::npos){
+      // Copy the content from endPos to startPos
+      output << pattern.substr(endPos + 1, startPos - endPos - (endPos > 0 ? 1 : 0 ));
+      if((endPos = pattern.find_first_of('%', startPos+1)) != string::npos){
+        if((delim = pattern.find_first_of('|', startPos+1)) != string::npos && delim < endPos){
+          delimiter = pattern.substr(startPos + 1, delim - startPos - 1);
+          startPos = delim;
+        }
+        var = pattern.substr(startPos + 1, endPos - startPos - 1);
+        if       (var.compare("no") == 0 && channelNo > 0){
+          output << delimiter << channelNo;
+        } else if(var.compare("chan") == 0 && !channelName.empty()){
+          output << delimiter << channelName;
+        } else if(var.compare("title") == 0 && !title.empty()){
+          output << delimiter << title;
+        }
+      }
+      startPos = endPos + 1;
+    }
+
+    return output.str();
   }
   bool Parse(const char* str){
     if(!str || strcmp(str, "") == 0){
