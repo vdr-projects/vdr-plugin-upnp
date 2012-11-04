@@ -312,9 +312,8 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHILD_COUNT, row.getString(property::object::KEY_CHILD_COUNT));
         }
         else {
-          string channelName = row.getString(property::object::KEY_CHANNEL_NAME);
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NR, row.getString(property::object::KEY_CHANNEL_NR));
-          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, ixml::XmlEscapeSpecialChars(channelName));
+          ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_CHANNEL_NAME, row.getString(property::object::KEY_CHANNEL_NAME));
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_START, row.getString(property::object::KEY_SCHEDULED_START));
           ixml::IxmlAddFilteredProperty(filterList, DIDLDoc, object, property::object::KEY_SCHEDULED_END, row.getString(property::object::KEY_SCHEDULED_END));
         }
