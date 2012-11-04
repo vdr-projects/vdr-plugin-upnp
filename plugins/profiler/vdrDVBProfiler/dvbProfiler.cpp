@@ -59,8 +59,8 @@ public:
   string ToString(){
     stringstream output;
 
-    size_t startPos = 0, endPos = 0, delim = 0;
-    string delimiter, var;
+    size_t startPos = 0, endPos = 0, delim = 0, opt = 0;
+    string delimiter, options, var;
     while((startPos = pattern.find_first_of('%', startPos)) != string::npos){
       // Copy the content from endPos to startPos
       output << pattern.substr(endPos + 1, startPos - endPos - (endPos > 0 ? 1 : 0 ));
@@ -69,9 +69,18 @@ public:
           delimiter = pattern.substr(startPos + 1, delim - startPos - 1);
           startPos = delim;
         }
-        var = pattern.substr(startPos + 1, endPos - startPos - 1);
+        if((opt = pattern.find_first_of(';', startPos+1)) != string::npos && opt < endPos){
+          options = pattern.substr(opt + 1, endPos - opt - 1);
+        } else {
+          opt = endPos;
+        }
+        var = pattern.substr(startPos + 1, opt - startPos - 1);
         if       (var.compare("no") == 0 && channelNo > 0){
-          output << delimiter << channelNo;
+          int width = atoi(options.c_str());
+          output << delimiter;
+          if(width > 0)
+            output << setfill('0') << setw(width);
+          output << channelNo;
         } else if(var.compare("chan") == 0 && !channelName.empty()){
           output << delimiter << channelName;
         } else if(var.compare("title") == 0 && !title.empty()){
