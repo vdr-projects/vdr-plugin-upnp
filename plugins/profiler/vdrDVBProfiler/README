@@ -27,3 +27,18 @@ HD channels and recordings: AVC_TS_HD_EU_ISO
 
 Radio channels and recordings as well as old PES recordings are
 currently not supported.
+
+Configuration:
+
+The DVB provider has a configuration file called 'channelTitle.conf'
+which can be used to customize the channels title shown by the
+server while browsing the live-TV containers.
+
+It is optional and only required if the user want to display
+more or less information in the content browser.
+
+The configuration file must be copied to the configuration directory
+of the UPnP plugin. For instance: /var/lib/vdr/plugins/upnp.
+
+The configuration itself is explained inside the example shipped
+with this sub-plugin
