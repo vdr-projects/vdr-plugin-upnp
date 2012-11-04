@@ -30,6 +30,8 @@ using namespace std;
 #define MAX_METADATA_LENGTH_L     1024
 #define MAX_METADATA_LENGTH_S     256
 
+#define _unused(x) ((void)x)
+
 namespace upnp {
 
   typedef std::list<std::string> StringList;

@@ -10,9 +10,12 @@
 #include <getopt.h>
 #include "upnp.h"
 #include "include/setup.h"
+#include "include/media/requestCounter.h"
 
 using namespace std;
 using namespace upnp;
+
+int request_counter_t::OPEN_REQUESTS = 0;
 
 cPluginUpnp::cPluginUpnp(void)
 {
@@ -76,6 +79,14 @@ void cPluginUpnp::Stop(void)
 {
   // Stop any background activities the plugin is performing.
   mMediaServer->Stop();
+}
+
+cString cPluginUpnp::Active(void)
+{
+  if(request_counter_t::OPEN_REQUESTS > 0){
+    return cString::sprintf(tr("There are %d requests active."), request_counter_t::OPEN_REQUESTS);
+  }
+  return NULL;
 }
 
 void cPluginUpnp::Housekeeping(void)

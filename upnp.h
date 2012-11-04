@@ -30,6 +30,7 @@ public:
   virtual bool Initialize(void);
   virtual bool Start(void);
   virtual void Stop(void);
+  virtual cString Active(void);
   virtual void Housekeeping(void);
   virtual void MainThreadHook(void);
   virtual cMenuSetupPage *SetupMenu(void);
