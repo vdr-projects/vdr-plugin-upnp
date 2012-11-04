@@ -22,6 +22,7 @@ clean:
 
 install:
 	@$(MAKE) -f ../../../Makefile.plugins -C "$(shell pwd)" _install
+	cp --remove-destination channelTitle.conf $(VDRCFGDIR)
 
 uninstall:
 	@$(MAKE) -f ../../../Makefile.plugins -C "$(shell pwd)" _uninstall
