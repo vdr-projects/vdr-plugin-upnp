@@ -89,7 +89,6 @@ public:
       } else {
         for(index = Channels.GetNextGroup(-1); (channel = Channels.Get(index)); index = Channels.GetNextGroup(index)){
           string group = string(channel->Name()) + '/';
-          cerr << group << endl;
           list.push_back(group);
         }
       }

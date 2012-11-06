@@ -824,11 +824,10 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
       }
     }
 
-    stringstream uristrm;
+    string entryUri;
     for(StringList::iterator it = entries.begin(); it != entries.end(); ++it){
-      uristrm.str(string());
-      uristrm << uri << *it;
-      ScanURI(uristrm.str(), provider);
+      entryUri = uri + *it;
+      ScanURI(entryUri, provider);
     }
   }
 

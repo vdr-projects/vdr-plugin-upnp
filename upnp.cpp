@@ -15,7 +15,7 @@
 using namespace std;
 using namespace upnp;
 
-int request_counter_t::OPEN_REQUESTS = 0;
+tools::atomic::AtomicInteger request_counter_t::OPEN_REQUESTS;
 
 cPluginUpnp::cPluginUpnp(void)
 {
@@ -84,7 +84,7 @@ void cPluginUpnp::Stop(void)
 cString cPluginUpnp::Active(void)
 {
   if(request_counter_t::OPEN_REQUESTS > 0){
-    return cString::sprintf(tr("There are %d requests active."), request_counter_t::OPEN_REQUESTS);
+    return cString::sprintf(tr("There are %d requests active."), request_counter_t::OPEN_REQUESTS.Get());
   }
   return NULL;
 }

@@ -105,10 +105,10 @@ using namespace upnp;
     while ((bytesRead = streamer->Read(buffer, KB(16))) > 0 && length) {
       reply.out().write(buffer, bytesRead);
       length -= bytesRead;
-      if (!reply.out()) {
-        code = HTTP_GONE;
-        break;
-      }
+//      if (!reply.out()) {
+//        code = HTTP_GONE;
+//        break;
+//      }
     }
   }
 
