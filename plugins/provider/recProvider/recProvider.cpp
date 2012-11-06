@@ -179,7 +179,9 @@ public:
 
     } else {
       int ul = uri.length();
-      string folder = uri.substr(uri.find_last_of('/', ul-2)+1, ul - 7);
+      int ls = uri.find_last_of('/', ul-2) + 1;
+
+      string folder = uri.substr(ls , ul - ls -1);
       char * str = strdup(folder.c_str());
       str = ExchangeChars(str, false);
       metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(str)));
