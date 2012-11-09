@@ -83,7 +83,7 @@ void cPluginUpnp::Stop(void)
 
 cString cPluginUpnp::Active(void)
 {
-  if(request_counter_t::OPEN_REQUESTS > 0){
+  if(mMediaServer->GetConfiguration().maxRequestTime > 0 && request_counter_t::OPEN_REQUESTS > 0){
     return cString::sprintf(tr("There are %d requests active."), request_counter_t::OPEN_REQUESTS.Get());
   }
   return NULL;
