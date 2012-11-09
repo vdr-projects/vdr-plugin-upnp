@@ -1,6 +1,7 @@
 VDR Plugin 'upnp' Revision History
 ----------------------------------
 
+ - Fix: Fixed Microsoft Windows Media Player 12 support.
  - New: Initial support for audio recordings, i.e. recordings from radio
         stations. Live radio stations will follow very soon.
  - Fix: SortCriteria should work now.
@@ -17,7 +18,7 @@ VDR Plugin 'upnp' Revision History
         so-file. This makes symbolic link against the .so obsolete.
         Thanks to Lars Hanisch
 
-2012-10-24: Version 1.0.0
+2012-10-24: Version 1.0.0 RC1
 
  - New: Plug-ins for providing access to live-TV and recordings instead of
         integrated functions. This makes it easier to replace them. Additionally,

@@ -38,7 +38,8 @@ using namespace upnp;
   int code = HTTP_OK;
   string codeText = "OK";
 
-  //reply.setKeepAliveHeader();
+  // DLNA requires KeepAlive timeout of 60s.
+  reply.setKeepAliveTimeout(60000);
   reply.setContentType(streamer->GetContentType());
   reply.setHeader("friendlyName.dlna.org  ", server->GetServerDescription().friendlyName);
   reply.setHeader("contentFeatures.dlna.org  ", streamer->GetContentFeatures());
@@ -53,7 +54,7 @@ using namespace upnp;
       reply.setHeader("Accept-Ranges  ", "bytes");
       if(request.hasHeader("getAvailableSeekRange.dlna.org:")){
         std::stringstream availableRangeHeader;
-        availableRangeHeader << "0 bytes=0-" << contentLength;
+        availableRangeHeader << "1 bytes=0-" << contentLength;
         reply.setHeader("availableSeekRange.dlna.org  ", availableRangeHeader.str());
       }
     }
@@ -96,8 +97,6 @@ using namespace upnp;
       codeText = "Partial Content";
     }
 
-    // DLNA requires KeepAlive timeout of 60s.
-    reply.setKeepAliveTimeout(60000);
     reply.setDirectMode(code, codeText.c_str());
 
     size_t bytesRead = 0;

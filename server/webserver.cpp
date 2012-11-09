@@ -24,8 +24,8 @@ cWebserver::cWebserver(std::string address)
 }
 
 cWebserver::~cWebserver(){
-  mApplication.shutdown();
   mWebserverThread.Stop();
+  Stop();
 }
 
 bool cWebserver::Start(){
