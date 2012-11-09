@@ -9,6 +9,7 @@
 #include "../upnp.h"
 #include <sstream>
 #include <tnt/job.h>
+#include <tnt/configurator.h>
 
 namespace upnp {
 
@@ -91,6 +92,11 @@ void cWebserver::SetListenerPort(uint16_t port){
   if(mWebserverThread.Active()) return;
 
   mListenerPort = port ? port : 7649;
+}
+
+void cWebserver::SetMaxRequestTime(unsigned int seconds){
+  tnt::Configurator config(mApplication);
+  config.setMaxRequestTime(seconds);
 }
 
 void cWebserver::SetWebserverRootDir(std::string rootDirectory){

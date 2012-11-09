@@ -48,6 +48,8 @@ struct cConfig {
    */
   uint16_t webServerPort;
 
+  uint16_t maxRequestTime;
+
   /**
    * External web server URL
    *

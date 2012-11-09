@@ -87,6 +87,7 @@ private:
     int upnpport;
     int wsport;
     int lvport;
+    int mRTime;
 
     char webserverRoot[STRING_SIZE];
     char presentationUrl[STRING_SIZE];

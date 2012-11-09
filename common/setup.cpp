@@ -36,6 +36,7 @@ void cMenuSetupUPnP::Update(){
 
     Add(new cMenuEditStrItem(tr("Webserver root directory"), webserverRoot, STRING_SIZE));
     Add(new cMenuEditIntItem(tr("Webserver port (0=auto)"), &wsport, 0, 65536));
+    Add(new cMenuEditIntItem(tr("Max. request time in seconds (0=auto)"), &wsport, 0, 3600));
 
     Add(new cMenuEditStrItem(tr("Presentation URL"), presentationUrl, STRING_SIZE));
 
@@ -128,6 +129,7 @@ void cMenuSetupUPnP::Load(){
   switchLive = config.useLive;
   interfaceIndex = GetIndexOfInterface(config.interface);
   wsport = config.webServerPort;
+  mRTime = config.maxRequestTime;
   upnpport = config.port;
   lvport = config.livePort;
 
@@ -150,6 +152,7 @@ void cMenuSetupUPnP::Store(){
 
   config.bindToAddress = switchBindAddress?true:false;
   config.webServerPort = wsport;
+  config.maxRequestTime = mRTime;
   config.port = upnpport;
 
   config.useLive = switchLive?true:false;
@@ -161,6 +164,7 @@ void cMenuSetupUPnP::Store(){
   SetupStore("expertSettings", config.expertSettings);
   SetupStore("webServerRoot", config.webServerRoot.c_str());
   SetupStore("webServerPort", config.webServerPort);
+  SetupStore("maxRequestTime", config.maxRequestTime);
   SetupStore("presentationURL", config.presentationURL.c_str());
   SetupStore("useLive", config.useLive);
   SetupStore("livePort", config.livePort);
@@ -188,6 +192,7 @@ bool cMenuSetupUPnP::SetupParse(const char *name, const char *value, upnp::cConf
   else if (strcasecmp(name, "expertSettings")==0)         config.expertSettings = atoi(value)?true:false;
   else if (strcasecmp(name, "webServerRoot")==0)          config.webServerRoot = value;
   else if (strcasecmp(name, "webServerPort")==0)          config.webServerPort = (uint16_t)atoi(value);
+  else if (strcasecmp(name, "maxRequestTime")==0)         config.maxRequestTime = (uint16_t)atoi(value);
   else if (strcasecmp(name, "presentationURL")==0)        config.presentationURL = value;
   else if (strcasecmp(name, "useLive")==0)                config.useLive = atoi(value)?true:false;
   else if (strcasecmp(name, "livePort")==0)               config.livePort = atoi(value);
