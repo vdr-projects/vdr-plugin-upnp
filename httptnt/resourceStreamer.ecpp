@@ -102,12 +102,9 @@ using namespace upnp;
     size_t bytesRead = 0;
     char buffer[KB(16)];
     while ((bytesRead = streamer->Read(buffer, KB(16))) > 0 && length) {
-      reply.out().write(buffer, bytesRead);
+      if(!(reply.out().write(buffer, bytesRead))) break;
       length -= bytesRead;
-//      if (!reply.out()) {
-//        code = HTTP_GONE;
-//        break;
-//      }
+      request.touch();
     }
   }
 

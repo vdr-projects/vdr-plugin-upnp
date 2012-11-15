@@ -36,7 +36,7 @@ void cMenuSetupUPnP::Update(){
 
     Add(new cMenuEditStrItem(tr("Webserver root directory"), webserverRoot, STRING_SIZE));
     Add(new cMenuEditIntItem(tr("Webserver port (0=auto)"), &wsport, 0, 65536));
-    Add(new cMenuEditIntItem(tr("Max. request time in seconds (0=auto)"), &wsport, 0, 3600));
+    Add(new cMenuEditIntItem(tr("Max. request time in seconds (0=auto)"), &mRTime, 0, 3600));
 
     Add(new cMenuEditStrItem(tr("Presentation URL"), presentationUrl, STRING_SIZE));
 
