@@ -96,7 +96,7 @@ public:
     struct dirent* dirEntry;
 
     if((dirHandle = opendir(GetFile(uri).c_str())) == NULL){
-      return false;
+      return list;
     }
 
     string filename;
