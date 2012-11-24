@@ -312,9 +312,13 @@ void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long int cUID, 
 void cUPnPResourceProvider::Action(){}
 
 upnp::cPluginManager::cPluginManager()
+: selfhandle(NULL)
 {}
 
-upnp::cPluginManager::~cPluginManager(){}
+upnp::cPluginManager::~cPluginManager(){
+  if(selfhandle)
+    dlclose(selfhandle);
+}
 
 const cPluginManager::ProfilerList& upnp::cPluginManager::GetProfilers() const {
   return profilers;
@@ -338,10 +342,27 @@ cUPnPResourceProvider* upnp::cPluginManager::CreateProvider(const string& schema
 #define UPNPPLUGIN_PREFIX "libupnp-"
 #define SO_INDICATOR      ".so."
 
-bool upnp::cPluginManager::LoadPlugins(const string& directory){
+bool upnp::cPluginManager::LoadPlugins(){
+
+  Dl_info info;
+  static int marker=0;
+  if(!dladdr((void *)&marker,&info)) {
+    esyslog("UPnP\tError while getting information about myself: %s", dlerror());
+    return false;
+  }
+
+  selfhandle = dlopen(info.dli_fname,RTLD_NOW|RTLD_GLOBAL);
+  if(!selfhandle) {
+    esyslog("Error while opening myself: %s",dlerror());
+    return false;
+  }
 
   DIR* dirHandle;
   struct dirent* dirEntry;
+  string library = info.dli_fname;
+  string directory = library.substr(0, library.find_last_of('/'));
+
+  dsyslog("UPnP\tScanning %s for plugins.", directory.c_str());
 
   if((dirHandle = opendir(directory.c_str())) == NULL){
     return false;

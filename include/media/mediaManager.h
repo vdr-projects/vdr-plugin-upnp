@@ -57,7 +57,6 @@ public:
   cMediaManager();
   virtual ~cMediaManager();
 
-  void SetPluginDirectory(const string& directory);
   void SetDatabaseDir(const string& file);
 
   bool Initialise();
@@ -95,7 +94,6 @@ private:
   IdList            eventedContainerUpdateIDs;
   StringList        scanTargets;
   string            databaseFile;
-  string            pluginDirectory;
   tntdb::Connection connection;
 
   upnp::cPluginManager* pluginManager;

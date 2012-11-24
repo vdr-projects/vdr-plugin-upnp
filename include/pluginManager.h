@@ -25,7 +25,7 @@ public:
   cPluginManager();
   virtual ~cPluginManager();
 
-  bool LoadPlugins(const std::string& directory);
+  bool LoadPlugins();
 
   int Count() const;
 
@@ -64,6 +64,7 @@ private:
   ProviderMap   providerFactory;
   ProfilerList  profilers;
   ProviderList  providers;
+  void*         selfhandle;
 
 };
 

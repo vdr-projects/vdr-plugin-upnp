@@ -21,8 +21,6 @@
 
 namespace upnp {
 
-#define DEFAULTPLUGINDIR PLUGINDIR
-
 static const char* DIDLFragment = "<DIDL-Lite "
                                   "xmlns=\"urn:schemas-upnp-org:metadata-1-0/DIDL-Lite/\" "
                                   "xmlns:dc=\"http://purl.org/dc/elements/1.1/\" "
@@ -107,7 +105,6 @@ void cResourceStreamer::Close(){
 
 cMediaManager::cMediaManager()
 : systemUpdateID(0)
-, pluginDirectory(DEFAULTPLUGINDIR)
 , pluginManager(NULL)
 {
   SetDatabaseDir(string());
@@ -597,8 +594,8 @@ bool cMediaManager::Initialise(){
   dsyslog("UPnP\tLoading Plugins...");
   pluginManager = new upnp::cPluginManager();
 
-  if(!pluginManager->LoadPlugins(pluginDirectory)){
-    esyslog("UPnP\tError while loading upnp plugin directory '%s'", pluginDirectory.c_str());
+  if(!pluginManager->LoadPlugins()){
+    esyslog("UPnP\tError while loading upnp plugins");
     return false;
   } else {
     dsyslog("UPnP\tFound %d plugins", pluginManager->Count());
@@ -719,11 +716,6 @@ void cMediaManager::SetDatabaseDir(const string& file){
   else databaseFile = file;
 
   databaseFile += "/metadata.db";
-}
-
-void cMediaManager::SetPluginDirectory(const string& directory){
-  if(directory.empty()) pluginDirectory = DEFAULTPLUGINDIR;
-  else pluginDirectory = directory;
 }
 
 void cMediaManager::Action(){
