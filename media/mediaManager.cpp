@@ -112,8 +112,7 @@ cMediaManager::cMediaManager()
 
 cMediaManager::~cMediaManager(){
   try {
-    tntdb::Statement stmt = connection.prepare("VACUUM");
-    stmt.execute();
+    connection.execute("VACUUM");
   } catch (const std::exception& e) {
     esyslog("UPnP\tFailed to vacuum database '%s': '%s'", databaseFile.c_str(), e.what());
   }
@@ -466,6 +465,14 @@ cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(const std::string& browseF
     return NumBrowseFlags;
 }
 
+void cMediaManager::Housekeeping(){
+  try {
+    connection.execute("VACUUM");
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tFailed to vacuum database '%s': '%s'", databaseFile.c_str(), e.what());
+  }
+}
+
 bool cMediaManager::Initialise(){
 
   try {
@@ -614,9 +621,12 @@ bool cMediaManager::Initialise(){
 
 bool cMediaManager::CheckIntegrity(){
 
-  tntdb::Statement enableForeignKeys = connection.prepare("PRAGMA foreign_keys = ON");
-
-  enableForeignKeys.execute();
+  connection.execute("PRAGMA foreign_keys = ON");
+  connection.execute("PRAGMA page_size = 4096");
+  connection.execute("PRAGMA cache_size = 16384");
+  connection.execute("PRAGMA temp_store = MEMORY");
+  connection.execute("PRAGMA synchronous = OFF");
+  connection.execute("PRAGMA locking_mode = EXCLUSIVE");
 
   tntdb::Statement checkTable = connection.prepare(
           "SELECT name FROM sqlite_master WHERE type='table' AND name=:table;"
@@ -747,7 +757,6 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
       }
     }
 
-    isyslog("UPnP\tUnsupported resource: '%s' skipped.", uri.c_str());
     return false;
 
   } else {

@@ -60,6 +60,7 @@ public:
   void SetDatabaseDir(const string& file);
 
   bool Initialise();
+  void Housekeeping();
 
   uint32_t GetSystemUpdateID() const;
   IdList GetContainerUpdateIDs(bool unevented = false);

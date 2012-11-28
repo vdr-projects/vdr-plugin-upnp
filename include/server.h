@@ -75,6 +75,8 @@ public:
 
   static void RegisterService(cUPnPService* service);
 
+  void Housekeeping();
+
 private:
 	cMediaServer();
 

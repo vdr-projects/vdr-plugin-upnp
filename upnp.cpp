@@ -91,7 +91,8 @@ cString cPluginUpnp::Active(void)
 
 void cPluginUpnp::Housekeeping(void)
 {
-  // Perform any cleanup or other regular tasks.
+  if(mMediaServer)
+    mMediaServer->Housekeeping();
 }
 
 void cPluginUpnp::MainThreadHook(void)

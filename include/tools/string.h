@@ -21,6 +21,7 @@ string ToString(long number);
 string StringListToCSV(StringList list);
 string IdListToCSV(IdList list);
 void StringExplode(string str, string separator, StringVector& results);
+string Trim(const std::string& str, const std::string& whitespace = " \t");
 
 }
 

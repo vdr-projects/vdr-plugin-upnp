@@ -74,6 +74,18 @@ StringVector GetNetworkInterfaces(bool skipLoop){
   return interfaces;
 }
 
+string Trim(const std::string& str, const std::string& whitespace)
+{
+  const unsigned long int strBegin = str.find_first_not_of(whitespace);
+  if (strBegin == std::string::npos)
+    return ""; // no content
+
+  const unsigned long int strEnd = str.find_last_not_of(whitespace);
+  const unsigned long int strRange = strEnd - strBegin + 1;
+
+  return str.substr(strBegin, strRange);
+}
+
 string ToString(long number){
   stringstream ss;
   ss << number;

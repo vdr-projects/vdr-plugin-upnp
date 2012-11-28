@@ -159,6 +159,12 @@ bool cMediaServer::Stop(){
   return true;
 }
 
+void cMediaServer::Housekeeping(){
+  if(mMediaManager){
+    mMediaManager->Housekeeping();
+  }
+}
+
 bool cMediaServer::Initialize(){
   string address;
   uint16_t port = 0;
