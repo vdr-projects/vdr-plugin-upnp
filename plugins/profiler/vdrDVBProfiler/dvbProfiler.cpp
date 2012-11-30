@@ -183,7 +183,14 @@ private:
         pid = TsPid(buf);
         if(pid == 0){
           parser.ParsePat(buf, TS_SIZE);
-        } else if (pid == parser.PmtPid()) {
+        }
+        else
+#if VDRVERSNUM < 10732
+        if (pid == parser.PmtPid())
+#else
+        if (PatPmtParser.IsPmtPid(pid))
+#endif
+        {
           parser.ParsePmt(buf, TS_SIZE);
           if(parser.GetVersions(patV, pmtV))
             break;
