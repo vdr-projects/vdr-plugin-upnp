@@ -6,11 +6,14 @@
  */
 
 #include <plugin.h>
+#include <server.h>
 #include <vdr/epg.h>
 #include <vdr/channels.h>
 #include <vdr/tools.h>
+#include <vdr/plugin.h>
 #include <string>
 #include <sstream>
+#include <fstream>
 #include <algorithm>
 #include <tools.h>
 #include <pwd.h>
@@ -22,7 +25,33 @@ namespace upnp {
 
 class VdrProvider : public cUPnPResourceProvider {
 private:
-  time_t     lastModified;
+  time_t      lastModified;
+  int         from;
+  int         to;
+
+  bool Load(const string& filename)
+  {
+    if (access(filename.c_str(), F_OK) == 0) {
+      isyslog("loading %s", filename.c_str());
+      ifstream file;
+      file.open(filename.c_str(), ifstream::in);
+      if(!file.is_open())
+        return false;
+      string line; int pos;
+      while(getline(file, line)){
+        if(line.length() > 0 && line[0] != '#'){
+          if((pos = line.find_first_of('-')) != string::npos){
+            from = atoi(line.substr(0, pos).c_str());
+            to = atoi(line.substr(pos+1).c_str());
+            break;
+          }
+        }
+      }
+      if(to == 0) to = INT_MAX;
+      return true;
+    }
+    return false;
+  }
 
   bool IsRootContainer(const string& uri){
     if(uri.find(GetRootContainer(), 0) != 0){
@@ -51,7 +80,13 @@ public:
 
   VdrProvider()
   : lastModified(0)
-  {}
+  , from(0)
+  , to(INT_MAX)
+  {
+    stringstream file;
+    file << cMediaServer::GetInstance()->GetConfigDirectory() << "/vdrProvider.conf";
+    Load(file.str());
+  }
 
   virtual ~VdrProvider(){
     Cancel(2);
@@ -69,9 +104,10 @@ public:
     StringList list;
     int index;
     cChannel* channel = NULL;
+    if(to == 0) to = INT_MAX;
     // Check if this is the root and we have no groups in the channels.conf:
     if(uri.compare(GetRootContainer()) == 0 && Channels.GetNextGroup(0) == -1){
-      for(index = Channels.GetNextNormal(-1); (channel = Channels.Get(index)); index = Channels.GetNextNormal(index)){
+      for(index = Channels.GetNextNormal(from - 1); (channel = Channels.Get(index)) && index < to; index = Channels.GetNextNormal(index)){
         list.push_back(*channel->GetChannelID().ToString());
       }
     } else {
@@ -87,7 +123,7 @@ public:
           }
         }
       } else {
-        for(index = Channels.GetNextGroup(-1); (channel = Channels.Get(index)); index = Channels.GetNextGroup(index)){
+        for(index = Channels.GetNextGroup(from - 1); (channel = Channels.Get(index)) && index < to; index = Channels.GetNextGroup(index)){
           string group = string(channel->Name()) + '/';
           list.push_back(group);
         }

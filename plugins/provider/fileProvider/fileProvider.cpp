@@ -6,6 +6,7 @@
  */
 
 #include <plugin.h>
+#include <server.h>
 #include <fstream>
 #include <sstream>
 #include <tools/string.h>
@@ -82,7 +83,7 @@ public:
   : fileFD(NULL)
   {
     stringstream file;
-    file << cPlugin::ConfigDirectory(PLUGIN_NAME_I18N) << "/directories.conf";
+    file << cMediaServer::GetInstance()->GetConfigDirectory() << "/directories.conf";
     Load(file.str());
   }
 

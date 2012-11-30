@@ -57,6 +57,7 @@ public:
 
   void SetConfiguration(upnp::cConfig newConfig);
   upnp::cConfig GetConfiguration() const;
+  const string& GetConfigDirectory() const { return mConfigDirectory; };
 
   const char* GetServerIPAddress() const;
   uint16_t GetServerPort() const;
@@ -90,6 +91,7 @@ private:
 	Description         mServerDescription;
 	iconList            mServerIcons;
 	upnp::cConfig       mCurrentConfiguration;
+	string              mConfigDirectory;
 	UpnpDevice_Handle   mDeviceHandle;
 	int                 mAnnounceMaxAge;
 	size_t              mMaxContentLength;

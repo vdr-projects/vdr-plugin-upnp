@@ -169,6 +169,8 @@ bool cMediaServer::Initialize(){
   string address;
   uint16_t port = 0;
 
+  mConfigDirectory = cPlugin::ConfigDirectory(PLUGIN_NAME_I18N);
+
   if(mCurrentConfiguration.expertSettings){
     address = mCurrentConfiguration.bindToAddress
               ? mCurrentConfiguration.address
