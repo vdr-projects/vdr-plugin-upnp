@@ -176,8 +176,6 @@ bool cMediaManager::UpdateContainerUpdateId(const string& objectID, long int upd
       return false;
     }
 
-    dsyslog("UPnP\tUpdated container with ID '%s': %ld", objectID.c_str(), updateID);
-
     return true;
 
   } catch (const std::exception& e) {
