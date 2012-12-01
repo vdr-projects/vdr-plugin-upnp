@@ -194,7 +194,7 @@ private:
           parser.ParsePat(buf, TS_SIZE);
         }
         else
-#if VDRVERSNUM < 10732
+#if VDRVERSNUM < 10733
         if (pid == parser.PmtPid())
 #else
         if (parser.IsPmtPid(pid))
