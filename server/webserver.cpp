@@ -80,6 +80,9 @@ bool cWebserver::Initialise(){
 
     isyslog("UPnP\tUsing %s for static content delivery.", mWebserverRootDir.c_str());
 
+    // DLNA requires KeepAlive timeout of 60s.
+    SetKeepAliveTimeout(60000);
+
   } catch (const std::exception& e){
     esyslog("UPnP\tError while initialising web server: %s", e.what());
     return false;
@@ -97,6 +100,11 @@ void cWebserver::SetListenerPort(uint16_t port){
 void cWebserver::SetMaxRequestTime(unsigned int seconds){
   tnt::Configurator config(mApplication);
   config.setMaxRequestTime(seconds);
+}
+
+void cWebserver::SetKeepAliveTimeout(unsigned int milliseconds){
+  tnt::Configurator config(mApplication);
+  config.setKeepAliveTimeout(milliseconds);
 }
 
 void cWebserver::SetWebserverRootDir(std::string rootDirectory){

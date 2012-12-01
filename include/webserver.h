@@ -22,6 +22,7 @@ namespace upnp {
     cWebserver(std::string address);
     virtual ~cWebserver();
 
+    void SetKeepAliveTimeout(unsigned int seconds);
     void SetMaxRequestTime(unsigned int seconds);
     void SetWebserverRootDir(std::string rootDirectory);
     void SetPresentationUrl(std::string presentationUrl);

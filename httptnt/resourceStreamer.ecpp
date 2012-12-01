@@ -38,8 +38,6 @@ using namespace upnp;
   int code = HTTP_OK;
   string codeText = "OK";
 
-  // DLNA requires KeepAlive timeout of 60s.
-  tnt::HttpReply::setKeepAliveTimeout(60000);
   reply.setContentType(streamer->GetContentType());
   reply.setHeader("friendlyName.dlna.org  ", server->GetServerDescription().friendlyName);
   reply.setHeader("contentFeatures.dlna.org  ", streamer->GetContentFeatures());
