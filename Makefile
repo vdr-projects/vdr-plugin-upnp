@@ -57,7 +57,7 @@ LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl
 
 ### The main target:
 
-all: libvdr-$(PLUGIN).so i18n
+all: plugin subplugins
 
 ### Implicit rules:
 
@@ -103,6 +103,8 @@ i18n: $(I18Nmsgs) $(I18Npot)
 
 ### Targets:
 
+plugin: libvdr-$(PLUGIN).so i18n
+
 libvdr-$(PLUGIN).so: $(OBJS) $(TNTOBJ)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -rdynamic -shared $(OBJS) $(TNTOBJ) $(LIBS) -o $@
 	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
@@ -126,7 +128,9 @@ dist: $(I18Npo) clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)
 	@echo Distribution package created as $(PACKAGE).tgz
 
-clean:
+clean: clean-plugin clean-subplugins
+
+clean-plugin:
 	@-rm -f $(OBJS) $(TNTOBJ) $(DEPFILE) *.so *.so.$(APIVERSION) *.tgz core* *~ $(PODIR)/*.mo $(PODIR)/*.pot
 
 clean-subplugins:

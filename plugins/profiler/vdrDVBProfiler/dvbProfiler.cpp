@@ -111,7 +111,11 @@ public:
   }
 
   virtual bool CanHandleSchema(const string& schema){
-    if(schema.find("vdr",0) == 0 || schema.find("rec",0) == 0){
+#if VDRVERSNUM > 10704
+    if( schema.find("vdr",0) == 0 || schema.find("rec",0) == 0 ){
+#else
+    if( schema.find("vdr",0) == 0 ) {
+#endif
       return true;
     } else {
       return false;
@@ -121,9 +125,13 @@ public:
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
     if        (uri.find("vdr",0) == 0){
       return GetChannelMetadata(uri, metadata);
-    } else if (uri.find("rec",0) == 0){
+    }
+#if VDRVERSNUM > 10704
+    else if (uri.find("rec",0) == 0){
       return GetRecordingMetadata(uri, metadata);
-    } else {
+    }
+#endif
+    else {
       return false;
     }
   }
@@ -132,6 +140,7 @@ public:
 
 private:
 
+#if VDRVERSNUM > 10704
   bool GetRecordingMetadata(const string& u, cMetadata& metadata){
     string videoDir = string(VideoDirectory), uri = u.substr(6), recStr = videoDir + "/" + uri;
     cRecording* recording = Recordings.GetByName(recStr.c_str());
@@ -188,7 +197,7 @@ private:
 #if VDRVERSNUM < 10732
         if (pid == parser.PmtPid())
 #else
-        if (PatPmtParser.IsPmtPid(pid))
+        if (parser.IsPmtPid(pid))
 #endif
         {
           parser.ParsePmt(buf, TS_SIZE);
@@ -302,6 +311,7 @@ private:
 
     return true;
   }
+#endif
 
   bool GetChannelMetadata(const string& uri, cMetadata& metadata){
 
