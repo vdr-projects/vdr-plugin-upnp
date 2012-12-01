@@ -466,11 +466,6 @@ cMediaManager::BrowseFlag cMediaManager::ToBrowseFlag(const std::string& browseF
 }
 
 void cMediaManager::Housekeeping(){
-  try {
-    connection.execute("VACUUM");
-  } catch (const std::exception& e) {
-    esyslog("UPnP\tFailed to vacuum database '%s': '%s'", databaseFile.c_str(), e.what());
-  }
 }
 
 bool cMediaManager::Initialise(){
@@ -625,7 +620,7 @@ bool cMediaManager::CheckIntegrity(){
   connection.execute("PRAGMA page_size = 4096");
   connection.execute("PRAGMA cache_size = 16384");
   connection.execute("PRAGMA temp_store = MEMORY");
-  connection.execute("PRAGMA synchronous = OFF");
+  connection.execute("PRAGMA synchronous = NORMAL");
   connection.execute("PRAGMA locking_mode = EXCLUSIVE");
 
   tntdb::Statement checkTable = connection.prepare(
