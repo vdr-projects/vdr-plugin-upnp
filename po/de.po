@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-upnp 1.0.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2012-11-01 19:47+0200\n"
+"POT-Creation-Date: 2012-12-01 13:48+0100\n"
 "PO-Revision-Date: 2012-11-01 16:04+0100\n"
 "Last-Translator: Denis Loh <denis.loh@web.de>\n"
 "Language-Team: German\n"
@@ -36,6 +36,10 @@ msgstr ""
 "                                                fest, wo die Datenbank-\n"
 "                                                datei gespeichert werden\n"
 "                                                soll.\n"
+
+#, c-format
+msgid "There are %d requests active."
+msgstr ""
 
 msgid "Invalid action"
 msgstr ""
@@ -189,6 +193,9 @@ msgstr "Webserverwurzelverzeichnis"
 
 msgid "Webserver port (0=auto)"
 msgstr "Webserverport (0=auto)"
+
+msgid "Max. request time in seconds (0=auto)"
+msgstr ""
 
 msgid "Presentation URL"
 msgstr "Präsentationswebseite"
