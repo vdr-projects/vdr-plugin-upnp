@@ -13,7 +13,6 @@
 #include <vdr/plugin.h>
 #include <string>
 #include <sstream>
-#include <fstream>
 #include <algorithm>
 #include <tools.h>
 #include <pwd.h>
@@ -29,37 +28,15 @@ private:
   int         from;
   int         to;
 
-  bool Load(const string& filename)
+  bool Parse(const string& line)
   {
-    if (access(filename.c_str(), F_OK) == 0) {
-      isyslog("loading %s", filename.c_str());
-      ifstream file;
-      file.open(filename.c_str(), ifstream::in);
-      if(!file.is_open())
-        return false;
-      string line; int pos;
-      while(getline(file, line)){
-        if(line.length() > 0 && line[0] != '#'){
-          if((pos = line.find_first_of('-')) != string::npos){
-            from = atoi(line.substr(0, pos).c_str());
-            to = atoi(line.substr(pos+1).c_str());
-            break;
-          }
-        }
-      }
-      if(to == 0) to = INT_MAX;
+    int pos = 0;
+    if((pos = line.find_first_of('-')) != string::npos){
+      from = atoi(line.substr(0, pos).c_str());
+      to = atoi(line.substr(pos+1).c_str());
       return true;
     }
     return false;
-  }
-
-  bool IsRootContainer(const string& uri){
-    if(uri.find(GetRootContainer(), 0) != 0){
-      isyslog("VdrProvider\tUri does not contain the root.");
-      return false;
-    } else {
-      return true;
-    }
   }
 
   int GetGroupByName(string name)
@@ -83,9 +60,7 @@ public:
   , from(0)
   , to(INT_MAX)
   {
-    stringstream file;
-    file << cMediaServer::GetInstance()->GetConfigDirectory() << "/vdrProvider.conf";
-    Load(file.str());
+    LoadConfigFile("vdrProvider.conf");
   }
 
   virtual ~VdrProvider(){
@@ -99,7 +74,7 @@ public:
   }
 
   virtual StringList GetContainerEntries(const string& uri){
-    if(!IsRootContainer(uri)) return StringList();
+    if(!HasRootContainer(uri)) return StringList();
 
     StringList list;
     int index;
@@ -143,14 +118,14 @@ public:
   }
 
   virtual long GetContainerUpdateId(const string& uri){
-    if(!IsRootContainer(uri)) return 0;
+    if(!HasRootContainer(uri)) return 0;
 
     // We now have containers. However, they do not support containerUpdateIDs separately.
     return (long)lastModified;
   }
 
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
-    if(!IsRootContainer(uri)) return false;
+    if(!HasRootContainer(uri)) return false;
 
     if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
 
@@ -179,7 +154,7 @@ public:
   }
 
   virtual string GetHTTPUri(const string& uri, const string& currentIP, const string& pInfo){
-    if(!IsRootContainer(uri)) return string();
+    if(!HasRootContainer(uri)) return string();
 
     int port = 3000;
 

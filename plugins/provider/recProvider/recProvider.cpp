@@ -24,15 +24,6 @@ namespace upnp {
 class RecProvider : public cUPnPResourceProvider {
 private:
 
-  bool IsRootContainer(const string& uri){
-    if(uri.find(GetRootContainer(), 0) != 0){
-      isyslog("RecProvider\tUri does not contain the root.");
-      return false;
-    } else {
-      return true;
-    }
-  }
-
   bool GetFileStat(const string& uri, struct stat& fileStat){
     stringstream filename;
     filename << VideoDirectory << "/" << uri.substr(6);
@@ -111,7 +102,7 @@ public:
   }
 
   virtual StringList GetContainerEntries(const string& u){
-    if(!IsRootContainer(u)) return StringList();
+    if(!HasRootContainer(u)) return StringList();
 
     StringList list;
     string videoDir(VideoDirectory), fs, uri = u.substr(6);
@@ -169,7 +160,7 @@ public:
   }
 
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
-    if(!IsRootContainer(uri)) return false;
+    if(!HasRootContainer(uri)) return false;
 
     if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
 
@@ -204,6 +195,8 @@ public:
   }
 
   virtual bool Open(const string& uri){
+    if(!HasRootContainer(uri)) return false;
+
     filename = string(VideoDirectory) + "/" + uri.substr(6);
     currentFileNumber = 1;
     return ScanFiles();

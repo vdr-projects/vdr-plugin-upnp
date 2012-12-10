@@ -11,6 +11,7 @@
 #include "../include/tools/string.h"
 #include "../include/tools/uuid.h"
 #include <string>
+#include <fstream>
 #include <sstream>
 #include <dlfcn.h>
 #include <dirent.h>
@@ -286,6 +287,10 @@ string cUPnPResourceProvider::GetHTTPUri(const string&, const string&, const str
   return string();
 }
 
+string cUPnPResourceProvider::GetFile(const string& uri){
+  return uri;
+}
+
 bool cUPnPResourceProvider::Seekable() const {
   return false;
 }
@@ -307,6 +312,42 @@ void cUPnPResourceProvider::Close(){
 
 void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long int cUID, const string& target){
   cMediaServer::GetInstance()->GetManager().OnContainerUpdate(uri, cUID, target);
+}
+
+bool cUPnPResourceProvider::HasRootContainer(const string& uri){
+  if(uri.find(GetRootContainer(), 0) != 0){
+    isyslog("RecProvider\tUri does not contain the root.");
+    return false;
+  } else {
+    return true;
+  }
+}
+
+bool cUPnPResourceProvider::Parse(const string& line){
+  return true;
+}
+
+bool cUPnPResourceProvider::LoadConfigFile(const string& fn, bool allowComments)
+{
+  string filename = cMediaServer::GetInstance()->GetConfigDirectory() + "/" + fn;
+  if (access(filename.c_str(), F_OK) == 0) {
+    isyslog("loading %s", filename.c_str());
+    ifstream file;
+    file.open(filename.c_str(), ifstream::in);
+    if(!file.is_open())
+      return false;
+    string line;
+    while(getline(file, line)){
+      if(line.length() > 0){
+        if(allowComments && line[0] == '#')
+          continue;
+        if(!Parse(line))
+          return false;
+      }
+    }
+    return true;
+  }
+  return false;
 }
 
 void cUPnPResourceProvider::Action(){}

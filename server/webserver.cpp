@@ -7,6 +7,7 @@
 
 #include "../include/webserver.h"
 #include "../upnp.h"
+#include <signal.h>
 #include <sstream>
 #include <tnt/job.h>
 #include <tnt/configurator.h>
@@ -46,6 +47,8 @@ bool cWebserver::Initialise(){
   try {
     // Map static contents
     stringstream ss1, ss2;
+
+    signal(SIGPIPE, SIG_IGN);
 
     mApplication.listen(mListenerAddress.c_str(), mListenerPort);
 

@@ -6,11 +6,7 @@
  */
 
 #include <plugin.h>
-#include <server.h>
-#include <fstream>
-#include <sstream>
 #include <tools/string.h>
-#include <vdr/plugin.h>
 #include <pwd.h>
 #include <unistd.h>
 
@@ -24,47 +20,12 @@ private:
   StringMap directoryMap;
   FILE* fileFD;
 
-  bool IsRootContainer(const string& uri){
-    if(uri.find(GetRootContainer(), 0) != 0){
-      isyslog("RecProvider\tUri does not contain the root.");
-      return false;
-    } else {
-      return true;
+  bool Parse(const string& line){
+    int pos;
+    if((pos = line.find_first_of(':')) != string::npos){
+      directoryMap[tools::Trim(line.substr(0,pos))] = tools::Trim(line.substr(pos+1));
     }
-  }
-
-  bool Load(const string& filename)
-  {
-    if (access(filename.c_str(), F_OK) == 0) {
-      isyslog("loading %s", filename.c_str());
-      ifstream file;
-      file.open(filename.c_str(), ifstream::in);
-      if(!file.is_open())
-        return false;
-      string line; int pos;
-      while(getline(file, line)){
-        if(line.length() > 0 && line[0] != '#'){
-          if((pos = line.find_first_of(':')) != string::npos){
-            directoryMap[tools::Trim(line.substr(0,pos))] = tools::Trim(line.substr(pos+1));
-          }
-        }
-      }
-      return true;
-    }
-    return false;
-  }
-
-  string GetFile(const string& uri){
-    string mountPoint = uri.substr(7, uri.find_first_of('/',7) - 7);
-
-    string file;
-    if(!mountPoint.empty() && !directoryMap[mountPoint].empty()){
-      file = directoryMap[mountPoint];
-      if(uri.find_first_of('/', 7) != string::npos)
-        file += uri.substr(uri.find_first_of('/',7));
-    }
-
-    return file;
+    return true;
   }
 
   bool GetFileStat(const string& uri, struct stat& fileStat){
@@ -82,9 +43,7 @@ public:
   FileProvider()
   : fileFD(NULL)
   {
-    stringstream file;
-    file << cMediaServer::GetInstance()->GetConfigDirectory() << "/directories.conf";
-    Load(file.str());
+    LoadConfigFile("directories.conf");
   }
 
   virtual string ProvidesSchema() { return "file"; }
@@ -120,6 +79,8 @@ public:
   virtual StringList GetContainerEntries(const string& uri) {
     StringList list;
 
+    if(!HasRootContainer(uri)) return list;
+
     DIR* dirHandle;
     struct dirent* dirEntry;
 
@@ -149,7 +110,7 @@ public:
   }
 
   virtual bool GetMetadata(const string& uri, cMetadata& metadata){
-    if(!IsRootContainer(uri)) return false;
+    if(!HasRootContainer(uri)) return false;
 
     if(!cUPnPResourceProvider::GetMetadata(uri, metadata)) return false;
 
@@ -171,6 +132,21 @@ public:
 
   virtual bool Seekable() const {
     return true;
+  }
+
+  virtual string GetFile(const string& uri){
+    if(!HasRootContainer(uri)) return string();
+
+    string mountPoint = uri.substr(7, uri.find_first_of('/',7) - 7);
+
+    string file;
+    if(!mountPoint.empty() && !directoryMap[mountPoint].empty()){
+      file = directoryMap[mountPoint];
+      if(uri.find_first_of('/', 7) != string::npos)
+        file += uri.substr(uri.find_first_of('/',7));
+    }
+
+    return file;
   }
 
   virtual bool Open(const string& uri) {

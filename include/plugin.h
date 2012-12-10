@@ -376,6 +376,8 @@ public:
    */
   virtual string GetHTTPUri(const string& uri, const string& currentIP, const string& protocolInfo);
 
+  virtual string GetFile(const string& uri);
+
   virtual bool Seekable() const;
 
   /**
@@ -479,6 +481,25 @@ protected:
   void OnContainerUpdate(const string& uri, long containerUpdateId, const string& target = string());
 
   /**
+   * Load a configuration file.
+   *
+   * This loads a configuration file from the configuration directory of
+   * the upnp plugin. Subplugins don't have their own configuration directory.
+   *
+   * If the seconds parameter is true, comments are allowed but skipped while
+   * parsing, i.e. they are not passed to Parse().
+   */
+  bool LoadConfigFile(const string& filename, bool allowComments = true);
+
+  /**
+   * Checks if the given URI contains the root container.
+   *
+   * This function returns true if the given uri contains the container
+   * returned by GetRootContainer().
+   */
+  bool HasRootContainer(const string& uri);
+
+  /**
    * Thread action to check for updates
    *
    * This should be used to determine changes on the containers. It should
@@ -487,6 +508,14 @@ protected:
    *
    */
   virtual void Action();
+
+  /**
+   * Parses a single line of a configuration file.
+   *
+   * This function must be overriden if the sub plugin wants to read
+   * a configuration file.
+   */
+  bool Parse(const string& uri);
 
 };
 
@@ -541,10 +570,11 @@ public:
    *
    * @param uri the absolute path to the resource.
    * @param metadata the metadate object, where the information shall be saved.
+   * @param provider the provider with which the file was accessed.
    * @return true, if this profiler was able to get the specific metadata,
    * false, if not.
    */
-  virtual bool GetMetadata(const string& uri, cMetadata& metadata) = 0;
+  virtual bool GetMetadata(const string& uri, cMetadata& metadata, cUPnPResourceProvider* provider) = 0;
 
 };
 

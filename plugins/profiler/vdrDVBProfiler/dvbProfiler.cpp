@@ -122,7 +122,7 @@ public:
     }
   }
 
-  virtual bool GetMetadata(const string& uri, cMetadata& metadata){
+  virtual bool GetMetadata(const string& uri, cMetadata& metadata, cUPnPResourceProvider*){
     if        (uri.find("vdr",0) == 0){
       return GetChannelMetadata(uri, metadata);
     }
