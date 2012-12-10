@@ -744,7 +744,7 @@ bool cMediaManager::ScanURI(const string& uri, cUPnPResourceProvider* provider){
     string schema = uri.substr(0, uri.find_first_of(':',0));
     for(cPluginManager::ProfilerList::iterator it = profilers.begin(); it != profilers.end(); ++it){
       if((*it)->CanHandleSchema(schema)){
-        if((*it)->GetMetadata(uri, metadata) && RefreshObject(metadata)){
+        if((*it)->GetMetadata(uri, metadata, provider) && RefreshObject(metadata)){
           return true;
         }
       }
