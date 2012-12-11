@@ -80,6 +80,8 @@ private:
     return OpenFile(1);
   }
 
+  cCondWait sleep;
+
 public:
 
   RecProvider()
@@ -92,7 +94,8 @@ public:
   }
 
   virtual ~RecProvider(){
-    Cancel(2);
+    sleep.Signal();
+    Cancel(5);
   }
 
   virtual string ProvidesSchema(){ return "rec"; }
@@ -256,6 +259,7 @@ public:
     int state = 0;
     time_t now;
     bool update = false;
+
     while(Running()){
       update = false;
 
@@ -276,7 +280,7 @@ public:
       if(update){
         OnContainerUpdate(GetRootContainer(), GetContainerUpdateId(GetRootContainer()));
       }
-      sleep(10);
+      sleep.Wait(10000);
     }
   }
 

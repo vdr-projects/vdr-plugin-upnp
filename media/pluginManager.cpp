@@ -425,6 +425,7 @@ bool upnp::cPluginManager::LoadPlugins(){
             boost::shared_ptr<cUPnPResourceProvider> provider((cUPnPResourceProvider*)(dll->GetFunc()()));
             providerFactory[provider->ProvidesSchema()] = (ResourceProviderFuncPtr)dll->GetFunc();
             providers.push_back( provider );
+            provider->SetDescription("%s", provider->ProvidesSchema().c_str());
             provider->Start();
           } else {
             boost::shared_ptr<cMediaProfiler> profiler((cMediaProfiler*)(dll->GetFunc()()));

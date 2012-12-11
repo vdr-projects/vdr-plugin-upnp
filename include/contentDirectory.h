@@ -52,6 +52,8 @@ private:
 
   void Action();
 
+  cCondWait sleep;
+
 } ContentDirectory;
 
 }  // namespace upnp

@@ -58,6 +58,7 @@ namespace upnp {
     class cWSThread : public cThread {
     public:
       cWSThread(cWebserver& webServer);
+      virtual ~cWSThread();
       void Stop();
       virtual void Action(void);
     private:

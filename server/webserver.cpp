@@ -26,7 +26,6 @@ cWebserver::cWebserver(std::string address)
 }
 
 cWebserver::~cWebserver(){
-  mWebserverThread.Stop();
   Stop();
 }
 
@@ -35,11 +34,7 @@ bool cWebserver::Start(){
 }
 
 void cWebserver::Stop(){
-  try {
-    mApplication.shutdown();
-  } catch (const std::exception& e){
-    esyslog("UPnP\tError while stopping web server: %s", e.what());
-  }
+  mWebserverThread.Stop();
 }
 
 bool cWebserver::Initialise(){
@@ -166,15 +161,27 @@ cWebserver::cWSThread::cWSThread(cWebserver& webServer)
 {
 }
 
+cWebserver::cWSThread::~cWSThread(){
+  Stop();
+}
+
 void cWebserver::cWSThread::Action(){
   try {
-    mWebserver.mApplication.run();
+    if(Running()){
+      mWebserver.mApplication.run();
+      dsyslog("UPnP\tStarted web server thread.");
+    }
   } catch (const std::exception& e){
     esyslog("UPnP\tError while starting web server: %s", e.what());
   }
 }
 
 void cWebserver::cWSThread::Stop(){
+  try {
+    tnt::Tntnet::shutdown();
+  } catch (const std::exception& e){
+    esyslog("UPnP\tError while stopping web server: %s", e.what());
+  }
   Cancel(5);
 }
 

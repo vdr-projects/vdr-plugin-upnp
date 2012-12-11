@@ -53,6 +53,8 @@ private:
     return uri.substr(6,uri.size()-7);
   }
 
+  cCondWait sleep;
+
 public:
 
   VdrProvider()
@@ -64,7 +66,8 @@ public:
   }
 
   virtual ~VdrProvider(){
-    Cancel(2);
+    sleep.Signal();
+    Cancel(5);
   }
 
   virtual string ProvidesSchema(){ return "vdr"; }
@@ -207,7 +210,7 @@ public:
         lastModified = now;
       }
 
-      sleep(2);
+      sleep.Wait(2000);
     }
 
   }

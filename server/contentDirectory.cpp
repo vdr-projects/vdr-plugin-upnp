@@ -104,11 +104,12 @@ void cContentDirectory::Action(){
       this->Cancel();
     }
     // Sleep 2 seconds
-    cCondWait::SleepMs(2000);
+    sleep.Wait(2000);
   }
 }
 
 void cContentDirectory::Stop(){
+  this->sleep.Signal();
   this->Cancel(2);
 }
 
