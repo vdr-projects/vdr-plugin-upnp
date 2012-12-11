@@ -963,17 +963,27 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
 
     resourcestr << "DELETE FROM " << db::Resources << " WHERE "
                 << "`" << property::object::KEY_OBJECTID << "`"
-                << " = '" << objectID << "'";
+                << " = :objectID";
 
     cMetadata::ResourceList resources = metadata.GetResources();
-    for(cMetadata::ResourceList::iterator it = resources.begin(); it != resources.end(); ++it){
 
+    int t = 1;
+    for(cMetadata::ResourceList::iterator it = resources.begin(); it != resources.end(); ++it){
       // This is appended to the delete statement and will delete all resources, which are not in the set.
       // The resources are identified by their resource URI. Therefore: two resources with same URI refer
       // to the same file or stream.
       resourcestr << " AND"
                   << " `" << property::resource::KEY_RESOURCE << "`"
-                  << " != \"" << (*it).GetResourceUri() << "\"";
+                  << " != :resource" << t;
+    }
+
+    tntdb::Statement delresourcestmt = connection.prepare(resourcestr.str());
+    delresourcestmt.setString("objectID", objectID);
+    t = 1;
+
+    for(cMetadata::ResourceList::iterator it = resources.begin(); it != resources.end(); ++it){
+
+      delresourcestmt.setString(string("resource") + tools::ToString(t), (*it).GetResourceUri());
 
       resourcestmt1.setString("objectID", objectID)
                    .setString("resource", (*it).GetResourceUri())
@@ -1019,7 +1029,6 @@ bool cMediaManager::RefreshObject(cMetadata& metadata){
       resourcestmt2.execute();
     }
 
-    tntdb::Statement delresourcestmt = connection.prepare(resourcestr.str());
     delresourcestmt.execute();
 
     stringstream detailstr;

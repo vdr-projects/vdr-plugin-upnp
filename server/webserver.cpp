@@ -48,7 +48,7 @@ bool cWebserver::Initialise(){
     // Map static contents
     stringstream ss1, ss2;
 
-    signal(SIGPIPE, SIG_IGN);
+    ::signal(SIGPIPE, SIG_IGN);
 
     mApplication.listen(mListenerAddress.c_str(), mListenerPort);
 
