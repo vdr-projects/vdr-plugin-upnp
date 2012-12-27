@@ -34,13 +34,24 @@ const char *cPluginUpnp::CommandLineHelp(void)
             "  \n"
             "  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
             "                                                where the the database\n"
-            "                                                file shall be located.\n");
+            "                                                file shall be located.\n"
+            "  -a <IP address>      --address=<IP address>   Binds the server to the\n"
+            "                                                specific IP address.\n"
+            "  -i <Interface>       --interface=<Interface>  Binds the server to the\n"
+            "                                                specific network\n"
+            "                                                interface.\n"
+            "  -p <Port>            --port=<Port>            Sets the port where the\n"
+            "                                                UPnP server shall listen\n"
+            "                                                on.");
 }
 
 bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
 {
   static struct option long_options[] = {
     {"db-dir",   required_argument, NULL, 'd'},
+    {"port",     required_argument, NULL, 'p'},
+    {"address",  required_argument, NULL, 'a'},
+    {"interface",required_argument, NULL, 'i'},
     {0, 0, 0, 0}
   };
 
@@ -48,10 +59,21 @@ bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
   upnp::cConfig config = mMediaServer->GetConfiguration();
 
   int c = 0; int index = -1;
-  while((c = getopt_long(argc, argv, "d:",long_options, &index)) != -1){
+  while((c = getopt_long(argc, argv, "d:p:a:i:",long_options, &index)) != -1){
     switch(c){
     case 'd':
       if(!cMenuSetupUPnP::SetupParse("databaseDir", optarg, config)) return false;
+      break;
+    case 'p':
+      if(!cMenuSetupUPnP::SetupParse("port", optarg, config)) return false;
+      break;
+    case 'a':
+      if(!cMenuSetupUPnP::SetupParse("address", optarg, config) ||
+         !cMenuSetupUPnP::SetupParse("bindToAddress", "1", config)) return false;
+      break;
+    case 'i':
+      if(!cMenuSetupUPnP::SetupParse("interface", optarg, config) ||
+         !cMenuSetupUPnP::SetupParse("bindToAddress", "0", config)) return false;
       break;
     default:
       return false;
