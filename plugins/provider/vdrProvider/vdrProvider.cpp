@@ -39,14 +39,25 @@ private:
     return false;
   }
 
-  int GetGroupByName(string name)
+  int GetGroupByName(const string name)
   {
     if(name.empty()) return -1;
     int Idx = -1;
-    cChannel *channel = Channels.Get(++Idx);
-    while (channel && !(channel->GroupSep() && name.compare(channel->Name()) == 0))
-      channel = Channels.Get(++Idx);
-    return channel ? Idx : -1;
+    cChannel *group = Channels.Get(++Idx);
+    while (group && !(group->GroupSep() && name.compare(group->Name()) == 0))
+      group = Channels.Get(++Idx);
+    return group ? Idx : -1;
+  }
+
+  int GetGroupByChannel(const cChannel* channel)
+  {
+    if(!channel) return -1;
+    int Idx = -1;
+    cChannel* group = Channels.Get(++Idx);
+    while(group && !(group->GroupSep() && group->Number() > channel->Number()))
+      group = Channels.Get(++Idx);
+    return group ? Idx : -1;
+
   }
 
   string GetContainerName(string uri){
@@ -180,14 +191,22 @@ public:
 
   virtual void Action(){
 
+#define SLEEP_TIMEOUT 120
+
     const cSchedules* Schedules;
+    cSchedule* Schedule;
+
+    const cEvent* event;
+
     long now = 0;
     bool modified = false;
+
     while(Running()){
+
+      event = NULL;
       now = time(NULL);
 
       if(!Channels.BeingEdited() && Channels.Modified() > 0){
-        OnContainerUpdate(GetRootContainer(), now);
         modified = true;
       }
 
@@ -195,22 +214,36 @@ public:
         cSchedulesLock lock;
         Schedules = cSchedules::Schedules(lock);
         // iterate over all the schedules, find those, which were modified and tell
-        // it to the media manager
-        for(cSchedule* Schedule = Schedules->First(); Schedule; Schedule = Schedules->Next(Schedule))
+        // it to the media manager. If we found an entry, there's no need to continue searching.
+        for(Schedule = Schedules->First(); Schedule; Schedule = Schedules->Next(Schedule))
         {
-          if(Schedule->Modified() > lastModified && Schedule->PresentSeenWithin(30)){
-            OnContainerUpdate(GetRootContainer(), now, *Schedule->ChannelID().ToString());
+          // Get the next event of the schedule...
+          event = Schedule->GetFollowingEvent();
+          if(event){
+            // and check if it starts after the last modification and in two minutes from now.
+            // This causes an update only if there is at least one element in the schedule
+            // which starts within the next two minutes. Other elements, which will start later,
+            // will be skipped.
+            if(event->StartTime() > lastModified && event->StartTime() < now + SLEEP_TIMEOUT){
+              modified = true;
+              break;
+            }
+          } else if(Schedule->Modified() > lastModified){
             modified = true;
+            break;
           }
         }
+
       }
 
       if(modified){
+        OnContainerUpdate(GetRootContainer(), now);
         modified = false;
         lastModified = now;
       }
 
-      sleep.Wait(2000);
+      // Sleep 2 minutes
+      sleep.Wait(SLEEP_TIMEOUT * 1000);
     }
 
   }
