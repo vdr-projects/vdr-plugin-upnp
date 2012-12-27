@@ -51,11 +51,25 @@ cMediaServer::cMediaServer()
 }
 
 cMediaServer::~cMediaServer(){
-  delete mWebserver;
-  delete mMediaManager;
+  UpnpFinish();
+
+  if(mWebserver){
+    mWebserver->Stop();
+
+    delete mWebserver;
+    mWebserver = NULL;
+  }
+
+  if(mMediaManager){
+    delete mMediaManager;
+    mMediaManager = NULL;
+  }
 }
 
 bool cMediaServer::Start(){
+
+  // If the plugin is not enabled, do not start it.
+  if(!mCurrentConfiguration.enabled) return true;
 
   isyslog("UPnP\tStarting UPnP media server");
 
@@ -141,19 +155,9 @@ bool cMediaServer::Stop(){
     return false;
   }
 
-  UpnpFinish();
-
   isyslog("UPnP\tStopping web server...");
   if(mWebserver){
     mWebserver->Stop();
-
-    delete mWebserver;
-    mWebserver = NULL;
-  }
-
-  if(mMediaManager){
-    delete mMediaManager;
-    mMediaManager = NULL;
   }
 
   return true;

@@ -408,6 +408,11 @@ int cMediaManager::Browse(BrowseRequest& request){
     break;
   case CD_BROWSE_DIRECT_CHILDREN:
     where << "`" << property::object::KEY_PARENTID << "`";
+
+    // Limit the number of results to reduce response time and SOAP message size.
+    if(request.requestCount == 0 || request.requestCount > 30)
+      request.requestCount = 30;
+
     break;
   default:
     esyslog("UPnP\tInvalid arguments. Browse flag invalid");
