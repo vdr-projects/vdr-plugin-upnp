@@ -34,13 +34,13 @@ namespace upnp {
     bool Start();
     void Stop();
 
-    const std::string GetBaseUrl() const;
-    const std::string GetServiceUrl() const;
-    const std::string GetControlUrl() const;
-    const std::string GetStaticContentUrl() const;
-    const std::string GetPresentationUrl() const;
+    std::string GetBaseUrl() const;
+    std::string GetServiceUrl() const;
+    std::string GetControlUrl() const;
+    std::string GetStaticContentUrl() const;
+    std::string GetPresentationUrl() const;
 
-    const std::string GetThumbnailDir() const;
+    std::string GetThumbnailDir() const;
 
     std::string GetListenerAddress() const { return mListenerAddress; }
     uint16_t GetListenerPort() const { return mListenerPort; }

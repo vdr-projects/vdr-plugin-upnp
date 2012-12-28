@@ -127,33 +127,36 @@ void cWebserver::SetPresentationUrl(std::string presentationUrl){
     mPresentationUrl = presentationUrl;
 }
 
-const std::string cWebserver::GetBaseUrl() const {
+std::string cWebserver::GetBaseUrl() const {
   stringstream s;
   s << "http://" << mListenerAddress << ":" << mListenerPort << "/";
 
   return s.str();
 }
 
-const std::string cWebserver::GetServiceUrl() const {
+std::string cWebserver::GetServiceUrl() const {
   return GetBaseUrl() + mServiceUrl;
 }
 
-const std::string cWebserver::GetControlUrl() const {
+std::string cWebserver::GetControlUrl() const {
   stringstream s;
   s << "http://" << UpnpGetServerIpAddress() << ":" << UpnpGetServerPort() << "/services/";
   return s.str();
 }
 
-const std::string cWebserver::GetPresentationUrl() const {
+std::string cWebserver::GetPresentationUrl() const {
   return (mPresentationUrl.find("http://",0) == 0) ? mPresentationUrl : (GetBaseUrl() + mPresentationUrl);
 }
 
-const std::string cWebserver::GetStaticContentUrl() const {
+std::string cWebserver::GetStaticContentUrl() const {
   return GetBaseUrl() + mStaticContentUrl;
 }
 
-const std::string cWebserver::GetThumbnailDir() const {
-  return mWebserverRootDir + "images/thumbs/";
+std::string cWebserver::GetThumbnailDir() const {
+  stringstream s;
+  s << mWebserverRootDir << "images/thumbs/";
+
+  return s.str();
 }
 
 cWebserver::cWSThread::cWSThread(cWebserver& webServer)
