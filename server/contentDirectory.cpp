@@ -76,7 +76,7 @@ int cContentDirectory::Subscribe(Upnp_Subscription_Request* Request){
 
 void cContentDirectory::Action(){
   int Retry = 5;
-  dsyslog("UPnP\tStart Content directory thread");
+  LOG(5, "Start Content directory thread");
   while(this->Running()){
     IXML_Document* PropertySet = NULL;
 

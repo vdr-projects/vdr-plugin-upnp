@@ -192,7 +192,7 @@ bool cMediaServer::Initialize(){
 
   int ret = 0;
 
-  isyslog("UPnP\tInitializing UPnP media server on %s:%d", address.c_str(), port);
+  LOG(1, "Initializing UPnP media server on %s:%d", address.c_str(), port);
 
   ret = UpnpInit(address.c_str(), mCurrentConfiguration.port);
 
@@ -200,6 +200,8 @@ bool cMediaServer::Initialize(){
     esyslog("UPnP\tFailed to initialise UPnP media server. Error code: %d", ret);
     return false;
   }
+
+  isyslog("UPnP\tInitialized UPnP media server on %s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
 
   mWebserver = new cWebserver(GetServerIPAddress());
   mMediaManager = new cMediaManager();
@@ -295,7 +297,7 @@ cMediaServer::serviceMap& cMediaServer::GetServices(){
 
 void cMediaServer::RegisterService(cUPnPService* service){
   if(service != NULL){
-    dsyslog("UPnP\tRegistered service: %s", service->GetServiceDescription().serviceType.c_str());
+    LOG(1, "Registered service: %s", service->GetServiceDescription().serviceType.c_str());
     GetServices()[service->GetServiceDescription().serviceID] = service;
   }
 }
@@ -318,7 +320,7 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
   case UPNP_CONTROL_ACTION_REQUEST:
     actionRequest = (Upnp_Action_Request*) event;
 
-    dsyslog("UPnP\tAction request: %s", actionRequest->ActionName);
+    LOG(3, "Action request: %s", actionRequest->ActionName);
 
     if(!mediaServer->CheckDeviceUUID(actionRequest->DevUDN)){
       esyslog("UPnP\tUPnP Callback - action request not for this device");
@@ -337,7 +339,7 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
   case UPNP_EVENT_SUBSCRIPTION_REQUEST:
     eventRequest = (Upnp_Subscription_Request*) event;
 
-    dsyslog("UPnP\tSubscription request from: %s", eventRequest->ServiceId);
+    LOG(3, "Subscription request from: %s", eventRequest->ServiceId);
 
     if(!mediaServer->CheckDeviceUUID(eventRequest->UDN)){
       esyslog("UPnP\tUPnP Callback - event request not for this device");

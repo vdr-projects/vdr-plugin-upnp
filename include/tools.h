@@ -32,6 +32,23 @@ using namespace std;
 
 #define _unused(x) ((void)x)
 
+#ifdef DEBUG
+
+#if __STDC_VERSION__ < 199901L
+  #if __GNUC__ >= 2
+  #define __func__ __PRETTY_FUNCTION__
+  #else
+  #define __func__ "<unknown>"
+  #endif
+#endif
+
+#define LOG(level, msg...) upnp::log_debug_msg(__FILE__, __func__, __LINE__, level, msg);
+
+namespace upnp {
+  void log_debug_msg(const char* file, const char* func, int line, int level, const char* msg, ...) __attribute__ ((format (printf, 5, 6)));
+}
+#endif
+
 namespace upnp {
 
   typedef std::list<std::string> StringList;

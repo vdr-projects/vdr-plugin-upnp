@@ -6,6 +6,7 @@
  */
 
 #include "../include/webserver.h"
+#include "../include/tools.h"
 #include "../upnp.h"
 #include <signal.h>
 #include <sstream>
@@ -172,7 +173,7 @@ void cWebserver::cWSThread::Action(){
   try {
     if(Running()){
       mWebserver.mApplication.run();
-      dsyslog("UPnP\tStarted web server thread.");
+      LOG(3, "Started web server thread.");
     }
   } catch (const std::exception& e){
     esyslog("UPnP\tError while starting web server: %s", e.what());

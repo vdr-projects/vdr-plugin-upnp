@@ -184,7 +184,7 @@ bool cMenuSetupUPnP::SetupParse(const char *name, const char *value, upnp::cConf
 {
 
   if(parsedArgs.find(name) != std::string::npos){
-    dsyslog("UPnP\tSkipping %s=%s, was overridden in command line.", name, value);
+    LOG(1, "Skipping %s=%s, was overridden in command line.", name, value);
     return true;
   }
 

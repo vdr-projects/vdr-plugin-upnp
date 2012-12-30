@@ -479,7 +479,7 @@ bool cMediaManager::Initialise(){
 
     connection = tntdb::connect(ss.str());
 
-    dsyslog("UPnP\tPreparing database structure...");
+    LOG(2, "Preparing database structure...");
 
     if(!CheckIntegrity()){
       try {
@@ -660,7 +660,7 @@ bool cMediaManager::CheckIntegrity(){
 }
 
 cResourceStreamer* cMediaManager::GetResourceStreamer(const string& objectID, int resourceID){
-  dsyslog("UPnP\tTry to stream resource[%d] of objectID %s", resourceID, objectID.c_str());
+  LOG(5, "Try to stream resource[%d] of objectID %s", resourceID, objectID.c_str());
 
   stringstream resourceSQL;
 

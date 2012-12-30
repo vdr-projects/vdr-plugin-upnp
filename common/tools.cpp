@@ -17,6 +17,26 @@
 
 using namespace std;
 
+#ifdef DEBUG
+
+#define MESSAGE_SIZE 256
+namespace upnp {
+  void log_debug_msg(const char* file, const char* func, int line, int level, const char* msg, ...){
+    char* lvlenv = getenv("UPNP_DEBUG_LEVEL");
+    int debug_level = lvlenv ? atoi(lvlenv) : 0;
+    if(level && debug_level >= level){
+      va_list ap;
+      char message[MESSAGE_SIZE];
+
+      snprintf(message, sizeof(message), "[%s:%d] %s - %s", file, line, func, msg);
+      va_start(ap, msg);
+      vsyslog(LOG_NOTICE, message, ap);
+      va_end(ap);
+    }
+  }
+}
+#endif
+
 namespace upnp {
 
 namespace tools {
