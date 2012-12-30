@@ -387,6 +387,21 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
 }
 
 int cMediaManager::Browse(BrowseRequest& request){
+
+  LOG(5, "Browse request"
+         "ObjectID:         %s\n"
+         "Browse metadata:  %d\n"
+         "Request count:    %d\n"
+         "Start index:      %d\n"
+         "Filter:           %s\n"
+         "Sort critera:     %s",
+         request.objectID,
+         request.browseMetadata,
+         request.requestCount,
+         request.startIndex,
+         request.filter.c_str(),
+         request.sortCriteria.c_str());
+
   stringstream metadata, count, where;
 
   metadata << "SELECT *,(SELECT COUNT(1) FROM " << db::Metadata << " m WHERE "
@@ -439,7 +454,7 @@ int cMediaManager::Browse(BrowseRequest& request){
   }
 
   int ret = 0;
-  if((ret = CreateResponse(request, metadata.str(), count.str())) == UPNP_E_SUCCESS) return ret;
+  if((ret = CreateResponse(request, metadata.str(), count.str())) != UPNP_E_SUCCESS) return ret;
 
   return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
@@ -454,7 +469,7 @@ int cMediaManager::Search(SearchRequest& request){
   // TODO: Finish search method
 
   int ret = 0;
-  if((ret = CreateResponse(request, metadata.str(), count.str())) == UPNP_E_SUCCESS) return ret;
+  if((ret = CreateResponse(request, metadata.str(), count.str())) != UPNP_E_SUCCESS) return ret;
 
   return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
