@@ -395,7 +395,7 @@ int cMediaManager::Browse(BrowseRequest& request){
          "Start index:      %d\n"
          "Filter:           %s\n"
          "Sort critera:     %s",
-         request.objectID,
+         request.objectID.c_str(),
          request.browseMetadata,
          request.requestCount,
          request.startIndex,
