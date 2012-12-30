@@ -296,7 +296,7 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
 
         string objectID = row.getString(property::object::KEY_OBJECTID);
 
-        LOG(5, "Added new %s with objectID '%s' (%s) to result set.", (isContainer) ? "container" : "item", objectID.c_str(), row.getString(property::object::KEY_TITLE));
+        LOG(5, "Added new %s with objectID '%s' (%s) to result set.", (isContainer) ? "container" : "item", objectID.c_str(), row.getString(property::object::KEY_TITLE).c_str());
 
         ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_OBJECTID, objectID);
         ixml::IxmlAddProperty(DIDLDoc, object, property::object::KEY_PARENTID, row.getString(property::object::KEY_PARENTID));
