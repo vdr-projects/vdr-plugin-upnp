@@ -388,19 +388,12 @@ int cMediaManager::CreateResponse(MediaRequest& request, const string& select, c
 
 int cMediaManager::Browse(BrowseRequest& request){
 
-  LOG(5, "Browse request"
-         "ObjectID:         %s\n"
-         "Browse metadata:  %d\n"
-         "Request count:    %d\n"
-         "Start index:      %d\n"
-         "Filter:           %s\n"
-         "Sort critera:     %s",
+  LOG(5, "Browse request for ObjectID = '%s', filter: '%s', sort: '%s', from: %d count: %d",
          request.objectID.c_str(),
-         request.browseMetadata,
-         request.requestCount,
-         request.startIndex,
          request.filter.c_str(),
-         request.sortCriteria.c_str());
+         request.sortCriteria.c_str(),
+         request.startIndex,
+         request.requestCount);
 
   stringstream metadata, count, where;
 
@@ -455,6 +448,8 @@ int cMediaManager::Browse(BrowseRequest& request){
 
   int ret = 0;
   if((ret = CreateResponse(request, metadata.str(), count.str())) != UPNP_E_SUCCESS) return ret;
+
+  LOG(5, "Found %d matches, returning %d", request.totalMatches, request.numberReturned);
 
   return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
 }
