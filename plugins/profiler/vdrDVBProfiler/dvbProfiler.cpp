@@ -138,6 +138,10 @@ public:
 
   ::cConfig<ChannelTitle> channelTitleConfig;
 
+  cCharSetConv conv;
+#define TO_UTF8(from, to, length) \
+  char to[length]; conv.Convert(from, to, length);
+
 private:
 
 #if VDRVERSNUM > 10704
