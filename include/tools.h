@@ -47,6 +47,8 @@ using namespace std;
 namespace upnp {
   void log_debug_msg(const char* file, const char* func, int line, int level, const char* msg, ...) __attribute__ ((format (printf, 5, 6)));
 }
+#else
+#define LOG(level, msg...)
 #endif
 
 namespace upnp {
