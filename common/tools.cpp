@@ -106,6 +106,13 @@ string Trim(const std::string& str, const std::string& whitespace)
   return str.substr(strBegin, strRange);
 }
 
+string ToUTF8String(const char* bytes){
+  cCharSetConv conv;
+  char to[4096];
+  conv.Convert(bytes, to, 4096);
+  return string(to);
+}
+
 string ToString(long number){
   stringstream ss;
   ss << number;

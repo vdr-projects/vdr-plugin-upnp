@@ -17,6 +17,7 @@ namespace upnp {
 
 namespace tools {
 
+string ToUTF8String(const char* bytes);
 string ToString(long number);
 string StringListToCSV(StringList list);
 string IdListToCSV(IdList list);

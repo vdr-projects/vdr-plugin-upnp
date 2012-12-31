@@ -173,9 +173,9 @@ private:
     metadata.SetParentIDByUri(fs);
     metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(info->Title()?info->Title():recording->Title())));
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(info->ShortText()?info->ShortText():"")));
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(info->Description()?info->Description():"")));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, tools::ToUTF8String(info->Title()?info->Title():recording->Title())));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, tools::ToUTF8String(info->ShortText()?info->ShortText():"")));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, tools::ToUTF8String(info->Description()?info->Description():"")));
 
     boost::posix_time::ptime date = boost::posix_time::from_time_t(info->GetEvent()->StartTime());
     metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(date.date())));
@@ -335,7 +335,10 @@ private:
 	  // TODO: implement check for radio stations (this is ...audioItem.audioBroadcast)
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CLASS, string("object.item.videoItem.videoBroadcast")));
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
-	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NAME, string(channel->Name())));
+
+	  string channelName = tools::ToUTF8String(channel->Name());
+
+	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NAME, channelName));
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NR, (long int)channel->Number()));
 
 	  // Now, we try to get the present event of the schedule
@@ -353,24 +356,24 @@ private:
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(startTime.date())));
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_START, boost::posix_time::to_iso_extended_string(startTime)));
 	      metadata.SetProperty(cMetadata::Property(property::object::KEY_SCHEDULED_END, boost::posix_time::to_iso_extended_string(endTime)));
-	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(event->ShortText()?event->ShortText():"")));
-	      metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, string(event->Description()?event->Description():"")));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, tools::ToUTF8String(event->ShortText()?event->ShortText():"")));
+	      metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, tools::ToUTF8String(event->Description()?event->Description():"")));
 	    }
 
       ChannelTitle* titleConfig = channelTitleConfig.First();
       if(titleConfig){
         titleConfig->Clear();
         if(event)
-          titleConfig->SetTitle(event->Title());
-        titleConfig->SetChannelName(channel->Name());
+          titleConfig->SetTitle(tools::ToUTF8String(event->Title()));
+        titleConfig->SetChannelName(channelName);
         titleConfig->SetChannelNumber(channel->Number());
 
         metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, titleConfig->ToString()));
       } else {
         stringstream ss;
-        ss << channel->Name();
+        ss << channelName;
         if(event)
-          ss << " - " << event->Title();
+          ss << " - " << tools::ToUTF8String(event->Title());
         metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, ss.str()));
       }
 
@@ -413,7 +416,7 @@ private:
 	  stringstream ss;
 	  cMetadata::Resource thumbnail;
 	  ss.str(string());
-	  ss << "channelIcons/" << channel->Name() << ".jpg";
+	  ss << "channelIcons/" << channelName << ".jpg";
 
 	  stringstream filename, uriStrm;
 	  filename << cMediaServer::GetInstance()->GetWebserver().GetThumbnailDir() << ss.str();

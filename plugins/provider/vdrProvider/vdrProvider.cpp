@@ -66,10 +66,6 @@ private:
 
   cCondWait sleep;
 
-  cCharSetConv conv;
-#define TO_UTF8(from, to, length) \
-  char to[length]; conv.Convert(from, to, length);
-
 public:
 
   VdrProvider()
@@ -117,8 +113,7 @@ public:
         }
       } else {
         for(index = Channels.GetNextGroup(from - 1); (channel = Channels.Get(index)) && index < to; index = Channels.GetNextGroup(index)){
-          TO_UTF8(channel->Name(), chanName, 1024);
-          string group = string(chanName) + '/';
+          string group = tools::ToUTF8String(channel->Name()) + '/';
           list.push_back(group);
         }
       }
@@ -154,9 +149,9 @@ public:
       metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string("VDR Live-TV")));
       metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string("Watch Live-TV")));
     } else if((index = GetGroupByName(GetContainerName(uri))) != -1 && (channel = Channels.Get(index)) != NULL){
-      TO_UTF8(channel->Name(), chanName, 1024);
-      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(chanName)));
-      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, string(chanName)));
+      string chanName = tools::ToUTF8String(channel->Name());
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, chanName));
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, chanName));
     } else {
       return false;
     }

@@ -178,7 +178,7 @@ public:
       string folder = uri.substr(ls , ul - ls -1);
       char * str = strdup(folder.c_str());
       str = ExchangeChars(str, false);
-      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, string(str)));
+      metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, tools::ToUTF8String(str)));
       free(str);
     }
 
