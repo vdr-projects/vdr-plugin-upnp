@@ -177,7 +177,7 @@ private:
     metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, tools::ToUTF8String(info->ShortText()?info->ShortText():"")));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, tools::ToUTF8String(info->Description()?info->Description():"")));
 
-    boost::posix_time::ptime date = boost::posix_time::from_time_t(info->GetEvent()->StartTime());
+    boost::posix_time::ptime date = boost::posix_time::from_time_t(info->GetEvent()?info->GetEvent()->StartTime():0);
     metadata.SetProperty(cMetadata::Property(property::object::KEY_DATE, boost::gregorian::to_iso_extended_string(date.date())));
 
     cMetadata::Resource resource;
