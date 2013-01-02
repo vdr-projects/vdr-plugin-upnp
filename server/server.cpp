@@ -180,7 +180,7 @@ bool cMediaServer::Initialize(){
               ? mCurrentConfiguration.address
               : tools::GetAddressByInterface(mCurrentConfiguration.interface);
 
-    if(address.empty() || !address.compare("0.0.0.0")){
+    if(address.empty() || address.compare("0.0.0.0") == 0){
       address = tools::GetAddressByInterface(tools::GetNetworkInterfaceByIndex(0, true));
     }
 
@@ -192,9 +192,9 @@ bool cMediaServer::Initialize(){
 
   int ret = 0;
 
-  LOG(1, "Initializing UPnP media server on %s:%d", address.c_str(), port);
+  LOG(1, "Initializing UPnP media server on %s:%d", address.empty()?"0":address.c_str(), port);
 
-  ret = UpnpInit(address.c_str(), mCurrentConfiguration.port);
+  ret = UpnpInit(address.empty()?"127.0.0.1":address.c_str(), mCurrentConfiguration.port);
 
   if(ret != UPNP_E_SUCCESS && ret != UPNP_E_INIT){
     esyslog("UPnP\tFailed to initialise UPnP media server. Error code: %d", ret);
