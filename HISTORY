@@ -1,6 +1,10 @@
 VDR Plugin 'upnp' Revision History
 ----------------------------------
 
+2013-01-03: Version 1.0.0
+
+ - Fix: Fixed many UTF-8 issues
+ - Fix: Reduced file system access by the database
  - Fix: Fixed Microsoft Windows Media Player 12 support.
  - New: Initial support for audio recordings, i.e. recordings from radio
         stations. Live radio stations will follow very soon.
