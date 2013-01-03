@@ -64,7 +64,7 @@ string GetAddressByInterface(string Interface){
 }
 string GetNetworkInterfaceByIndex(int Index, bool skipLoop){
   StringVector interfaces = GetNetworkInterfaces(skipLoop);
-  if(interfaces.size() < 0)
+  if(interfaces.size() > 0)
     return interfaces[Index];
   else
     return string();
