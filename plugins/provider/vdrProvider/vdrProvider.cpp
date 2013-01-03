@@ -49,17 +49,6 @@ private:
     return group ? Idx : -1;
   }
 
-  int GetGroupByChannel(const cChannel* channel)
-  {
-    if(!channel) return -1;
-    int Idx = -1;
-    cChannel* group = Channels.Get(++Idx);
-    while(group && !(group->GroupSep() && group->Number() > channel->Number()))
-      group = Channels.Get(++Idx);
-    return group ? Idx : -1;
-
-  }
-
   string GetContainerName(string uri){
     return uri.substr(6,uri.size()-7);
   }

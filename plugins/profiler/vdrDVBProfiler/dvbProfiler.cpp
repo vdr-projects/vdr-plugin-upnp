@@ -136,6 +136,31 @@ public:
     }
   }
 
+  int GetGroupByChannel(const cChannel* channel)
+  {
+    if(!channel) return -1;
+    int Idx = 0, Idx2;
+    cChannel *group, *chan;
+
+    for(group = Channels.First(); group; group = Channels.Next(group)){
+      if(group->GroupSep() && *group->Name()){
+        Idx2 = Idx;
+        for(chan = Channels.Next(group); chan; chan = Channels.Next(chan)){
+          if(chan->GroupSep() && *group->Name()){
+            group = Channels.Prev(chan);
+            break;
+          }
+          if(channel == chan) return Idx;
+          ++Idx2;
+        }
+        Idx = Idx2;
+      }
+      ++Idx;
+    }
+
+    return -1;
+  }
+
   ::cConfig<ChannelTitle> channelTitleConfig;
 
   cCharSetConv conv;
@@ -340,6 +365,12 @@ private:
 
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NAME, channelName));
 	  metadata.SetProperty(cMetadata::Property(property::object::KEY_CHANNEL_NR, (long int)channel->Number()));
+
+    int group = GetGroupByChannel(channel);
+    if(group != -1){
+      LOG(4, "Channel group: %s (%d)", Channels.Get(group)->Name(), group);
+      metadata.SetProperty(cMetadata::Property("upnp:genre", tools::ToUTF8String(Channels.Get(group)->Name())));
+    }
 
 	  // Now, we try to get the present event of the schedule
 	  {
