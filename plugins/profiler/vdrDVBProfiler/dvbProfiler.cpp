@@ -198,7 +198,11 @@ private:
     metadata.SetParentIDByUri(fs);
     metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, tools::ToUTF8String(recording->Title())));
+    string title = tools::ToUTF8String(recording->Name());
+    // Replace Episode delimiter if existent:
+    std::replace(title.begin(), title.end(), '~', ':');
+
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, title));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, tools::ToUTF8String(info->ShortText()?info->ShortText():"")));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, tools::ToUTF8String(info->Description()?info->Description():"")));
 
