@@ -13,6 +13,7 @@
 #include <vdr/videodir.h>
 #include <string>
 #include <sstream>
+#include <algorithm>
 #include <tools.h>
 #include <pwd.h>
 #include <unistd.h>
@@ -128,7 +129,9 @@ public:
         } else {
           fs = string(rec->FileName()).substr(vul);
         }
-        list.push_back(fs);
+        bool contains = std::find(list.begin(), list.end(), fs) != list.end();
+        if (!contains)
+          list.push_back(fs);
       }
     }
 

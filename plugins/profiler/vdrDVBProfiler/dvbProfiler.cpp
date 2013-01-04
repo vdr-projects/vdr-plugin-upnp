@@ -198,7 +198,7 @@ private:
     metadata.SetParentIDByUri(fs);
     metadata.SetProperty(cMetadata::Property(property::object::KEY_RESTRICTED, true));
 
-    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, tools::ToUTF8String(info->Title()?info->Title():recording->Title())));
+    metadata.SetProperty(cMetadata::Property(property::object::KEY_TITLE, tools::ToUTF8String(recording->Title())));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_DESCRIPTION, tools::ToUTF8String(info->ShortText()?info->ShortText():"")));
     metadata.SetProperty(cMetadata::Property(property::object::KEY_LONG_DESCRIPTION, tools::ToUTF8String(info->Description()?info->Description():"")));
 
