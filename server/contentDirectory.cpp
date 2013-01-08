@@ -314,8 +314,8 @@ int cContentDirectory::Browse(Upnp_Action_Request* request){
 
   int ret = mMediaServer->GetManager().Browse(browseRequest);
   if(ret!=UPNP_E_SUCCESS){
-    esyslog("UPnP\tError while browsing. Code: %d", ret);
     this->SetError(request, ret);
+    esyslog("UPnP\tError while browsing: %s (%d)", request->ErrStr, request->ErrCode);
     return request->ErrCode;
   }
 

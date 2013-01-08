@@ -59,6 +59,7 @@ bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
   upnp::cConfig config = mMediaServer->GetConfiguration();
 
   int c = 0; int index = -1;
+  bool expert = false;
   while((c = getopt_long(argc, argv, "d:p:a:i:",long_options, &index)) != -1){
     switch(c){
     case 'd':
@@ -66,18 +67,25 @@ bool cPluginUpnp::ProcessArgs(int argc, char *argv[])
       break;
     case 'p':
       if(!cMenuSetupUPnP::SetupParse("port", optarg, config)) return false;
+      expert = true;
       break;
     case 'a':
       if(!cMenuSetupUPnP::SetupParse("address", optarg, config) ||
          !cMenuSetupUPnP::SetupParse("bindToAddress", "1", config)) return false;
+      expert = true;
       break;
     case 'i':
       if(!cMenuSetupUPnP::SetupParse("interface", optarg, config) ||
          !cMenuSetupUPnP::SetupParse("bindToAddress", "0", config)) return false;
+      expert = true;
       break;
     default:
       return false;
     }
+  }
+
+  if(expert){
+    if(!cMenuSetupUPnP::SetupParse("expertSettings", optarg, config)) return false;
   }
 
   mMediaServer->SetConfiguration(config);

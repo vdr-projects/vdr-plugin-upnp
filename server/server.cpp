@@ -96,7 +96,8 @@ bool cMediaServer::Start(){
                                 &mDeviceHandle);
 
   if(ret != UPNP_E_SUCCESS){
-    esyslog("UPnP\tFailed to register the device. Error code: %d", ret);
+    esyslog("UPnP\tFailed to register the device. Error code: %s Help: %s",
+        GetErrorMessage(ret).c_str(), GetErrorHelp(ret).c_str());
     return false;
   }
 
@@ -115,7 +116,8 @@ bool cMediaServer::Start(){
                                 &mDeviceHandle);
 
   if(ret != UPNP_E_SUCCESS){
-    esyslog("UPnP\tFailed to register the device. Error code: %d", ret);
+    esyslog("UPnP\tFailed to register the device. Error code: %s Help: %s",
+        GetErrorMessage(ret).c_str(), GetErrorHelp(ret).c_str());
     return false;
   }
 
@@ -130,7 +132,8 @@ bool cMediaServer::Start(){
   isyslog("UPnP\tSend first advertisements to publish start in network");
   ret = UpnpSendAdvertisement(mDeviceHandle, GetAnnounceMaxAge());
   if (ret != UPNP_E_SUCCESS) {
-    esyslog("UPnP\tError while sending first advertisments - Errorcode: %d", ret);
+    esyslog("UPnP\tError while sending first advertisments. Error code: %s Help: %s",
+        GetErrorMessage(ret).c_str(), GetErrorHelp(ret).c_str());
     return false;
   }
 
@@ -151,7 +154,8 @@ bool cMediaServer::Stop(){
   isyslog("UPnP\tStopping UPnP media server");
   UpnpUnRegisterRootDevice(mDeviceHandle);
   if (ret != UPNP_E_SUCCESS) {
-    esyslog("UPnP\tError while sending first advertisments - Errorcode: %d", ret);
+    esyslog("UPnP\tError while unregistering device. Error code: %s Help: %s",
+        GetErrorMessage(ret).c_str(), GetErrorHelp(ret).c_str());
     return false;
   }
 
@@ -197,7 +201,8 @@ bool cMediaServer::Initialize(){
   ret = UpnpInit(address.empty()?"127.0.0.1":address.c_str(), mCurrentConfiguration.port);
 
   if(ret != UPNP_E_SUCCESS && ret != UPNP_E_INIT){
-    esyslog("UPnP\tFailed to initialise UPnP media server. Error code: %d", ret);
+    esyslog("UPnP\tFailed to initialise UPnP media server. Error code: %s Help: %s",
+        GetErrorMessage(ret).c_str(), GetErrorHelp(ret).c_str());
     return false;
   }
 
@@ -243,7 +248,8 @@ bool cMediaServer::Initialize(){
   ret = UpnpSetMaxContentLength(GetMaxContentLength());
 
   if(ret != UPNP_E_SUCCESS){
-    esyslog("UPnP\tFailed to set max. content length of SOAP messages. Error code: %d", ret);
+    esyslog("UPnP\tFailed to set max. content length of SOAP messages. Error code: %s Help: %s",
+        GetErrorMessage(ret).c_str(), GetErrorHelp(ret).c_str());
     return false;
   }
 
@@ -364,6 +370,110 @@ int cMediaServer::ActionCallback(Upnp_EventType eventtype, void *event, void *co
 
 bool cMediaServer::CheckDeviceUUID(string deviceUUID) const {
   return deviceUUID.find(mCurrentConfiguration.deviceUUID) != string::npos;
+}
+
+string cMediaServer::GetErrorHelp(int error) const {
+  switch (error){
+  case UPNP_E_INVALID_DESC:
+    return "Invalid device description. Most likely, the web server has an issue start listening on a specific interface or port.";
+  default:
+    return string();
+  }
+}
+
+string cMediaServer::GetErrorMessage(int error) const {
+  switch (error){
+  case UPNP_E_SUCCESS:
+    return "Success";
+  case UPNP_E_INVALID_HANDLE:
+    return "Invalid UPnP handle.";
+  case UPNP_E_INVALID_PARAM:
+    return "Invalid parameter.";
+  case UPNP_E_OUTOF_HANDLE:
+    return "Out of UPnP handles.";
+  case UPNP_E_OUTOF_CONTEXT:
+    return "Out of context";
+  case UPNP_E_OUTOF_MEMORY:
+    return "Out of memory";
+  case UPNP_E_INIT:
+    return "Initialization error";
+  case UPNP_E_BUFFER_TOO_SMALL:
+    return "Buffer too small";
+  case UPNP_E_INVALID_DESC:
+    return "Invalid device description";
+  case UPNP_E_INVALID_URL:
+    return "Invalid URL";
+  case UPNP_E_INVALID_SID:
+    return "Invalid service ID";
+  case UPNP_E_INVALID_SERVICE:
+    return "Invalid service";
+  case UPNP_E_INVALID_DEVICE:
+    return "Invalid device";
+  case UPNP_E_BAD_RESPONSE:
+    return "Bad response";
+  case UPNP_E_BAD_REQUEST:
+    return "Bad request";
+  case UPNP_E_INVALID_ACTION:
+    return "Invalid action";
+  case UPNP_E_FINISH:
+    return "Library finished already";
+  case UPNP_E_INIT_FAILED:
+    return "Initialization failed";
+  case UPNP_E_URL_TOO_BIG:
+    return "URL too big";
+  case UPNP_E_BAD_HTTPMSG:
+    return "Bad HTTP message";
+  case UPNP_E_ALREADY_REGISTERED:
+    return "Already registered";
+  case UPNP_E_NETWORK_ERROR:
+    return "Network error";
+  case UPNP_E_SOCKET_WRITE:
+    return "Socket write error";
+  case UPNP_E_SOCKET_READ:
+    return "Socket read error";
+  case UPNP_E_SOCKET_BIND:
+    return "Socket bind error";
+  case UPNP_E_SOCKET_CONNECT:
+    return "Socket connect error";
+  case UPNP_E_OUTOF_SOCKET:
+    return "Out of sockets";
+  case UPNP_E_LISTEN:
+    return "Socket listen error";
+  case UPNP_E_TIMEDOUT:
+    return "Socket timeout";
+  case UPNP_E_SOCKET_ERROR:
+    return "General socket error";
+  case UPNP_E_FILE_WRITE_ERROR:
+    return "File write error";
+  case UPNP_E_CANCELED:
+    return "Canceled";
+  case UPNP_E_EVENT_PROTOCOL:
+    return "Event protocol";
+  case UPNP_E_SUBSCRIBE_UNACCEPTED:
+    return "Subscription rejected";
+  case UPNP_E_UNSUBSCRIBE_UNACCEPTED:
+    return "Unsubscription rejected";
+  case UPNP_E_NOTIFY_UNACCEPTED:
+    return "Notification rejected";
+  case UPNP_E_INVALID_ARGUMENT:
+    return "Invalid argument";
+  case UPNP_E_FILE_NOT_FOUND:
+    return "File not found";
+  case UPNP_E_FILE_READ_ERROR:
+    return "File read error";
+  case UPNP_E_EXT_NOT_XML:
+    return "Not an \".xml\" extension";
+  case UPNP_E_NO_WEB_SERVER:
+    return "No web server";
+  case UPNP_E_OUTOF_BOUNDS:
+    return "Out of bounds";
+  case UPNP_E_NOT_FOUND:
+    return "Not found";
+  case UPNP_E_INTERNAL_ERROR:
+    return "Internal error";
+  default:
+    return "Unknown error code. Please see the rest of the logs.";
+  }
 }
 
 cMediaServer::Description::Description(

@@ -78,6 +78,9 @@ public:
 
   void Housekeeping();
 
+  string GetErrorMessage(int error) const;
+  string GetErrorHelp(int error) const;
+
 private:
 	cMediaServer();
 
