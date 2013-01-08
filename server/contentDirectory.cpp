@@ -267,7 +267,7 @@ int cContentDirectory::Browse(Upnp_Action_Request* request){
   cMediaManager::BrowseRequest browseRequest;
 
   if(this->ParseStringValue(request->ActionRequest, "ObjectID", browseRequest.objectID)){
-    esyslog("UPnP\tInvalid arguments. ObjectID missing or wrong");
+    esyslog("UPnP\tInvalid arguments. ObjectID missing or wrong: %s", browseRequest.objectID);
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;
   }
@@ -285,14 +285,14 @@ int cContentDirectory::Browse(Upnp_Action_Request* request){
   }
 
   if(this->ParseStringValue(request->ActionRequest, "Filter", browseRequest.filter)){
-    esyslog("UPnP\tInvalid arguments. Filter missing or wrong");
+    esyslog("UPnP\tInvalid arguments. Filter missing or wrong: %s", browseRequest.filter);
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;
   }
 
   long startIndex;
   if(this->ParseIntegerValue(request->ActionRequest, "StartingIndex", startIndex)){
-    esyslog("UPnP\tInvalid arguments. Starting index missing or wrong");
+    esyslog("UPnP\tInvalid arguments. Starting index missing or wrong: %d", browseRequest.startIndex);
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;
   }
@@ -300,14 +300,14 @@ int cContentDirectory::Browse(Upnp_Action_Request* request){
 
   long requestCount;
   if(this->ParseIntegerValue(request->ActionRequest, "RequestedCount", requestCount)){
-    esyslog("UPnP\tInvalid arguments. Requested count missing or wrong");
+    esyslog("UPnP\tInvalid arguments. Requested count missing or wrong: %d", browseRequest.requestCount);
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;
   }
   browseRequest.requestCount = requestCount;
 
   if(this->ParseStringValue(request->ActionRequest, "SortCriteria", browseRequest.sortCriteria)){
-    esyslog("UPnP\tInvalid arguments. Sort criteria missing or wrong");
+    esyslog("UPnP\tInvalid arguments. Sort criteria missing or wrong: %s", browseRequest.sortCriteria);
     this->SetError(request, UPNP_SOAP_E_INVALID_ARGS);
     return request->ErrCode;
   }
@@ -315,7 +315,7 @@ int cContentDirectory::Browse(Upnp_Action_Request* request){
   int ret = mMediaServer->GetManager().Browse(browseRequest);
   if(ret!=UPNP_E_SUCCESS){
     this->SetError(request, ret);
-    esyslog("UPnP\tError while browsing: %s (%d)", request->ErrStr, request->ErrCode);
+    esyslog("UPnP\tError while browsing object ID '%s': %s (%d)", browseRequest.objectID, request->ErrStr, request->ErrCode);
     return request->ErrCode;
   }
 
