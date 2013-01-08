@@ -453,7 +453,12 @@ int cMediaManager::Browse(BrowseRequest& request){
 
   LOG(5, "Found %d matches, returning %d", request.totalMatches, request.numberReturned);
 
-  return (request.totalMatches == 0 && request.numberReturned == 0) ? UPNP_CDS_E_CANT_PROCESS_REQUEST : UPNP_E_SUCCESS;
+  if(request.totalMatches == 0 && request.numberReturned == 0){
+    dsyslog("Container %s is empty.", request.objectID);
+    return UPNP_CDS_E_CANT_PROCESS_REQUEST;
+  } else {
+    return UPNP_E_SUCCESS;
+  }
 }
 
 int cMediaManager::Search(SearchRequest& request){
