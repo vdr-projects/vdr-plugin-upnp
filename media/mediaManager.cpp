@@ -454,7 +454,7 @@ int cMediaManager::Browse(BrowseRequest& request){
   LOG(5, "Found %d matches, returning %d", request.totalMatches, request.numberReturned);
 
   if(request.totalMatches == 0 && request.numberReturned == 0){
-    dsyslog("Container %s is empty.", request.objectID);
+    dsyslog("Container %s is empty.", request.objectID.c_str());
     return UPNP_CDS_E_CANT_PROCESS_REQUEST;
   } else {
     return UPNP_E_SUCCESS;
