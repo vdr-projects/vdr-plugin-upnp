@@ -9,6 +9,7 @@ CATEGORY  = Profiler
 TARGET    = $(SUBPLUGIN)-$(CATEGORY)
 
 OBJS      = $(SUBPLUGIN)$(CATEGORY).o
+DOCS      = README
 
 
 ROOTBUILDDIR = ../../..
@@ -22,7 +23,8 @@ clean:
 
 install:
 	@$(MAKE) -f ../../../Makefile.plugins -C "$(shell pwd)" _install
-	cp --remove-destination channelTitle.conf $(VDRCFGDIR)
+	@mkdir -p $(DESTDIR)$(VDRCFGDIR)
+	cp --remove-destination channelTitle.conf $(DESTDIR)$(VDRCFGDIR)
 
 uninstall:
 	@$(MAKE) -f ../../../Makefile.plugins -C "$(shell pwd)" _uninstall

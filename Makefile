@@ -14,13 +14,10 @@
 
 -include Make.config
 
-### Make sure that necessary options are included:
+### dummy entry to silence the vdr >= 1.7.34 Makefile about old Makefile architecture
+# PKGCFG
 
--include $(VDRDIR)/Make.global
-
-### Allow user defined VDR options to overwrite defaults:
-
--include $(VDRDIR)/Make.config
+### this plugin has subplugins:
 
 SUBPLUGDIR ?= ./plugins
 
@@ -28,6 +25,10 @@ SUBPLUGDIR ?= ./plugins
 
 ARCHIVE = $(PLUGIN)-$(VERSION)
 PACKAGE = vdr-$(ARCHIVE)
+
+### The name of the shared object file:
+
+SOFILE = libvdr-$(PLUGIN).so
 
 ### The object files (add further files here):
 
@@ -54,10 +55,9 @@ OBJS = 	$(PLUGIN).o \
 		
 LIBS += -lupnp -lcxxtools -ltntnet -ltntdb -ldl
 
-
 ### The main target:
 
-all: plugin subplugins
+all: $(SOFILE) subplugins i18n
 
 ### Implicit rules:
 
@@ -72,53 +72,65 @@ all: plugin subplugins
 MAKEDEP = $(CXX) -MM -MG
 DEPFILE = .dependencies
 $(DEPFILE): Makefile
-	@$(MAKEDEP) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.cpp) $(TNTOBJ:%.o=%.cpp) > $@
+	@$(MAKEDEP) $(CXXFLAGS) $(DEFINES) $(INCLUDES) $(OBJS:%.o=%.cpp) $(TNTOBJ:%.o=%.cpp) > $@
 
 -include $(DEPFILE)
 
 ### Internationalization (I18N):
 
 PODIR     = po
-LOCALEDIR = $(VDRDIR)/locale
 I18Npo    = $(wildcard $(PODIR)/*.po)
-I18Nmsgs  = $(addprefix $(LOCALEDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
+I18Nmo    = $(addsuffix .mo, $(foreach file, $(I18Npo), $(basename $(file))))
+I18Nmsgs  = $(addprefix $(DESTDIR)$(LOCDIR)/, $(addsuffix /LC_MESSAGES/vdr-$(PLUGIN).mo, $(notdir $(foreach file, $(I18Npo), $(basename $(file))))))
 I18Npot   = $(PODIR)/$(PLUGIN).pot
 
 %.mo: %.po
 	msgfmt -c -o $@ $<
 
-$(I18Npot): $(PLUGIN).h $(OBJS:%.o=%.cpp)  $(TNTOBJ:%.o=%.cpp)
-	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ $^
+$(I18Npot): $(wildcard *.cpp)
+	xgettext -C -cTRANSLATORS --no-wrap --no-location -k -ktr -ktrNOOP --package-name=vdr-$(PLUGIN) --package-version=$(VERSION) --msgid-bugs-address='<see README>' -o $@ `ls $^`
 
 %.po: $(I18Npot)
-	msgmerge -U --no-wrap --no-location --backup=none -q $@ $<
+	msgmerge -U --no-wrap --no-location --backup=none -q -N $@ $<
 	@touch $@
 
-$(I18Nmsgs): $(LOCALEDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
-	@mkdir -p $(dir $@)
-	cp $< $@
+$(I18Nmsgs): $(DESTDIR)$(LOCDIR)/%/LC_MESSAGES/vdr-$(PLUGIN).mo: $(PODIR)/%.mo
+	install -D -m644 $< $@
 
 .PHONY: i18n
-i18n: $(I18Nmsgs) $(I18Npot)
+i18n: $(I18Nmo) $(I18Npot)
+
+install-i18n: $(I18Nmsgs)
+
+uninstall-i18n:
+	for lang in $(shell basename --multiple --suffix=.po $(shell ls po/*.po)); do rm -v $(DESTDIR)$(LOCDIR)/$$lang/LC_MESSAGES/vdr-$(PLUGIN).mo; done
 
 ### Targets:
 
-plugin: libvdr-$(PLUGIN).so i18n
-
-libvdr-$(PLUGIN).so: $(OBJS) $(TNTOBJ)
+$(SOFILE): $(OBJS) $(TNTOBJ)
 	$(CXX) $(CXXFLAGS) $(LDFLAGS) -rdynamic -shared $(OBJS) $(TNTOBJ) $(LIBS) -o $@
-	@cp --remove-destination $@ $(LIBDIR)/$@.$(APIVERSION)
 
-install: all
-	@mkdir -p $(VDRPLUGINLIBDIR)
-	@mkdir -p $(VDRCFGDIR)
-#	@mkdir -p $(VDRRESDIR)
-	install -m 755 -o root -g root $(PRESTRIP) $(LIBDIR)/libvdr-$(PLUGIN).so.$(APIVERSION) $(VDRPLUGINLIBDIR)
-	cp --remove-destination --recursive httpdocs $(VDRCFGDIR)
+install-lib: $(SOFILE)
+	install -m 755 -o root -g root $(PRESTRIP) -D $^ $(DESTDIR)$(LIBDIR)/$^.$(APIVERSION)
 
-uninstall:
-	rm --recursive $(VDRPLUGINLIBDIR)/libvdr-$(PLUGIN).so.$(APIVERSION)
-#	rm --recursive $(VDRCFGDIR)/httpdocs
+install-resources:
+	@mkdir -p $(DESTDIR)$(VDRRESDIR)
+	@cp --remove-destination --recursive httpdocs $(DESTDIR)$(VDRRESDIR)
+
+uninstall-resources:
+	rm --recursive $(DESTDIR)$(VDRRESDIR)
+
+install: install-lib install-resources install-subplugins install-i18n install-docs
+
+uninstall: uninstall-resources uninstall-subplugins uninstall-docs uninstall-i18n
+	rm --recursive $(DESTDIR)$(LIBDIR)/$(SOFILE).$(APIVERSION)
+
+install-docs:
+	@mkdir -p $(DESTDIR)$(INSDOCDIR)
+	@for doc in COPYING HISTORY INSTALL README; do cp $$doc $(DESTDIR)$(INSDOCDIR); done
+
+uninstall-docs:
+	rm --recursive $(DESTDIR)$(INSDOCDIR)
 
 dist: $(I18Npo) clean
 	@-rm -rf $(TMPDIR)/$(ARCHIVE)

@@ -16,6 +16,15 @@
 # Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA 02111-1307, USA.
 # Or, point your browser to http://www.gnu.org/copyleft/gpl.html
 
+#
+# when building locally in the VDR source tree ("LCLBLD=1 make plugins"),
+# we have to divert ROOTBUILDDIR for our subplugins
+ifdef LCLBLD
+SUBPLGDIR = $(LIBDIR)
+else
+SUBPLGDIR = $(ROOTBUILDDIR)
+endif
+
 ### Includes and Defines
 
 SINCLUDES += -I../../../include
@@ -44,7 +53,7 @@ $(DEPFILE): $(OBJS:%.o=%.cpp) $(wildcard *.h)
 LIBUPNP    = libupnp-$(shell echo $(TARGET) | awk '{print tolower($$0)}').so
 LIBUPNPVER = $(LIBUPNP).$(UPNPAPIVERSION)-$(APIVERSION)
 
-BUILDTARGETS = $(LIBDIR)/$(LIBUPNPVER)
+BUILDTARGETS = $(SUBPLGDIR)/$(LIBUPNPVER)
 
 _all: $(BUILDTARGETS)
 .PHONY: clean dist
@@ -55,14 +64,21 @@ _all: $(BUILDTARGETS)
 $(LIBUPNP): $(OBJS)
 	$(CXX) $(CXXFLAGS) -shared $(OBJS) $(LIBS) $(SHAREDLIBS) -o $@
 
-$(LIBDIR)/$(LIBUPNPVER): $(LIBUPNP)
+$(SUBPLGDIR)/$(LIBUPNPVER): $(LIBUPNP)
 	@cp -p $< $@
 
 _clean:
-	@-rm -f $(OBJS) $(CLEAN_RM) $(DEPFILE) $(LIBUPNP) $(LIBDIR)/$(LIBUPNPVER) core* *~
+	@-rm -f $(OBJS) $(CLEAN_RM) $(DEPFILE) $(LIBUPNP) $(SUBPLGDIR)/$(LIBUPNPVER) core* *~
 
-_install: all
-	install -m 755 -o root -g root $(PRESTRIP) $(LIBDIR)/$(LIBUPNPVER) $(VDRPLUGINLIBDIR)
+_install: all _install-docs
+	install -m 755 -o root -g root $(PRESTRIP) $(SUBPLGDIR)/$(LIBUPNPVER) $(DESTDIR)$(LIBDIR)
 
-_uninstall:
-	rm $(VDRPLUGINLIBDIR)/$(LIBUPNPVER)
+_uninstall: _uninstall-docs
+	rm $(DESTDIR)$(LIBDIR)/$(LIBUPNPVER)
+
+_install-docs:
+	@mkdir -p $(DESTDIR)$(INSDOCDIR)
+	@for doc in $(DOCS); do cp $$doc $(DESTDIR)$(INSDOCDIR)/$$doc.$(TARGET); done
+
+_uninstall-docs:
+	@for doc in $(DOCS); do rm $(DESTDIR)$(INSDOCDIR)/$$doc.$(TARGET); done

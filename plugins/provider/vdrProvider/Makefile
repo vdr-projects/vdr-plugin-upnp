@@ -9,6 +9,7 @@ CATEGORY  = Provider
 TARGET    = $(SUBPLUGIN)-$(CATEGORY)
 
 OBJS      = $(SUBPLUGIN)$(CATEGORY).o
+DOCS      = README
 
 
 ROOTBUILDDIR = ../../..
