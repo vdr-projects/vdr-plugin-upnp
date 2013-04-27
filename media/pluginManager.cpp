@@ -310,7 +310,7 @@ bool cUPnPResourceProvider::Seek(size_t offset, int origin){
 void cUPnPResourceProvider::Close(){
 }
 
-void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long int cUID, const string& target){
+void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long int cUID, const StringList& target){
   cMediaServer::GetInstance()->GetManager().OnContainerUpdate(uri, cUID, target);
 }
 

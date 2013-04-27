@@ -23,7 +23,7 @@ class cResourceStreamer;
 class cPluginManager;
 
 class cMediaManager : public cThread {
-  friend void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long updateID, const string& target = string());
+  friend void cUPnPResourceProvider::OnContainerUpdate(const string& uri, long updateID, const StringList& target = StringList());
 private:
 
   struct MediaRequest {
@@ -82,7 +82,7 @@ private:
 
   int CreateResponse(MediaRequest&, const string&, const string&);
 
-  void OnContainerUpdate(const string& uri, long updateID, const string& target);
+  void OnContainerUpdate(const string& uri, long updateID, const StringList& target);
   bool UpdateContainerUpdateId(const string& objectID, long updateID);
 
   bool ScanURI(const string& uri, cUPnPResourceProvider* provider);

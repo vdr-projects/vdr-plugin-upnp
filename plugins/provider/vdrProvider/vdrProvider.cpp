@@ -190,15 +190,12 @@ public:
 
     long now = 0;
     bool modified = false;
+    StringList targets;
 
     while(Running()){
 
       event = NULL;
       now = time(NULL);
-
-      if(!Channels.BeingEdited() && Channels.Modified() > 0){
-        modified = true;
-      }
 
       { // Reduce Scope of Schedules lock.
         cSchedulesLock lock;
@@ -216,9 +213,11 @@ public:
             // will be skipped.
             if(event->StartTime() > lastModified && event->StartTime() < now + SLEEP_TIMEOUT){
               modified = true;
+              targets.push_back(*event->ChannelID().ToString());
               break;
             }
           } else if(Schedule->Modified() > lastModified){
+            targets.push_back(*event->ChannelID().ToString());
             modified = true;
             break;
           }
@@ -227,7 +226,8 @@ public:
       }
 
       if(modified){
-        OnContainerUpdate(GetRootContainer(), now);
+        OnContainerUpdate(GetRootContainer(), now, targets);
+        targets.clear();
         modified = false;
         lastModified = now;
       }

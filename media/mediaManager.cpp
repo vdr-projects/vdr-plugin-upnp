@@ -133,7 +133,7 @@ IdList cMediaManager::GetContainerUpdateIDs(bool unevented){
   return list;
 }
 
-void cMediaManager::OnContainerUpdate(const string& uri, long updateID, const string& target){
+void cMediaManager::OnContainerUpdate(const string& uri, long updateID, const StringList& target){
   systemUpdateID = time(NULL);
 
   string objectID = tools::GenerateUUIDFromURL(uri);
@@ -144,15 +144,16 @@ void cMediaManager::OnContainerUpdate(const string& uri, long updateID, const st
   // does not exist. Therefore, we cannot scan this directory successfully.
   if(!UpdateContainerUpdateId(objectID, updateID)) return;
 
-  stringstream ss;
-
-  ss << uri;
-
-  if(!target.empty()){
-    ss << target;
+  if(target.empty()){
+    scanTargets.push_back(uri);
+  } else {
+    stringstream ss;
+    for(StringList::const_iterator it = target.begin(); it != target.end(); ++it){
+      ss.str();
+      ss << uri << *it;
+      scanTargets.push_back(ss.str());
+    }
   }
-
-  scanTargets.push_back(ss.str());
 
   // Start scanning for changed files.
   Start();

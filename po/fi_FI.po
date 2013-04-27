@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: vdr-upnp 1.0.0\n"
 "Report-Msgid-Bugs-To: <see README>\n"
-"POT-Creation-Date: 2013-01-03 09:22+0100\n"
+"POT-Creation-Date: 2013-04-21 11:57+0200\n"
 "PO-Revision-Date: 2012-10-31 10:31+0200\n"
 "Last-Translator: Rolf Ahrenberg\n"
 "Language-Team: Finnish <vdr@linuxtv.org>\n"
@@ -16,83 +16,77 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-msgid "UPnP/DLNA compliant Media Server functionality for VDR"
-msgstr "UPnP/DLNA-mediapalvelin VDR:lle"
+msgid "Enable UPnP server"
+msgstr "UPnP-palvelin"
 
-msgid ""
-"  The UPnP/DLNA server is designed to detect everything automatically.\n"
-"  Therefore the user is not required to change most of the settings.\n"
-"  \n"
-"  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
-"                                                where the the database\n"
-"                                                file shall be located.\n"
-"  -a <IP address>      --address=<IP address>   Binds the server to the\n"
-"                                                specific IP address.\n"
-"  -i <Interface>       --interface=<Interface>  Binds the server to the\n"
-"                                                specific network\n"
-"                                                interface.\n"
-"  -p <Port>            --port=<Port>            Sets the port where the\n"
-"                                                UPnP server shall listen\n"
-"                                                on."
+msgid "disabled"
+msgstr "ei käytössä"
+
+msgid "enabled"
+msgstr "käytössä"
+
+msgid "Use expert settings"
+msgstr "Näytä lisäasetukset"
+
+msgid "Webserver settings"
+msgstr "Web-palvelimen asetukset"
+
+msgid "Webserver root directory"
+msgstr "Web-palvelimen juurihakemisto"
+
+msgid "Webserver port (0=auto)"
+msgstr "Web-palvelimen portti (0=auto)"
+
+msgid "Max. request time in seconds (0=auto)"
 msgstr ""
 
-#, c-format
-msgid "There are %d requests active."
-msgstr ""
+msgid "Presentation URL"
+msgstr "Esitys-URL"
 
-msgid "Invalid action"
-msgstr ""
+msgid "Use \"live\" plugin for presentation"
+msgstr "Käytä \"live\"-laajennosta esityksiin"
 
-msgid "Invalid args"
-msgstr ""
+msgid "Live webserver port (0=auto)"
+msgstr "Live-laajennoksen portti (0=auto)"
 
-msgid "Invalid var"
-msgstr ""
+msgid "UPnP server settings"
+msgstr "UPnP-palvelimen asetukset"
 
-msgid "Action failed"
-msgstr ""
+msgid "Generate new device UUID"
+msgstr "Luo uusi UUID laitteelle"
 
-msgid "Argument value invalid"
-msgstr ""
+msgid "Current device UUID"
+msgstr "Nykyinen laitteen UUID"
 
-msgid "Argument value out of range"
-msgstr ""
+msgid "Max. content length of SOAP Messages"
+msgstr "SOAP-viestien suurin pituus"
 
-msgid "Optional action not implemented"
-msgstr ""
+msgid "Max. age of UPnP announcements"
+msgstr "UPnP-ilmoitusten suurin kestoaika"
 
-msgid "Out of memory"
-msgstr ""
+msgid "Bind UPnP server to "
+msgstr "Sido UPnP-palvelin"
 
-msgid "Human intervention required"
-msgstr ""
+msgid "interface"
+msgstr "sovittimeen"
 
-msgid "String argument to long"
-msgstr ""
+msgid "address"
+msgstr "osoitteeseen"
 
-msgid "Action not authorized"
-msgstr ""
+msgid "Set IP address"
+msgstr "Aseta IP-osoite"
 
-msgid "Signature failure"
-msgstr ""
+msgid "Set network interface"
+msgstr "Aseta verkkosovitin"
 
-msgid "Signature missing"
-msgstr ""
+msgid "UPnP server port (0=auto)"
+msgstr "UPnP-palvelimen portti (0=auto)"
 
-msgid "Not encrypted"
-msgstr ""
+msgid "Database settings"
+msgstr "Tietokanta-asetukset"
 
-msgid "Invalid sequence"
-msgstr ""
-
-msgid "Invalid control URL"
-msgstr ""
-
-msgid "No such session"
-msgstr ""
-
-msgid "Unknown error code. Contact the device manufacturer"
-msgstr ""
+msgid "Path to database file"
+msgstr "Tiedostopolku tietokannalle"
 
 msgid "Incompatible protocol info"
 msgstr ""
@@ -172,74 +166,80 @@ msgstr ""
 msgid "Transfer busy"
 msgstr ""
 
-msgid "Enable UPnP server"
-msgstr "UPnP-palvelin"
-
-msgid "disabled"
-msgstr "ei käytössä"
-
-msgid "enabled"
-msgstr "käytössä"
-
-msgid "Use expert settings"
-msgstr "Näytä lisäasetukset"
-
-msgid "Webserver settings"
-msgstr "Web-palvelimen asetukset"
-
-msgid "Webserver root directory"
-msgstr "Web-palvelimen juurihakemisto"
-
-msgid "Webserver port (0=auto)"
-msgstr "Web-palvelimen portti (0=auto)"
-
-msgid "Max. request time in seconds (0=auto)"
+msgid "Invalid action"
 msgstr ""
 
-msgid "Presentation URL"
-msgstr "Esitys-URL"
+msgid "Invalid args"
+msgstr ""
 
-msgid "Use \"live\" plugin for presentation"
-msgstr "Käytä \"live\"-laajennosta esityksiin"
+msgid "Invalid var"
+msgstr ""
 
-msgid "Live webserver port (0=auto)"
-msgstr "Live-laajennoksen portti (0=auto)"
+msgid "Action failed"
+msgstr ""
 
-msgid "UPnP server settings"
-msgstr "UPnP-palvelimen asetukset"
+msgid "Argument value invalid"
+msgstr ""
 
-msgid "Generate new device UUID"
-msgstr "Luo uusi UUID laitteelle"
+msgid "Argument value out of range"
+msgstr ""
 
-msgid "Current device UUID"
-msgstr "Nykyinen laitteen UUID"
+msgid "Optional action not implemented"
+msgstr ""
 
-msgid "Max. content length of SOAP Messages"
-msgstr "SOAP-viestien suurin pituus"
+msgid "Out of memory"
+msgstr ""
 
-msgid "Max. age of UPnP announcements"
-msgstr "UPnP-ilmoitusten suurin kestoaika"
+msgid "Human intervention required"
+msgstr ""
 
-msgid "Bind UPnP server to "
-msgstr "Sido UPnP-palvelin"
+msgid "String argument to long"
+msgstr ""
 
-msgid "interface"
-msgstr "sovittimeen"
+msgid "Action not authorized"
+msgstr ""
 
-msgid "address"
-msgstr "osoitteeseen"
+msgid "Signature failure"
+msgstr ""
 
-msgid "Set IP address"
-msgstr "Aseta IP-osoite"
+msgid "Signature missing"
+msgstr ""
 
-msgid "Set network interface"
-msgstr "Aseta verkkosovitin"
+msgid "Not encrypted"
+msgstr ""
 
-msgid "UPnP server port (0=auto)"
-msgstr "UPnP-palvelimen portti (0=auto)"
+msgid "Invalid sequence"
+msgstr ""
 
-msgid "Database settings"
-msgstr "Tietokanta-asetukset"
+msgid "Invalid control URL"
+msgstr ""
 
-msgid "Path to database file"
-msgstr "Tiedostopolku tietokannalle"
+msgid "No such session"
+msgstr ""
+
+msgid "Unknown error code. Contact the device manufacturer"
+msgstr ""
+
+msgid ""
+"  The UPnP/DLNA server is designed to detect everything automatically.\n"
+"  Therefore the user is not required to change most of the settings.\n"
+"  \n"
+"  -d <DB directory>    --db-dir=<DB directory>  Specifies the directory\n"
+"                                                where the the database\n"
+"                                                file shall be located.\n"
+"  -a <IP address>      --address=<IP address>   Binds the server to the\n"
+"                                                specific IP address.\n"
+"  -i <Interface>       --interface=<Interface>  Binds the server to the\n"
+"                                                specific network\n"
+"                                                interface.\n"
+"  -p <Port>            --port=<Port>            Sets the port where the\n"
+"                                                UPnP server shall listen\n"
+"                                                on."
+msgstr ""
+
+#, c-format
+msgid "There are %d requests active."
+msgstr ""
+
+msgid "UPnP/DLNA compliant Media Server functionality for VDR"
+msgstr "UPnP/DLNA-mediapalvelin VDR:lle"

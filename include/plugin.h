@@ -473,12 +473,12 @@ protected:
    *    - change of the parent container, where the file or container
    *      was moved to
    *
-   * The optional target must be an element inside the container
-   * specified in the URI. If the target is not empty, only this
-   * element will be checked for changes. Otherwise the full container
+   * The optional target list contains elements inside the container
+   * specified in the URI. If the target list is not empty, only those
+   * elements will be checked for changes. Otherwise the full container
    * is scanned.
    */
-  void OnContainerUpdate(const string& uri, long containerUpdateId, const string& target = string());
+  void OnContainerUpdate(const string& uri, long containerUpdateId, const StringList& target = StringList());
 
   /**
    * Load a configuration file.
