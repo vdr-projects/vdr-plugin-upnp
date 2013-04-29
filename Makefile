@@ -35,6 +35,7 @@ SOFILE = libvdr-$(PLUGIN).so
 TNTOBJ =	httptnt/deviceDescription.o \
 			httptnt/cds_scpd.o \
 			httptnt/cms_scpd.o \
+			httptnt/x_mrr_scpd.o \
 			httptnt/resourceStreamer.o
 
 OBJS = 	$(PLUGIN).o \
@@ -44,6 +45,7 @@ OBJS = 	$(PLUGIN).o \
 		server/service.o \
 		server/connectionManager.o \
 		server/contentDirectory.o \
+		server/mediaReceiverRegistrar.o \
 		common/config.o \
 		common/tools.o \
 		common/parser.o \

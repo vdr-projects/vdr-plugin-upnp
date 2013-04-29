@@ -10,7 +10,6 @@
 #include "../include/tools.h"
 #include "../include/media/mediaManager.h"
 #include <vdr/i18n.h>
-#include <upnp/upnptools.h>
 #include <string>
 #include <sstream>
 

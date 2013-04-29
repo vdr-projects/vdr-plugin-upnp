@@ -9,7 +9,6 @@
 #include "../include/media/mediaManager.h"
 #include "../include/server.h"
 #include <vdr/i18n.h>
-#include <upnp/upnptools.h>
 #include <sstream>
 
 namespace upnp {
