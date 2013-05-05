@@ -69,7 +69,7 @@ public:
 
   const cWebserver& GetWebserver() const { return *mWebserver; }
   cMediaManager& GetManager() const { return *mMediaManager; }
-  tntdb::Connection& GetDatabase() const { return mConnection; }
+  tntdb::Connection GetDatabase() const { return mConnection; }
 
   const string GetDeviceUUID() const { return string("uuid:") + mCurrentConfiguration.deviceUUID; }
 

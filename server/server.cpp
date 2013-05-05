@@ -248,8 +248,8 @@ bool cMediaServer::Initialize(){
 
   }
 
-  ss.str();
-  ss << "sqlite:" << mCurrentConfiguration.databaseDir.empty() << "/metadata.db";
+  ss.str(string());
+  ss << "sqlite:" << mCurrentConfiguration.databaseDir << "/metadata.db";
   try {
     mConnection = tntdb::connect(ss.str());
   } catch (const std::exception& e) {

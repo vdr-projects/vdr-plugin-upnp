@@ -14,6 +14,8 @@
 #include <list>
 #include <string>
 #include <stdint.h>
+#include <tntdb/connect.h>
+#include <tntdb/connection.h>
 
 namespace upnp {
 
