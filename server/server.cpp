@@ -64,6 +64,12 @@ cMediaServer::~cMediaServer(){
     delete mMediaManager;
     mMediaManager = NULL;
   }
+
+  try {
+    mConnection.execute("VACUUM");
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tFailed to vacuum database: '%s'", e.what());
+  }
 }
 
 bool cMediaServer::Start(){
@@ -210,6 +216,7 @@ bool cMediaServer::Initialize(){
 
   mWebserver = new cWebserver(GetServerIPAddress());
   mMediaManager = new cMediaManager();
+  stringstream ss;
 
   if(mCurrentConfiguration.expertSettings){
 
@@ -226,8 +233,6 @@ bool cMediaServer::Initialize(){
       if(!mCurrentConfiguration.presentationURL.empty())
         mWebserver->SetPresentationUrl(mCurrentConfiguration.presentationURL);
     } else {
-      stringstream ss;
-
       uint16_t port = mCurrentConfiguration.livePort ? mCurrentConfiguration.livePort : 8008;
 
       ss << "http://" << GetServerIPAddress() << ":" << port << "/";
@@ -241,8 +246,15 @@ bool cMediaServer::Initialize(){
     if(mCurrentConfiguration.maxRequestTime)
       mWebserver->SetMaxRequestTime(mCurrentConfiguration.maxRequestTime);
 
-    if(!mCurrentConfiguration.databaseDir.empty())
-      mMediaManager->SetDatabaseDir(mCurrentConfiguration.databaseDir);
+  }
+
+  ss.str();
+  ss << "sqlite:" << mCurrentConfiguration.databaseDir.empty() << "/metadata.db";
+  try {
+    mConnection = tntdb::connect(ss.str());
+  } catch (const std::exception& e) {
+    esyslog("UPnP\tException occurred while connecting to database '%s': %s", ss.str().c_str(), e.what());
+    return false;
   }
 
   ret = UpnpSetMaxContentLength(GetMaxContentLength());

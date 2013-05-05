@@ -217,7 +217,7 @@ public:
               break;
             }
           } else if(Schedule->Modified() > lastModified){
-            targets.push_back(*event->ChannelID().ToString());
+            targets.push_back(*Schedule->ChannelID().ToString());
             modified = true;
             break;
           }

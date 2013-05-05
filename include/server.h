@@ -12,6 +12,8 @@
 #include <map>
 #include <list>
 #include <upnp/upnp.h>
+#include <tntdb/connect.h>
+#include <tntdb/connection.h>
 #include "../include/config.h"
 
 using namespace std;
@@ -67,6 +69,7 @@ public:
 
   const cWebserver& GetWebserver() const { return *mWebserver; }
   cMediaManager& GetManager() const { return *mMediaManager; }
+  tntdb::Connection& GetDatabase() const { return mConnection; }
 
   const string GetDeviceUUID() const { return string("uuid:") + mCurrentConfiguration.deviceUUID; }
 
@@ -94,6 +97,7 @@ private:
 	Description         mServerDescription;
 	iconList            mServerIcons;
 	upnp::cConfig       mCurrentConfiguration;
+  tntdb::Connection   mConnection;
 	string              mConfigDirectory;
 	UpnpDevice_Handle   mDeviceHandle;
 	int                 mAnnounceMaxAge;

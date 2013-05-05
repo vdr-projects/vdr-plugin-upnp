@@ -14,8 +14,6 @@
 #include <list>
 #include <string>
 #include <stdint.h>
-#include <tntdb/connect.h>
-#include <tntdb/connection.h>
 
 namespace upnp {
 
@@ -57,8 +55,6 @@ public:
   cMediaManager();
   virtual ~cMediaManager();
 
-  void SetDatabaseDir(const string& file);
-
   bool Initialise();
   void Housekeeping();
 
@@ -94,7 +90,6 @@ private:
   uint32_t          systemUpdateID;
   IdList            eventedContainerUpdateIDs;
   StringList        scanTargets;
-  string            databaseFile;
   tntdb::Connection connection;
 
   upnp::cPluginManager* pluginManager;
