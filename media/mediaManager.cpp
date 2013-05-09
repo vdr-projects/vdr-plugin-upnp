@@ -622,13 +622,6 @@ bool cMediaManager::Initialise(){
 bool cMediaManager::CheckIntegrity(){
 
   try {
-    connection.execute("PRAGMA foreign_keys = ON");
-    connection.execute("PRAGMA page_size = 4096");
-    connection.execute("PRAGMA cache_size = 16384");
-    connection.execute("PRAGMA temp_store = MEMORY");
-    connection.execute("PRAGMA synchronous = NORMAL");
-    connection.execute("PRAGMA locking_mode = EXCLUSIVE");
-
     tntdb::Statement checkTable = connection.prepare(
             "SELECT name FROM sqlite_master WHERE type='table' AND name=:table;"
             );

@@ -215,7 +215,7 @@ bool cMediaServer::Initialize(){
   isyslog("UPnP\tInitialized UPnP media server on %s:%d", UpnpGetServerIpAddress(), UpnpGetServerPort());
 
   mWebserver = new cWebserver(GetServerIPAddress());
-  mMediaManager = new cMediaManager();
+
   stringstream ss;
 
   if(mCurrentConfiguration.expertSettings){
@@ -252,10 +252,21 @@ bool cMediaServer::Initialize(){
   ss << "sqlite:" << mCurrentConfiguration.databaseDir << "/metadata.db";
   try {
     mConnection = tntdb::connect(ss.str());
+
+    mConnection.execute("PRAGMA foreign_keys = ON");
+    mConnection.execute("PRAGMA page_size = 4096");
+    mConnection.execute("PRAGMA cache_size = 16384");
+    mConnection.execute("PRAGMA temp_store = MEMORY");
+    mConnection.execute("PRAGMA synchronous = NORMAL");
+    mConnection.execute("PRAGMA locking_mode = EXCLUSIVE");
+
+    isyslog("UPnP\tSuccessfully connected to %s.", ss.str().c_str());
   } catch (const std::exception& e) {
     esyslog("UPnP\tException occurred while connecting to database '%s': %s", ss.str().c_str(), e.what());
     return false;
   }
+
+  mMediaManager = new cMediaManager();
 
   ret = UpnpSetMaxContentLength(GetMaxContentLength());
 
